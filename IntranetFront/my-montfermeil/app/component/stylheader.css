@@ -1,0 +1,43 @@
+.Thebody {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    
+}
+
+.login-header {
+    background-color: #333;
+    color: #fff;
+    padding: 20px;
+    text-align: center;
+    height: 120px;
+}
+
+.login-form {
+    margin-top: 20px;
+    text-align: right; /* Aligne tout le contenu à droite */
+}
+
+.login-form input[type="text"],
+.login-form input[type="password"] {
+    width: 120px; /* plus petit */
+    padding: 5px;  /* réduit le padding */
+    margin: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    display: inline-block; /* pour s'assurer qu'ils restent en ligne si besoin */
+}
+
+.login-form button {
+    padding: 5px 10px; /* plus petit */
+    margin: 5px;
+    background-color: #1c87c9;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.login-form button:hover {
+    background-color: #0e002b;
+}
