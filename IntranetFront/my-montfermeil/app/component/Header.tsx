@@ -40,6 +40,8 @@ function Header({ isConnectd }: { isConnectd?: boolean }) {
 async function handleLogin() {
     const email = document.getElementById('Email') as HTMLInputElement;
     const password = document.getElementById('Pass') as HTMLInputElement;
+    const router = useRouter();
+    
     if (!email || !password) {
         console.error('Email or Password input not found');
         return false;
