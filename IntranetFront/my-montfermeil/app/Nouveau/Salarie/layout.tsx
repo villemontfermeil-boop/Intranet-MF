@@ -2,13 +2,13 @@
 
 
 
-function Header({ChildrenRoot} : {ChildrenRoot: React.ReactNode}) {
+function Header({children} : {children: React.ReactNode}) {
 
 
     return (
        <>
              
-                {ChildrenRoot}
+                {children}
 
       
         

@@ -28,7 +28,7 @@ public class SecurityConfig {
                     .requestMatchers("/salaries/login").permitAll()
                     
                     // ADMIN UNIQUEMENT
-                    .requestMatchers("/salaries/NewSalarie").authenticated()
+                    .requestMatchers("/salaries/NewSalarie").permitAll()
                     .requestMatchers("/salaries/{id}").permitAll()
 
                     // TOUT LE RESTE
