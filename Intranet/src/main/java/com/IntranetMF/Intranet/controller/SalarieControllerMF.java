@@ -54,15 +54,14 @@ public class SalarieControllerMF {
             @RequestParam Integer numero,
             @RequestParam String fonction,
             @RequestParam String password,
-            @RequestParam String localisation)
-    // @RequestHeader(value = "Authorization", required = false) String
-    // authorization)
-    {
+            @RequestParam String localisation,
+            @RequestHeader(value = "Authorization", required = false) String
+             authorization)
+         {
 
-        // if(authorization == null || !authorization.equals("Bearer adminMF-token")) {
-        // throw new RuntimeException("Unauthorized: Admin access required to create a
-        // new salarie.");
-        // }
+        if(authorization == null || !authorization.equals("Bearer adminMF-token")) {
+         throw new RuntimeException("Unauthorized: Admin access required to create a new salarie.");
+        }
         SalarieMF newSalarie = new SalarieMF();
         newSalarie.setNom(nom);
         newSalarie.setPrenom(prenom);

@@ -122,7 +122,7 @@ function Header({nom} : {nom:string | null}) {
 
         sessionStorage.clear();
         setClientConnected(false);
-        router.refresh();
+        router.push('/')
     }
 
     useEffect(() => {
