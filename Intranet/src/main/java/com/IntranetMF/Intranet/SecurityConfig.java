@@ -21,13 +21,20 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            .cors(Customizer.withDefaults()) // ✅ IMPORTANT
-            .csrf(csrf -> csrf.disable())
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/salaries/**").permitAll()
-                .anyRequest().authenticated()
-            )
-            .httpBasic(Customizer.withDefaults());
+                .cors(Customizer.withDefaults())
+                .csrf(csrf -> csrf.disable())
+                .authorizeHttpRequests(auth -> auth
+                    // PUBLIC
+                    .requestMatchers("/salaries/login").permitAll()
+                    
+                    // ADMIN UNIQUEMENT
+                    .requestMatchers("/salaries/NewSalarie").authenticated()
+                    .requestMatchers("/salaries/{id}").permitAll()
+
+                    // TOUT LE RESTE
+                    // .anyRequest().authenticated()
+                    )
+                .httpBasic(Customizer.withDefaults());
 
         return http.build();
     }

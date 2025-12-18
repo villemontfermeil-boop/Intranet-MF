@@ -6,7 +6,7 @@ function RootLayout({ children } : { children: React.ReactNode}) {
   return (
     <html lang="en">
       <body>
-        <Header isConnectd={localStorage.length > 0 ? true : false}/>
+        <Header nom={localStorage.length > 0 ? localStorage.getItem('prenom')+ ' '+ localStorage.getItem('nom'): null}/>
         {children}
       </body>
     </html>

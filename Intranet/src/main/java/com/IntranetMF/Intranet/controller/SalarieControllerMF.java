@@ -23,7 +23,6 @@ public class SalarieControllerMF {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
-    
 
     public final SalarieInterfacesMF salarieControllerMF;
 
@@ -40,7 +39,12 @@ public class SalarieControllerMF {
             throw new RuntimeException("Salarie not found with id: " + id);
         }
     }
-    
+
+    @GetMapping("/")
+    public Iterable<SalarieMF> getAllSalaries() {
+        return salarieControllerMF.findAll();
+    }
+
     @Transactional
     @PostMapping("/NewSalarie")
     public SalarieMF createSalarie(
@@ -50,23 +54,26 @@ public class SalarieControllerMF {
             @RequestParam Integer numero,
             @RequestParam String fonction,
             @RequestParam String password,
-            @RequestParam String localisation,
-            @RequestHeader(value = "Authorization", required = false) String authorization) {
+            @RequestParam String localisation)
+    // @RequestHeader(value = "Authorization", required = false) String
+    // authorization)
+    {
 
-                if(authorization == null || !authorization.equals("Bearer adminMF-token")) {
-                    throw new RuntimeException("Unauthorized: Admin access required to create a new salarie.");
-                }
+        // if(authorization == null || !authorization.equals("Bearer adminMF-token")) {
+        // throw new RuntimeException("Unauthorized: Admin access required to create a
+        // new salarie.");
+        // }
         SalarieMF newSalarie = new SalarieMF();
         newSalarie.setNom(nom);
         newSalarie.setPrenom(prenom);
         newSalarie.setMail(mail);
         newSalarie.setNumero(numero);
         newSalarie.setFonction(fonction);
-        
-        if(!checkingPassword(password).equals("OK")) {
+
+        if (!checkingPassword(password).equals("OK")) {
             throw new RuntimeException("Password validation failed: " + checkingPassword(password));
         }
-       
+
         String encodedPassword = passwordEncoder.encode(password);
         newSalarie.setPassword(encodedPassword);
         newSalarie.setIsAdmin(false);
@@ -83,9 +90,9 @@ public class SalarieControllerMF {
             @RequestParam String password,
             @RequestHeader(value = "Authorization", required = true) String authorization) {
 
-                if(authorization == null || !authorization.equals("Bearer intranetMF-token")) {
-                    throw new RuntimeException("Unauthorized: Valid token required to login.");
-                }
+        if (authorization == null || !authorization.equals("Bearer intranetMF-token")) {
+            throw new RuntimeException("Unauthorized: Valid token required to login.");
+        }
 
         var salarieOpt = salarieControllerMF.findByMail(mail);
         if (salarieOpt.isPresent()) {
@@ -109,9 +116,9 @@ public class SalarieControllerMF {
             @RequestParam String mail,
             @RequestHeader(value = "Authorization", required = true) String authorization) {
 
-                if(authorization == null || !authorization.equals("Bearer intranetMF-token")) {
-                    throw new RuntimeException("Unauthorized: Valid token required to logout.");
-                }
+        if (authorization == null || !authorization.equals("Bearer intranetMF-token")) {
+            throw new RuntimeException("Unauthorized: Valid token required to logout.");
+        }
         var salarieOpt = salarieControllerMF.findByMail(mail);
         if (salarieOpt.isPresent()) {
             SalarieMF salarie = salarieOpt.get();
@@ -125,30 +132,31 @@ public class SalarieControllerMF {
         }
     }
 
-
     /*
-    Cette méthode vérifie si le mot de passe respecte les critères de sécurité suivants :
-    - Au moins 8 caractères de long
-    - Contient au moins une lettre majuscule
-    - Contient au moins une lettre minuscule
-    - Contient au moins un chiffre
-    - Contient au moins un caractère spécial (!@#$%^&*())
-    */
+     * Cette méthode vérifie si le mot de passe respecte les critères de sécurité
+     * suivants :
+     * - Au moins 8 caractères de long
+     * - Contient au moins une lettre majuscule
+     * - Contient au moins une lettre minuscule
+     * - Contient au moins un chiffre
+     * - Contient au moins un caractère spécial (!@#$%^&*())
+     */
+
     public String checkingPassword(String password) {
-        if(password.length() < 8) {
-           return "Password must be at least 8 characters long.";
-        }else if(!password.matches(".*[A-Z].*")) {
+        if (password.length() < 8) {
+            return "Password must be at least 8 characters long.";
+        } else if (!password.matches(".*[A-Z].*")) {
             return "Password must contain at least one uppercase letter.";
-        }else if(!password.matches(".*[a-z].*")) {
+        } else if (!password.matches(".*[a-z].*")) {
             return "Password must contain at least one lowercase letter.";
-        }else if(!password.matches(".*\\d.*")) {
+        } else if (!password.matches(".*\\d.*")) {
             return "Password must contain at least one digit.";
-        } else if(!password.matches(".*[!@#$%^&*()].*")) {
+        } else if (!password.matches(".*[!@#$%^&*()].*")) {
             return "Password must contain at least one special character (!@#$%^&*()).";
-        }else {
+        } else {
             return "OK";
         }
- 
+
     }
 
 }
