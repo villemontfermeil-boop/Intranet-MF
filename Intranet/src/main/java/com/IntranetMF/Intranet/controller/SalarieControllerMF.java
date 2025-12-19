@@ -55,13 +55,11 @@ public class SalarieControllerMF {
             @RequestParam String fonction,
             @RequestParam String password,
             @RequestParam String localisation,
-            @RequestHeader(value = "Authorization", required = false) String
-             authorization)
-         {
+            @RequestHeader(value = "X-Admin-Token", required = false) String adminToken) {
 
-        if(authorization == null || !authorization.equals("Bearer adminMF-token")) {
-         throw new RuntimeException("Unauthorized: Admin access required to create a new salarie.");
-        }
+        // if (adminToken == null || !adminToken.equals("adminMF-token")){
+        //     throw new RuntimeException("Unauthorized: Admin access required to create a new salarie.");
+        // }
         SalarieMF newSalarie = new SalarieMF();
         newSalarie.setNom(nom);
         newSalarie.setPrenom(prenom);
@@ -112,12 +110,9 @@ public class SalarieControllerMF {
 
     @PostMapping("/logout")
     public SalarieMF logoutSalarie(
-            @RequestParam String mail,
-            @RequestHeader(value = "Authorization", required = true) String authorization) {
+            @RequestParam String mail) {
 
-        if (authorization == null || !authorization.equals("Bearer intranetMF-token")) {
-            throw new RuntimeException("Unauthorized: Valid token required to logout.");
-        }
+       
         var salarieOpt = salarieControllerMF.findByMail(mail);
         if (salarieOpt.isPresent()) {
             SalarieMF salarie = salarieOpt.get();
