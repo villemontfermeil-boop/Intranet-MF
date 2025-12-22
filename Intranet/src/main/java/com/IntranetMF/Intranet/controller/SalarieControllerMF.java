@@ -1,6 +1,7 @@
 package com.IntranetMF.Intranet.controller;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -44,6 +45,18 @@ public class SalarieControllerMF {
     public Iterable<SalarieMF> getAllSalaries() {
         return salarieControllerMF.findAll();
     }
+
+    @GetMapping("/Salarie/{nom}")
+    public List<SalarieMF> findSalarierbymail(@PathVariable String nom){
+        List<SalarieMF>salarie =  salarieControllerMF.findByNomContainingIgnoreCase(nom);
+
+        if(!salarie.isEmpty())
+            return salarie;
+        else{
+            throw new RuntimeException("Aucun nom" + nom);
+        }
+
+    } 
 
     @Transactional
     @PostMapping("/NewSalarie")

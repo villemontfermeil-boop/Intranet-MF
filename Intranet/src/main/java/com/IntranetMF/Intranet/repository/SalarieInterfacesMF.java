@@ -15,5 +15,6 @@ public interface SalarieInterfacesMF extends JpaRepository<SalarieMF, Long> {
     Optional<SalarieMF> findByMail(String mail);
     List<SalarieMF> findByLocalisation(Localisation localisation);
     List<SalarieMF> findByFonction(String fonction);
+     List<SalarieMF> findByNomContainingIgnoreCase(String nomPartiel);
 
 }

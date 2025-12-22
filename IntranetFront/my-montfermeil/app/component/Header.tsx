@@ -4,6 +4,8 @@ import './stylheader.css';
 import { useRouter } from 'next/navigation';
 import { Console } from 'console';
 
+//AJOUTER UN NOMBRE DE TENTATIVE DE CONNEXION
+
 function Header({nom} : {nom:string | null}) {
     const [clicked, setClicked] = useState(false);
     const [clickedOUT, setClickedOUT] = useState(false);
@@ -87,16 +89,18 @@ function Header({nom} : {nom:string | null}) {
             sessionStorage.setItem('isAdmin', data.isAdmin);
             sessionStorage.setItem('isConnected', 'true');
             sessionStorage.setItem('numero', data.numero);
+            sessionStorage.setItem('MDP', password.value);
 
             setClientConnected(true);
             router.refresh();
+            alert(`Bienvenue ${data.nom} ${data.prenom}`)
             console.log('Login successful', data);
-            console.log('data',nom)
+            console.log('data',sessionStorage)
                 
                 
             return true;
         } catch (error) {
-            console.error('Login error:', error);
+            alert('Email invalide ou mot de passe incorrecte')
             return false;
         }
     }
@@ -105,12 +109,14 @@ function Header({nom} : {nom:string | null}) {
        LOGOUT BOUTON
        ========================= */
     async function handleLogout() {
+
+        const credential = btoa(`${sessionStorage.getItem('mail')}:${sessionStorage.getItem('MDP')}`);
         try {
             await fetch('http://localhost:8080/salaries/logout', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
-                    'Authorization': 'Bearer intranetMF-token'
+                    'Authorization': `Basic ${credential}`
                 },
                 body: new URLSearchParams({
                     mail: sessionStorage.getItem('mail') || ''
@@ -119,6 +125,7 @@ function Header({nom} : {nom:string | null}) {
         } catch (e) {
             console.error('Logout error:', e);
         }
+            console.log(sessionStorage.getItem('mail'));
 
         sessionStorage.clear();
         setClientConnected(false);
@@ -153,6 +160,7 @@ function Header({nom} : {nom:string | null}) {
                                 Logout
                             </button>
                             {admin && <button type="button" onClick={() => router.push('/Nouveau/Salarie')}>Admin Panel</button>}
+                            {admin && <button type="button" onClick={() => router.push('/Modifier/Salarie')}>Modifier un salarié</button>}
                         </>
                     ) : (
                         <>
