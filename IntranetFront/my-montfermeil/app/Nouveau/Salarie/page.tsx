@@ -4,11 +4,14 @@
 import { useEffect, useState } from "react";
 import '@/app/Nouveau/Salarie/style.css'
 
+import { useRouter } from "next/navigation";
 
 
 function AdminPanel() {
 
     const [isAdmin, setIsadmin] = useState<boolean>(false)
+    const router = useRouter();
+
     const [newSalarie, setNewSalarie] = useState({
         nom: '',
         prenom: '',
@@ -34,28 +37,47 @@ function AdminPanel() {
         // if(newSalarie.password.length<8  ){
 
         // }
-        
-       try {
+
+        try {
+            const idnetifiantAdmin = sessionStorage.getItem("mail");
+            const passwordAdmin = sessionStorage.getItem("MDP");
+            const credential = btoa(`${idnetifiantAdmin}:${passwordAdmin}`)
+
+            //zone a supprimer en prod
+
+            console.log("Credential", sessionStorage);
+            console.log("Data", newSalarie);
+
+            //
             const response = await fetch("http://localhost:8080/salaries/NewSalarie", {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
-                    'Authorization': 'Bearer adminMF-token'
+                    'Authorization': `Basic ${credential}`
                 },
                 body: new URLSearchParams({
                     nom: newSalarie.nom,
                     prenom: newSalarie.prenom,
                     mail: newSalarie.email,
-                    numero: newSalarie.numero,
+                    numero: String(newSalarie.numero),
                     fonction: newSalarie.fonction,
                     password: newSalarie.password,
-                    localisation: newSalarie.localisation
+                    localisation: newSalarie.localisation || 'NON_DEFINI'
                 })
-            });
-    }catch(error){
 
+
+            }
+            );
+            console.log(response);
+            console.log("Headers:", Object.fromEntries(response.headers.entries()));
+            alert(`${newSalarie.nom} ${newSalarie.prenom} à été ajouter`)
+            router.push('/')
+        } catch (error) {
+            console.log(error);
+
+
+        }
     }
-}
 
     if (isAdmin == true) {
         return (
@@ -116,7 +138,7 @@ function AdminPanel() {
                             required
                         />
 
-                        <select name="Localisation">
+                        <select name="localisation" value={newSalarie.localisation || 'NON_DEFINI'} onChange={handleChange}>
                             <option value="NON_DEFINI">NON_DEFINI</option>
                             <option value="COMMUNICATION">COMMUNICATION</option>
                             <option value="CABINET_DU_MAIRE">CABINET_DU_MAIRE</option>

@@ -40,6 +40,7 @@ public class SecurityConfig {
                 // USER & ADMIN
                 .requestMatchers("/salaries/{id}").hasAnyRole("USER", "ADMIN")
                 .requestMatchers("/salaries/logout").authenticated()
+                .requestMatchers("/Salarie/{email}").authenticated()
                 
                 .anyRequest().authenticated()
             )
