@@ -70,8 +70,10 @@ function ModifierSalarie() {
                             <tr style={{ backgroundColor: '#f2f2f2' }}>
                                 <th style={{ padding: '10px' }}>Nom</th>
                                 <th style={{ padding: '10px' }}>Prénom</th>
+                                <th style={{ padding: '10px' }}>Téléphone</th>
                                 <th style={{ padding: '10px' }}>Email</th>
-                                <th style={{ padding: '10px' }}>Poste</th>
+                                <th style={{ padding: '10px' }}>Fonction</th>
+                                <th style={{ padding: '10px' }}>Localisation</th>
                                 {sessionStorage.getItem("isAdmin") && <th style={{ padding: '10px' }}>Modifier</th>}
                                 
                             </tr>
@@ -81,9 +83,11 @@ function ModifierSalarie() {
                                 <tr key={index}>
                                     <td style={{ padding: '10px' }}>{person.nom || 'N/A'}</td>
                                     <td style={{ padding: '10px' }}>{person.prenom || 'N/A'}</td>
+                                    <td style={{ padding: '10px' }}>{person.numero || 'N/A'}</td>
                                     <td style={{ padding: '10px' }}>{person.mail || 'N/A'}</td>
+                                    <td style={{ padding: '10px' }}>{person.fonction || 'N/A'}</td>
                                     <td style={{ padding: '10px' }}>{person.localisation || 'N/A'}</td>
-                                    {sessionStorage.getItem("isAdmin") && <button id={index.toString()} onClick={(event) => routeur.push("")} style={{width: "100%", height: "100px"}}>Modifier</button>}
+                                    {sessionStorage.getItem("isAdmin") && <button id={index.toString()} onClick={() => routeur.push(`/Modifier/${person.id}`)} style={{width: "100%", height: "100px"}}>Modifier</button>}
                                 </tr>
                             ))}
                         </tbody>
