@@ -148,7 +148,7 @@ function Header({nom} : {nom:string | null}) {
 
     return (
         <div className="Thebody">
-                <img src="/logo.png" className='styleLogo'/>
+                <img src="/logo.png" onClick={() => router.push('/')} className='styleLogo'/>
 
             <header className="login-header">
                 
@@ -160,7 +160,7 @@ function Header({nom} : {nom:string | null}) {
                                 Logout
                             </button>
                             {admin && <button type="button" onClick={() => router.push('/Nouveau/Salarie')}>Admin Panel</button>}
-                            {admin && <button type="button" onClick={() => router.push('/Modifier/Salarie')}>Modifier un salarié</button>}
+                            {admin && <button type="button" onClick={() => router.push('/Modifier/Salarie')}>Les salarié</button>}
                         </>
                     ) : (
                         <>

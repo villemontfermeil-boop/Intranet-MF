@@ -18,6 +18,7 @@ function AdminPanel() {
         email: '',
         password: '',
         numero: '',
+        telpro: '',
         localisation: '',
         fonction: 'NON_DEFINI'
     })
@@ -60,6 +61,7 @@ function AdminPanel() {
                     prenom: newSalarie.prenom,
                     mail: newSalarie.email,
                     numero: String(newSalarie.numero),
+                    numeroPro: String(newSalarie.telpro),
                     fonction: newSalarie.fonction,
                     password: newSalarie.password,
                     localisation: newSalarie.localisation || 'NON_DEFINI'
@@ -118,6 +120,14 @@ function AdminPanel() {
                             name="numero"
                             placeholder="numero"
                             value={newSalarie.numero}
+                            onChange={handleChange}
+                            required
+                        />
+                        <input
+                            type="numero"
+                            name="telpro"
+                            placeholder="Téléphone pro"
+                            value={newSalarie.telpro}
                             onChange={handleChange}
                             required
                         />

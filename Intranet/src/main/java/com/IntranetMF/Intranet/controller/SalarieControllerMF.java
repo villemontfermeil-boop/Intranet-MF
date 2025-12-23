@@ -49,14 +49,28 @@ public class SalarieControllerMF {
 
     @GetMapping("/Salarie/{nom}")
     public List<SalarieMF> findSalarierbymail(@PathVariable String nom) {
-        List<SalarieMF> salarie = salarieControllerMF.findByNomContainingIgnoreCase(nom);
 
-        if (!salarie.isEmpty())
-            return salarie;
-        else {
-            throw new RuntimeException("Aucun nom" + nom);
+        String[] coupage = nom.trim().split("\\s+"); // Séparer en mots
+
+        List<SalarieMF> salarie;
+
+        if (coupage.length >= 2) {
+            String prenom = coupage[0];
+            String nomFamille = coupage[1];
+            // Recherche par prénom ET nom
+            salarie = salarieControllerMF.findByPrenomContainingIgnoreCaseAndNomContainingIgnoreCase(prenom,
+                    nomFamille);
+        } else {
+            // Si un seul mot, recherche sur prénom OU nom
+            String mot = coupage[0];
+            salarie = salarieControllerMF.findByPrenomContainingIgnoreCaseOrNomContainingIgnoreCase(mot, mot);
         }
 
+        if (!salarie.isEmpty()) {
+            return salarie;
+        } else {
+            throw new RuntimeException("Aucun salarié trouvé pour : " + nom);
+        }
     }
 
     @PatchMapping("/Modification/Salarie/{id}")
@@ -66,25 +80,26 @@ public class SalarieControllerMF {
             @RequestParam String prenom,
             @RequestParam String mail,
             @RequestParam Integer numero,
+            @RequestParam Integer numeroPro,
             @RequestParam String fonction,
-            @RequestParam String localisation ){
+            @RequestParam String localisation) {
 
-                var salarier = salarieControllerMF.findById(id);
-                if(salarier.isPresent()){
-                    SalarieMF newSalarie = new SalarieMF();
-                     newSalarie.setNom(nom);
-                     newSalarie.setPrenom(nom);
-                     newSalarie.setMail(mail);
-                     newSalarie.setNumero(numero);
-                     newSalarie.setFonction(fonction);
-                     newSalarie.setLocalisation(com.IntranetMF.Intranet.modele.LocalisationEnumMF.Localisation.valueOf(localisation));
-                       salarieControllerMF.save(newSalarie);
-                     return newSalarie;
-                    }else{
-                         throw new RuntimeException("Aucun salarier de cette id: : " + id);
-                    }
-
-            }
+        var salarierOpt = salarieControllerMF.findById(id);
+        if (salarierOpt.isPresent()) {
+            SalarieMF salarier = salarierOpt.get(); // on prend l'objet existant
+            salarier.setNom(nom);
+            salarier.setPrenom(prenom); // ici on met bien le prénom
+            salarier.setMail(mail);
+            salarier.setNumero(numero);
+            salarier.setTelPro(numeroPro);
+            salarier.setFonction(fonction);
+            salarier.setLocalisation(
+                    com.IntranetMF.Intranet.modele.LocalisationEnumMF.Localisation.valueOf(localisation));
+            return salarieControllerMF.save(salarier); // sauvegarde de l'objet existant modifié
+        } else {
+            throw new RuntimeException("Aucun salarié trouvé pour cet ID: " + id);
+        }
+    }
 
     @Transactional
     @PostMapping("/NewSalarie")
@@ -93,6 +108,7 @@ public class SalarieControllerMF {
             @RequestParam String prenom,
             @RequestParam String mail,
             @RequestParam Integer numero,
+            @RequestParam Integer numeroPro,
             @RequestParam String fonction,
             @RequestParam String password,
             @RequestParam String localisation,
@@ -106,6 +122,7 @@ public class SalarieControllerMF {
         newSalarie.setNom(nom);
         newSalarie.setPrenom(prenom);
         newSalarie.setMail(mail);
+        newSalarie.setTelPro(numeroPro);
         newSalarie.setNumero(numero);
         newSalarie.setFonction(fonction);
 

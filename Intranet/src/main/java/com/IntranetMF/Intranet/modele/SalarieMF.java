@@ -1,18 +1,17 @@
 package com.IntranetMF.Intranet.modele;
-import jakarta.persistence.Table;
-import lombok.NoArgsConstructor;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.Id;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-
 import java.time.LocalDateTime;
 
 import com.IntranetMF.Intranet.modele.LocalisationEnumMF.Localisation;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name= "Salarie_MF")
@@ -30,12 +29,14 @@ public class SalarieMF {
     @Column(name= "PRENOM_MF")
     private String prenom;
 
-
     @Column(name= "EMAIL_MF")
     private String mail;
     
     @Column(name= "TELEPHONE_MF")
     private Integer numero;
+
+    @Column(name= "TELEPHONE_PRO")
+    private Integer numeroPro;
 
     @Column(name= "FONCTION_MF")
     private String fonction;
@@ -102,6 +103,10 @@ public class SalarieMF {
         return isAdmin;
     }
 
+    public Integer getTelephonepro(){
+        return numeroPro;
+    }
+
 
 
 
@@ -142,6 +147,9 @@ public class SalarieMF {
     }
     public void setIsAdmin(Boolean isAdmin) {
         this.isAdmin = isAdmin;
+    }
+    public void setTelPro(Integer tel){
+        this.numeroPro = tel;
     }
     
 

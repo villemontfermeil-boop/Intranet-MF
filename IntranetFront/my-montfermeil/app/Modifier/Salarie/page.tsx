@@ -13,13 +13,13 @@ function ModifierSalarie() {
     const routeur = useRouter();
 
 
-    async function LookingForName(name: string ) {
+    async function LookingForName(name: string) {
 
         const identifiant = sessionStorage.getItem("mail")
         const password = sessionStorage.getItem("MDP")
 
         const credential = btoa(`${identifiant}:${password}`)
-        console.log(identifiant ,password  )
+        console.log(identifiant, password)
         try {
             const response = await fetch(`http://localhost:8080/salaries/Salarie/${encodeURIComponent(name)}`, {
                 method: "GET",
@@ -33,34 +33,40 @@ function ModifierSalarie() {
             const data = await response.json();
             Setpeople(data);
 
+
+
         } catch (error) {
             console.log(error)
-            
+
         }
     }
     useEffect(() => {
 
-        LookingForName(search);
+        if (search.trim() !== "") {   
+            LookingForName(search);
+        } else {
+            Setpeople([]);            
+                }
     }, [search])
 
     function handlechange({ e }: { e: string }) {
         SetSearch(e)
     }
-    {console.log(pepole)}
-     return (
+    { console.log(pepole) }
+    return (
         <div style={{ padding: '20px' }}>
-            <input 
-                type="text" 
+            <input
+                type="text"
                 value={search}
-                onChange={(e) => SetSearch(e.target.value)} 
+                onChange={(e) => SetSearch(e.target.value)}
                 placeholder="Rechercher un salarié par nom..."
-                style={{ 
-                    padding: '10px', 
+                style={{
+                    padding: '10px',
                     width: '300px',
                     marginBottom: '20px'
                 }}
             />
-            
+
             {/* Affichage des résultats */}
             <div>
                 <h3>Résultats ({pepole.length})</h3>
@@ -71,11 +77,12 @@ function ModifierSalarie() {
                                 <th style={{ padding: '10px' }}>Nom</th>
                                 <th style={{ padding: '10px' }}>Prénom</th>
                                 <th style={{ padding: '10px' }}>Téléphone</th>
+                                <th style={{ padding: '10px' }}>Téléphone Profésionnelle</th>
                                 <th style={{ padding: '10px' }}>Email</th>
                                 <th style={{ padding: '10px' }}>Fonction</th>
                                 <th style={{ padding: '10px' }}>Localisation</th>
                                 {sessionStorage.getItem("isAdmin") && <th style={{ padding: '10px' }}>Modifier</th>}
-                                
+
                             </tr>
                         </thead>
                         <tbody>
@@ -84,10 +91,11 @@ function ModifierSalarie() {
                                     <td style={{ padding: '10px' }}>{person.nom || 'N/A'}</td>
                                     <td style={{ padding: '10px' }}>{person.prenom || 'N/A'}</td>
                                     <td style={{ padding: '10px' }}>{person.numero || 'N/A'}</td>
+                                    <td style={{ padding: '10px' }}>{person.telephonepro || 'N/A'}</td>
                                     <td style={{ padding: '10px' }}>{person.mail || 'N/A'}</td>
                                     <td style={{ padding: '10px' }}>{person.fonction || 'N/A'}</td>
                                     <td style={{ padding: '10px' }}>{person.localisation || 'N/A'}</td>
-                                    {sessionStorage.getItem("isAdmin") && <button id={index.toString()} onClick={() => routeur.push(`/Modifier/${person.id}`)} style={{width: "100%", height: "100px"}}>Modifier</button>}
+                                    {sessionStorage.getItem("isAdmin") && <button id={index.toString()} onClick={() => routeur.push(`/Modifier/${person.id}`)} style={{ width: "100%", height: "100px" }}>Modifier</button>}
                                 </tr>
                             ))}
                         </tbody>
