@@ -41,6 +41,7 @@ public class SecurityConfig {
                 .requestMatchers("/salaries/{id}").hasAnyRole("USER", "ADMIN")
                 .requestMatchers("/salaries/logout").authenticated()
                 .requestMatchers("/Salarie/{email}").authenticated()
+                .requestMatchers("/Modification/Salarie/{id}").hasRole("ADMIN")
                 
                 .anyRequest().authenticated()
             )
@@ -70,7 +71,7 @@ public class SecurityConfig {
         config.setAllowedOrigins(List.of("http://localhost:3000","http://127.0.0.1:3000",
         "http://localhost:3001",
         "http://localhost"));
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH","DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);
         
