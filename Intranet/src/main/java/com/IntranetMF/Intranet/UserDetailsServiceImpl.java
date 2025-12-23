@@ -4,7 +4,6 @@ import com.IntranetMF.Intranet.repository.SalarieInterfacesMF;
 import org.springframework.stereotype.Service;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.context.annotation.Configuration;
 import java.util.ArrayList;
 import org.springframework.context.annotation.Bean;
 import java.util.List;
