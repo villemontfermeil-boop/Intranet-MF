@@ -8,6 +8,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -47,16 +48,43 @@ public class SalarieControllerMF {
     }
 
     @GetMapping("/Salarie/{nom}")
-    public List<SalarieMF> findSalarierbymail(@PathVariable String nom){
-        List<SalarieMF>salarie =  salarieControllerMF.findByNomContainingIgnoreCase(nom);
+    public List<SalarieMF> findSalarierbymail(@PathVariable String nom) {
+        List<SalarieMF> salarie = salarieControllerMF.findByNomContainingIgnoreCase(nom);
 
-        if(!salarie.isEmpty())
+        if (!salarie.isEmpty())
             return salarie;
-        else{
+        else {
             throw new RuntimeException("Aucun nom" + nom);
         }
 
-    } 
+    }
+
+    @PatchMapping("/Modification/Salarie/{id}")
+    public SalarieMF ModifyASalarier(
+            @PathVariable Long id,
+            @RequestParam String nom,
+            @RequestParam String prenom,
+            @RequestParam String mail,
+            @RequestParam Integer numero,
+            @RequestParam String fonction,
+            @RequestParam String localisation ){
+
+                var salarier = salarieControllerMF.findById(id);
+                if(salarier.isPresent()){
+                    SalarieMF newSalarie = new SalarieMF();
+                     newSalarie.setNom(nom);
+                     newSalarie.setPrenom(nom);
+                     newSalarie.setMail(mail);
+                     newSalarie.setNumero(numero);
+                     newSalarie.setFonction(fonction);
+                     newSalarie.setLocalisation(com.IntranetMF.Intranet.modele.LocalisationEnumMF.Localisation.valueOf(localisation));
+                       salarieControllerMF.save(newSalarie);
+                     return newSalarie;
+                    }else{
+                         throw new RuntimeException("Aucun salarier de cette id: : " + id);
+                    }
+
+            }
 
     @Transactional
     @PostMapping("/NewSalarie")
@@ -71,7 +99,8 @@ public class SalarieControllerMF {
             @RequestHeader(value = "X-Admin-Token", required = false) String adminToken) {
 
         // if (adminToken == null || !adminToken.equals("adminMF-token")){
-        //     throw new RuntimeException("Unauthorized: Admin access required to create a new salarie.");
+        // throw new RuntimeException("Unauthorized: Admin access required to create a
+        // new salarie.");
         // }
         SalarieMF newSalarie = new SalarieMF();
         newSalarie.setNom(nom);
@@ -125,7 +154,6 @@ public class SalarieControllerMF {
     public SalarieMF logoutSalarie(
             @RequestParam String mail) {
 
-       
         var salarieOpt = salarieControllerMF.findByMail(mail);
         if (salarieOpt.isPresent()) {
             SalarieMF salarie = salarieOpt.get();
