@@ -19,6 +19,7 @@ function SalarieModification() {
         nom: '',
         prenom: '',
         tele: '',
+        telepro: '',
         mail: '',
         fonction: '',
         localisation: ''
@@ -39,6 +40,7 @@ function SalarieModification() {
                 nom: result.nom ?? '',
                 prenom: result.prenom ?? '',
                 tele: result.numero ?? '',
+                telepro: result.numeroPro ?? '',
                 mail: result.mail ?? '',
                 fonction: result.fonction ?? '',
                 localisation: result.localisation ?? 'NON_DEFINI'
@@ -49,31 +51,49 @@ function SalarieModification() {
         }
     }
 
-    async function SendData(fonction: string, nomP: string, prenomP: string, emailP: string, telephoneportableP: string, localisationH: string) {
-        try {
-
-            const send = fetch(`http://localhost:8080/salaries/Modification/Salarie/${id}`, {
+    async function SendData(
+    fonction: string, 
+    nomP: string, 
+    prenomP: string, 
+    emailP: string, 
+    telephoneportableP: string, 
+    localisationH: string, 
+    telpro: string
+) {
+    try {
+        const response = await fetch(
+            `http://localhost:8080/salaries/Modification/Salarie/${id}`,
+            {
                 method: "PATCH",
-                headers: { 'Authorization': `Basic ${credential}` },
+                headers: {
+                    "Authorization": `Basic ${credential}`,
+                    "Content-Type": "application/x-www-form-urlencoded"
+                },
                 body: new URLSearchParams({
                     nom: nomP,
                     prenom: prenomP,
                     mail: emailP,
                     numero: telephoneportableP,
+                    numeroPro: telpro,
                     fonction: fonction,
-                    localisation: localisationH || 'NON_DEFINI'
-                })
-            })
-            // alert('Modification éffectuer avec succès')
-            // router.push('/')
-            console.log(send)
-        } catch (error) {
+                    localisation: localisationH || "NON_DEFINI"
+                }).toString()
+            }
+        );
 
-            console.log(error)
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`Erreur lors de la modification : ${errorText}`);
         }
 
-
+        const result = await response.json();
+        console.log("Modification réussie :", result);
+        // Redirection si tu veux
+        // router.push("/");
+    } catch (error) {
+        console.error(error);
     }
+}
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         SetPersonne({ ...personne, [e.target.name]: e.target.value });
     };
@@ -87,7 +107,7 @@ function SalarieModification() {
 
     useEffect(() => {
         if (button) {
-            SendData(personne.fonction, personne.nom, personne.prenom, personne.mail, personne.tele, personne.localisation);
+            SendData(personne.fonction, personne.nom, personne.prenom, personne.mail, personne.tele, personne.localisation, personne.telepro);
             setButton(false);
         }
     }, [button])
@@ -156,8 +176,22 @@ function SalarieModification() {
                             <td>
                                 <input
                                     name="tele"
-                                    type="number"
+                                    type="text"
+                                    pattern='[0-9]{*,10}'
                                     value={personne.tele}
+                                    onChange={handleChange}
+                                    required
+                                />
+                            </td>
+                        </tr>
+                            <tr>
+                            <th>TéléphonePro</th>
+                            <td>
+                                <input
+                                    name="telepro"
+                                    type="text"
+                                    pattern='[0-9]{*,10}'
+                                    value={personne.telepro}
                                     onChange={handleChange}
                                     required
                                 />
