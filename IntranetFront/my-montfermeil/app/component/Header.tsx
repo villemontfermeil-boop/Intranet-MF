@@ -6,13 +6,13 @@ import { Console } from 'console';
 
 //AJOUTER UN NOMBRE DE TENTATIVE DE CONNEXION
 
-function Header({nom} : {nom:string | null}) {
+function Header({ nom }: { nom: string | null }) {
     const [clicked, setClicked] = useState(false);
     const [clickedOUT, setClickedOUT] = useState(false);
     const [clientConnected, setClientConnected] = useState(false);
     const admin = sessionStorage.getItem('isAdmin') === 'true';
     const router = useRouter();
-   
+
 
     // Use sessionStorage so the user stays logged on refresh but is cleared on tab close.
     useEffect(() => {
@@ -95,9 +95,9 @@ function Header({nom} : {nom:string | null}) {
             router.refresh();
             alert(`Bienvenue ${data.nom} ${data.prenom}`)
             console.log('Login successful', data);
-            console.log('data',sessionStorage)
-                
-                
+            console.log('data', sessionStorage)
+
+
             return true;
         } catch (error) {
             alert('Email invalide ou mot de passe incorrecte')
@@ -125,7 +125,7 @@ function Header({nom} : {nom:string | null}) {
         } catch (e) {
             console.error('Logout error:', e);
         }
-            console.log(sessionStorage.getItem('mail'));
+        console.log(sessionStorage.getItem('mail'));
 
         sessionStorage.clear();
         setClientConnected(false);
@@ -148,19 +148,19 @@ function Header({nom} : {nom:string | null}) {
 
     return (
         <div className="Thebody">
-                <img src="/logo.png" onClick={() => router.push('/')} className='styleLogo'/>
+            <img src="/logo.png" onClick={() => router.push('/')} className='styleLogo' />
 
             <header className="login-header">
-                
-                <form className="login-form">
 
+                <form className="login-form">
+                    <button type="button" onClick={() => router.push('/Application')} style={{ float: "left" }}>Application</button>
                     {clientConnected ? (
                         <>
                             <button type="button" onClick={() => setClickedOUT(true)}>
                                 Logout
                             </button>
                             {admin && <button type="button" onClick={() => router.push('/Nouveau/Salarie')}>Admin Panel</button>}
-                            {admin && <button type="button" onClick={() => router.push('/Modifier/Salarie')}>Les salarié</button>}
+                            <button type="button" onClick={() => router.push('/Annuaire/Salarie')}>Les salarié</button>
                         </>
                     ) : (
                         <>
@@ -169,7 +169,7 @@ function Header({nom} : {nom:string | null}) {
                             <button type="button" onClick={() => setClicked(true)}>
                                 Login
                             </button>
-                            <button type="button">Sign Up</button>
+
                         </>
                     )}
                 </form>
