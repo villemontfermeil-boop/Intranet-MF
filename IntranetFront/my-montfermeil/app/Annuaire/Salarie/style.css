@@ -1,0 +1,270 @@
+/* Conteneur principal */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Barre de recherche */
+.search-input {
+    width: 100%;
+    max-width: 500px;
+    padding: 12px 16px;
+    margin-bottom: 25px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
+.search-input::placeholder {
+    color: #999;
+}
+
+/* Titre */
+.results-title {
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+    color: #333;
+    font-weight: 600;
+}
+
+/* Message "aucun résultat" */
+.no-results {
+    text-align: center;
+    padding: 40px;
+    color: #666;
+    font-size: 1.1rem;
+}
+
+/* Tableau responsive */
+.montableau {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+}
+
+/* En-têtes du tableau */
+.montableau thead {
+    background-color: #f8f9fa;
+}
+
+.montableau th {
+    padding: 16px 12px;
+    text-align: left;
+    font-weight: 600;
+    color: #495057;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 2px solid #dee2e6;
+}
+
+/* Cellules du tableau */
+.montableau td {
+    padding: 14px 12px;
+    border-bottom: 1px solid #e9ecef;
+    color: #212529;
+    font-size: 14px;
+    vertical-align: middle;
+}
+
+.montableau tr:last-child td {
+    border-bottom: none;
+}
+
+.montableau tr:hover {
+    background-color: #f8f9fa;
+    transition: background-color 0.2s ease;
+}
+
+/* Liens email */
+.montableau a[href^="mailto"] {
+    color: #007bff;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.montableau a[href^="mailto"]:hover {
+    color: #0056b3;
+    text-decoration: underline;
+}
+
+/* Bouton Modifier */
+.modifier-btn {
+    padding: 8px 16px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: block;
+    width: 100%;
+    text-align: center;
+}
+
+.modifier-btn:hover {
+    background-color: #0056b3;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 123, 255, 0.2);
+}
+
+.modifier-btn:active {
+    transform: translateY(0);
+}
+
+/* Styles responsives */
+@media (max-width: 1200px) {
+    .container {
+        padding: 15px;
+    }
+}
+
+@media (max-width: 992px) {
+    .search-input {
+        max-width: 400px;
+    }
+    
+    .montableau th,
+    .montableau td {
+        padding: 12px 10px;
+        font-size: 13px;
+    }
+}
+
+@media (max-width: 768px) {
+    /* Cacher certaines colonnes sur tablette */
+    .montableau th:nth-child(4), /* Téléphone Pro */
+    .montableau td:nth-child(4),
+    .montableau th:nth-child(6), /* Fonction */
+    .montableau td:nth-child(6) {
+        display: none;
+    }
+    
+    .search-input {
+        max-width: 100%;
+    }
+    
+    .results-title {
+        font-size: 1.3rem;
+    }
+}
+
+@media (max-width: 576px) {
+    /* Mode carte sur mobile */
+    .montableau {
+        display: block;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        overflow: visible;
+    }
+    
+    .montableau thead {
+        display: none;
+    }
+    
+    .montableau tbody {
+        display: block;
+    }
+    
+    .montableau tr {
+        display: block;
+        margin-bottom: 15px;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        padding: 15px;
+        background: white;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+    
+    .montableau td {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 0;
+        border-bottom: 1px solid #f1f3f5;
+    }
+    
+    .montableau td:last-child {
+        border-bottom: none;
+        padding-top: 15px;
+    }
+    
+    /* Ajouter des labels pour les données */
+    .montableau td::before {
+        content: attr(data-label);
+        font-weight: 600;
+        color: #495057;
+        margin-right: 10px;
+        flex-shrink: 0;
+        min-width: 120px;
+    }
+    
+    /* Email spécial sur mobile */
+    .montableau td:nth-child(5) {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .montableau td:nth-child(5)::before {
+        margin-bottom: 5px;
+    }
+    
+    /* Bouton modifier sur mobile */
+    .modifier-btn {
+        width: auto;
+        margin-top: 10px;
+        padding: 10px 20px;
+    }
+}
+
+/* Animation de chargement */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.montableau tr {
+    animation: fadeIn 0.3s ease-out;
+}
+
+/* Scroll horizontal pour table */
+.table-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin-bottom: 20px;
+    border-radius: 10px;
+}
+
+/* Scrollbar styling */
+.table-container::-webkit-scrollbar {
+    height: 6px;
+}
+
+.table-container::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+}
+
+.table-container::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 3px;
+}
+
+.table-container::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}

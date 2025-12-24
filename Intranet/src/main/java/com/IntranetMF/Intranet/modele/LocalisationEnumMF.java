@@ -4,15 +4,14 @@ public class LocalisationEnumMF {
 
     public enum Localisation {
         NON_DEFINI,
-        COMMUNICATION,
-        CABINET_DU_MAIRE,
-        DIRECTION_GENERALE_DES_SERVICES,
-        ELUS,
-        POLICE_MUNICIPALE,
-        PROSPECTIVE_ET_MUTATIONS_URBAINES,
-        VIE_HABITANT_ET_VIE_DE_LA_CITE,
+        VILLE_ÉDUCATIVE,
+        PROSPERTCTIVE_ET_MUTATION_URBAINES,
+        VILLE_CULTURELLE,
+        COHÉSION_LOCALE,
+        VILLE_MODERNE,
         VILLE_ATTRACTIVE,
-        VILLE_MODERNE
+        DIRECTION_GÉNÉRALE
+
     }
 
 }

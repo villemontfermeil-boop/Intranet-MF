@@ -139,14 +139,6 @@ function AdminPanel() {
                             onChange={handleChange}
                             required
                         />
-                        <input
-                            type="fonction"
-                            name="fonction"
-                            placeholder="Fonction (ex: Directeur de cabinet) "
-                            value={newSalarie.fonction}
-                            onChange={handleChange}
-                            required
-                        />
 
                         <select name="localisation" value={newSalarie.localisation || 'NON_DEFINI'} onChange={handleChange}>
                             <option value="NON_DEFINI">NON_DEFINI</option>
@@ -158,6 +150,84 @@ function AdminPanel() {
                             <option value="VIE_HABITANT_ET_VIE_DE_LA_CITE">VIE_HABITANT_ET_VIE_DE_LA_CITE</option>
                             <option value="VILLE_ATTRACTIVE">VILLE_ATTRACTIVE</option>
                             <option value="VILLE_MODERNE">VILLE_MODERNE</option>
+                        </select>
+
+                        <select
+                            name="fonction"
+                            value={newSalarie.fonction}
+                            onChange={handleChange}
+                        >
+                            <option disabled>--Direction Générale--</option>
+                            <option value="Police municipales">Police municipales</option>
+                            <option value="Cabinet">Cabinet</option>
+                            <option value="Communication">Communication</option>
+
+
+                            <option disabled>--Ville éducative--</option>
+                            <option value="4 Multi-accueils">4 Multi-acceuils</option>
+                            <option value="Relais petite enfance">Relais petite enfance</option>
+                            <option value="Scolaire restauration entretien">Scolaire restauration entretien</option>
+                            <option value="Enfance">Enfance</option>
+                            <option value="PRE">PRE</option>
+                            <option value="Jeunesse">Jeunesse</option>
+                            <option value="Animations sportives">Animations sportives</option>
+                            <option value="PIJ">PIJ</option>
+                            <option value="Mediation">Mediation</option>
+
+
+                            <option disabled>--Prospective et mutations urbaines--</option>
+                            <option value="Développement Urbain: Urbanisme">Développement Urbain: Urbanisme</option>
+                            <option value="Développement Urbain: Foncier">Développement Urbain: Foncier</option>
+                            <option value="Développement Urbain: PPSP">Développement Urbain: PPSP</option>
+                            <option value="Stratégies territoriales">Stratégies territoriales</option>
+                            <option value="Performance de l'habitat">Performance de l'habitat</option>
+
+
+                            <option disabled>--Ville attractive--</option>
+                            <option value="Batiments">Batiments</option>
+                            <option value="Festivités logistique">Festivités logistique</option>
+                            <option value="Ville nourricière">Ville nourricière</option>
+                            <option value="Transition énergétique">Transition énergétique</option>
+                            <option value="Environnement">Environnement</option>
+                            <option value="Mission d'appui">Mission d'appui</option>
+                            <option value="Espace public">Espace public</option>
+
+
+
+                            <option disabled>--Ville moderne--</option>
+                            <option value="Ressources humaines">Ressources humaines</option>
+                            <option value="Affaires juridiques">Affaires juridiques</option>
+                            <option value="Commandes publique">Commandes publique</option>
+                            <option value="Transformation numérique">Transformation numérique</option>
+                            <option value="Finances">Finances</option>
+                            <option value="Archives documentation">Archives documentation</option>
+                            <option value="Guichet unique">Guichet unique</option>
+
+
+                            <option disabled>--Cohésion local--</option>
+                            <option value="Agora">Agora</option>
+                            <option value="Vie des quartiers et citoyenneté">Vie des quartiers et citoyenneté</option>
+                            <option value="Animation commerciale patrimoniale">Animation commerciale patrimoniale</option>
+                            <option value="CCAS">CCAS</option>
+                            <option value="Inclusion et développement numérique">Inclusion et développement numérique</option>
+
+
+                            <option disabled>--Ville culturelle--</option>
+                            <option value="Ecoles municipales">Ecoles municipales</option>
+                            <option value="Programmation culturelle">Programmation culturelle</option>
+                            <option value="Coopération culturelle-Médicis">Coopération culturelle-Médicis</option>
+                            <option value="Grands évènements">Grands évènements</option>
+                            <option value="Médiathèque-Ludothèque">Médiathèque-Ludothèque</option>
+
+
+
+
+
+
+
+
+
+
                         </select>
                         <button type="submit">Créer</button>
                     </form>
