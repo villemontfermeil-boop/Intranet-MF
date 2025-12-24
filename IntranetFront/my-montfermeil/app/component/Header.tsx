@@ -160,7 +160,7 @@ function Header({ nom }: { nom: string | null }) {
                                 Logout
                             </button>
                             {admin && <button type="button" onClick={() => router.push('/Nouveau/Salarie')}>Admin Panel</button>}
-                            <button type="button" onClick={() => router.push('/Annuaire/Salarie')}>Les salarié</button>
+                            <button type="button" onClick={() => router.push('/Annuaire/Salarie')}>Les agents</button>
                         </>
                     ) : (
                         <>
