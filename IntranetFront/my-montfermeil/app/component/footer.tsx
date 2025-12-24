@@ -8,10 +8,10 @@ function footer() {
     return (
         <footer className="site-footer">
             <div className="footer-content">
-                <p>© 2025 MonSite. Tous droits réservés.</p>
+                <p>© 2025 site intranet de Montfermeil. Réservés au agents de la mairire.</p>
                 <div className="footer-links">
                     <a href="/about">À propos</a>
-                    <a href="/contact">Contact</a>
+                    <a href="mailto:service.communication@montfermeil.onmicrosoft.com">Contact</a>
                     <a href="/privacy">Confidentialité</a>
                 </div>
             </div>
