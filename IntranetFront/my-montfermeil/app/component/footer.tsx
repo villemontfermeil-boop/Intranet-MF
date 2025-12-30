@@ -12,7 +12,7 @@ function footer() {
                 <div className="footer-links">
                     <a href="/about">À propos</a>
                     <a href="mailto:service.communication@montfermeil.onmicrosoft.com">Contact</a>
-                    <a href="/privacy">Confidentialité</a>
+                    <a href="/Privacy">Confidentialité</a>
                 </div>
             </div>
         </footer>
