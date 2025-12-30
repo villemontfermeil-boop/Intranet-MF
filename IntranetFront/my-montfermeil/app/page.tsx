@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-
+import "@/app/home.css";
 
 function HomePage() {
     const [data, setData] = useState<any[]>([]);
@@ -40,26 +40,22 @@ function HomePage() {
 
     return (
         <>
-            <h1 style={{ textAlign: "center" }}>
+            <h1 className="title">
                 <u>Bienvenue sur l'intranet de la ville de montfermeil 2.0</u>
             </h1>
 
-            <div style={{ placeItems: "center" }}>
+            <div className="articles-container">
                 {data.map((value, index) => (
-                    <div key={index} style={{ border: "3px solid #3498db", width: "40%", height: "40%", placeItems: "center", marginTop: "5%" }}>
+                    <div key={index} style={{ border: "3px solid #3498db", placeItems: "center", marginTop: "5%" }}>
 
                         <h4><u>{value.titre}</u></h4>
                         <p>Créer le : {value.creation}</p>
 
-                        {sessionStorage.getItem("isConnected") == "true" ? <p >Par: <u><a style={{color: "blue"}} onClick={() => router.push(`/Annuaire/Salarie/${value.salarie.id}`)}>{value.salarie.nom} {value.salarie.prenom}</a></u></p> : <p>Par: {value.salarie.nom} {value.salarie.prenom}</p>}
+                        {sessionStorage.getItem("isConnected") == "true" ? <p >Par: <u><a  className="author-link" onClick={() => router.push(`/Annuaire/Salarie/${value.salarie.id}`)}>{value.salarie.nom} {value.salarie.prenom}</a></u></p> : <p>Par: {value.salarie.nom} {value.salarie.prenom}</p>}
                         <p>{value.description}</p>
 
                         {value.mediaName && isVideo(value.mediaName) && (
-                            <video controls width="300" style={{
-                                display: "flex",
-                                justifyContent: "center",
-                                alignItems: "center"
-                            }}>
+                            <video controls  className="media">
                                 <source src={`${path}${value.mediaName}`} />
                             </video>
                         )}
@@ -68,8 +64,7 @@ function HomePage() {
                             <img
                                 src={`${path}${value.mediaName}`}
                                 alt={value.description}
-                                width="300"
-                                style={{ justifyContent: "center", display: "flex" }}
+                               className="media"
                             />
                         )}
                     </div>

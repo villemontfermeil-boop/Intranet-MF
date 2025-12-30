@@ -17,6 +17,14 @@
     text-align: center;
     height: 30px;
 }
+.menu-toggle {
+    display: none;
+}
+
+/* Le menu est visible normalement */
+.menu-container {
+    display: inline-block;
+}
 
 .login-form {
     margin-top: 20px;
@@ -48,6 +56,60 @@
     background-color: #0e002b;
 }
 
+
+/* 📱 MOBILE */
+@media (max-width: 768px) {
+
+    .login-header {
+        height: auto;
+        padding: 10px;
+    }
+    .styleLogo{
+      margin-left: 40%;
+      display: block;
+    }
+
+    /* Bouton ☰ visible */
+    .menu-toggle {
+        display: block;
+        width: 100%;
+        margin-top: 30%;
+        background-color: #1c87c9;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        float: left;
+        padding: 8px;
+        cursor: pointer;
+    }
+
+    /* Menu fermé */
+    .menu-container {
+        display: none;
+        flex-direction: column;
+        background-color: #333;
+        padding: 10px;
+        border-radius: 8px;
+        margin-bottom: 1;
+    }
+
+    /* Menu ouvert */
+    .menu-container.open {
+        display: flex;
+        
+    }
+
+    .MenuButton {
+        width: 100%;
+        margin: 5px 0;
+        text-align: center;
+    }
+
+    .login-form input {
+        width: 100%;
+        float: none;
+    }
+}
 
 
 

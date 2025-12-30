@@ -12,6 +12,7 @@ function Header({ nom }: { nom: string | null }) {
     const [clientConnected, setClientConnected] = useState(false);
     const admin = sessionStorage.getItem('isAdmin') === 'true';
     const router = useRouter();
+    const [menu, SetMenu] = useState(false)
 
 
     // Use sessionStorage so the user stays logged on refresh but is cleared on tab close.
@@ -150,29 +151,55 @@ function Header({ nom }: { nom: string | null }) {
         <div className="Thebody">
             <img src="/logo.png" onClick={() => router.push('/')} className='styleLogo' />
 
-            <header className="login-header">
+            <header className="login-header" >
 
-                <form className="login-form">
-                    <button type="button" onClick={() => router.push('/Application')} style={{ float: "left" }}>Application</button>
-                    {clientConnected ? (
-                        <>
-                            <button type="button" onClick={() => setClickedOUT(true)}>
-                                Déconnexion
-                            </button>
-                            {admin && <button type="button" onClick={() => router.push('/Nouveau/Salarie')}>Nouvelle agent</button>}
-                            <button type="button" onClick={() => router.push('/Annuaire/Salarie')}>Les agents</button>
-                            {admin && <button type='button' onClick={()=> router.push("/Nouveau/Article")}>Nouvelle article</button>}
-                        </>
-                    ) : (
-                        <>
-                            <input type="text" placeholder="Email" id="Email" required />
-                            <input type="password" placeholder="Password" id="Pass" required />
-                            <button type="button" onClick={() => setClicked(true)}>
-                                Login
-                            </button>
+                <form className="login-form" >
 
-                        </>
-                    )}
+                    {/* Bouton menu visible seulement en mobile */}
+                    <button
+                        type="button"
+                        className="menu-toggle"
+                        onClick={() => SetMenu(!menu)}
+                    >
+                        ☰ Menu
+                    </button>
+
+                    <div className={`menu-container ${menu ? "open" : ""}`}>
+                        <button type="button" className='MenuButton' onClick={() => router.push('/Application')}>
+                            Application
+                        </button>
+
+                        {clientConnected ? (
+                            <>
+                               
+
+                                {admin && (
+                                    <button type="button" className='MenuButton' onClick={() => router.push('/Nouveau/Salarie')}>
+                                        Nouvel agent
+                                    </button>
+                                )}
+
+                                <button type="button" className='MenuButton' onClick={() => router.push('/Annuaire/Salarie')}>
+                                    Les agents
+                                </button>
+
+                                {admin && (
+                                    <button type="button" className='MenuButton' onClick={() => router.push("/Nouveau/Article")}>
+                                        Nouvel article
+                                    </button>
+                                )}
+                                 <button type="button" className='MenuButton' onClick={() => setClickedOUT(true)}>
+                                    <u style={{color: "lightblue"}}>Déconnexion</u>
+                                </button>
+                            </>
+                        ) : (
+                            <>
+                                <input type="text" placeholder="Email" id="Email" required />
+                                <input type="password" placeholder="Password" id="Pass" required />
+                                <button type="button" onClick={() => setClicked(true)}>Login</button>
+                            </>
+                        )}
+                    </div>
                 </form>
             </header>
         </div>

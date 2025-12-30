@@ -2,7 +2,7 @@
 
 import { exit } from "process";
 import { useEffect, useState } from "react";
-
+import "@/app/Nouveau/Article/style.css";
 
 function CreationArticle() {
     const path = "http://localhost:8080/Article/upload";
