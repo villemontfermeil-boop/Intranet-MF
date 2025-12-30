@@ -6,7 +6,8 @@ import com.IntranetMF.Intranet.modele.ArticleEnumMF;
 import com.IntranetMF.Intranet.modele.ArticleEnumMF.TypeArticle;
 
 import java.time.LocalDateTime;
-
+import java.time.format.DateTimeFormatter;
+import java.time.LocalDate;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -32,14 +33,14 @@ public class ArticleMF {
     @JoinColumn(name = "SALARIE_ID")
     private SalarieMF salarie;
 
-    @Column(name="TITRE_MF")
+    @Column(name = "TITRE_MF")
     private String titre;
 
     @Column(name = "DESCRIPTION_MF", nullable = false)
     private String description;
 
     @Column(name = "DATE_CREATION", nullable = false)
-    private LocalDateTime date;
+    private LocalDate date;
 
     @Column(name = "TYPE", nullable = false)
     @Enumerated(EnumType.STRING)
@@ -55,7 +56,7 @@ public class ArticleMF {
         return description;
     }
 
-    public String getTitre(){
+    public String getTitre() {
         return titre;
     }
 
@@ -67,8 +68,9 @@ public class ArticleMF {
         return salarie;
     }
 
-    public LocalDateTime getCreation() {
-        return date;
+    public String getCreation() {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        return this.date.format(formatter);
     }
 
     public String getMediaName() {
@@ -95,7 +97,7 @@ public class ArticleMF {
     }
 
     public void setCreation() {
-        this.date = LocalDateTime.now();
+        this.date = LocalDate.now();
     }
 
     public void setMediaName(String value) {
@@ -110,8 +112,8 @@ public class ArticleMF {
         this.type = types;
     }
 
-    public void setTitre(String titres){
-        this.titre =titres;
+    public void setTitre(String titres) {
+        this.titre = titres;
     }
 
 }
