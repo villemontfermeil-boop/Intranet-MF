@@ -1,9 +1,13 @@
 'use client';
 
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+
 
 function HomePage() {
     const [data, setData] = useState<any[]>([]);
+    const path = "http://localhost:8080/media/";
+    const router = useRouter();
 
     const isVideo = (fileName: string) => {
         const videoExtensions = ["mp4", "webm", "ogg"];
@@ -13,7 +17,7 @@ function HomePage() {
     };
 
     const isImage = (fileName: string) => {
-        const imageExtensions = ["jpg", "jpeg", "png", "gif"];
+        const imageExtensions = ["jpg", "jpeg", "png", "gif","webp"];
         const parts = fileName.split(".");
         const extension = parts.pop()?.toLowerCase();
         return imageExtensions.includes(extension || "");
@@ -40,24 +44,32 @@ function HomePage() {
                 <u>Bienvenue sur l'intranet de la ville de montfermeil 2.0</u>
             </h1>
 
-            <div>
+            <div style={{ placeItems: "center" }}>
                 {data.map((value, index) => (
-                    <div key={index}>
+                    <div key={index} style={{ border: "3px solid #3498db", width: "40%", height: "40%", placeItems: "center", marginTop: "5%" }}>
+
                         <h4><u>{value.titre}</u></h4>
-                        <span>{value.creation}</span>
+                        <p>Créer le : {value.creation}</p>
+
+                        {sessionStorage.getItem("isConnected") == "true" ? <p >Par: <u><a style={{color: "blue"}} onClick={() => router.push(`/Annuaire/Salarie/${value.salarie.id}`)}>{value.salarie.nom} {value.salarie.prenom}</a></u></p> : <p>Par: {value.salarie.nom} {value.salarie.prenom}</p>}
                         <p>{value.description}</p>
 
                         {value.mediaName && isVideo(value.mediaName) && (
-                            <video controls width="400">
-                                <source src={`http://localhost:8080/media/${value.mediaName}`} />
+                            <video controls width="300" style={{
+                                display: "flex",
+                                justifyContent: "center",
+                                alignItems: "center"
+                            }}>
+                                <source src={`${path}${value.mediaName}`} />
                             </video>
                         )}
 
                         {value.mediaName && isImage(value.mediaName) && (
                             <img
-                                src={`http://localhost:8080/media/${value.mediaName}`}
+                                src={`${path}${value.mediaName}`}
                                 alt={value.description}
-                                width="400"
+                                width="300"
+                                style={{ justifyContent: "center", display: "flex" }}
                             />
                         )}
                     </div>
