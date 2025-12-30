@@ -36,7 +36,7 @@ public class SecurityConfig {
                         .requestMatchers("/uploads/**").permitAll()
                         .requestMatchers("/Article/getArticle").permitAll()
                         .requestMatchers("/salaries/login").permitAll()
-                        .requestMatchers("/Article/upload").permitAll()
+                        .requestMatchers("/Article/upload").authenticated()
                         
                         // ADMIN
                         .requestMatchers("/salaries/NewSalarie").hasRole("ADMIN")

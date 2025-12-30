@@ -10,8 +10,8 @@ function ModifierSalarie() {
 
     const [search, SetSearch] = useState<string>("")
     const [pepole, Setpeople] = useState<any[]>([]);
+    const [visible, SetVisible] = useState(true);
     const routeur = useRouter();
-
 
     async function LookingForName(name: string) {
 
@@ -19,7 +19,6 @@ function ModifierSalarie() {
         const password = sessionStorage.getItem("MDP")
 
         const credential = btoa(`${identifiant}:${password}`)
-        console.log(identifiant, password)
         try {
             const response = await fetch(`http://localhost:8080/salaries/Salarie/${encodeURIComponent(name)}`, {
                 method: "GET",
@@ -32,30 +31,39 @@ function ModifierSalarie() {
             })
             const data = await response.json();
             Setpeople(data);
+            SetVisible(true)
 
 
 
         } catch (error) {
             console.log(error)
+            SetVisible(true)
+
 
         }
     }
     useEffect(() => {
+        if (sessionStorage.length == 0 || sessionStorage == null) {
+            routeur.push("/");
+        }
+
+    }, [])
+    useEffect(() => {
 
         if (search.trim() !== "") {
             //temps de chargement
+            SetVisible(false)
+
             setTimeout(() => {
                 LookingForName(search);
             }, 1000);
+
         } else {
             Setpeople([]);
         }
+
     }, [search])
 
-    function handlechange({ e }: { e: string }) {
-        SetSearch(e)
-    }
-    { console.log(sessionStorage.getItem("isAdmin")) }
     return (
         <div className="container">
             <input
@@ -65,9 +73,11 @@ function ModifierSalarie() {
                 placeholder="Rechercher un salarié par nom..."
                 className="search-input"
             />
-
             <div>
                 <h3 className="results-title">Résultats ({pepole.length})</h3>
+
+                <h2 hidden={visible}>Chargement... </h2>
+
                 {pepole.length > 0 ? (
                     <div className="table-container">
                         <table className="montableau">
@@ -80,6 +90,8 @@ function ModifierSalarie() {
                                     <th>Email</th>
                                     <th className="hide-on-tablet">Fonction</th>
                                     <th>Services</th>
+                                    <th>Lieux</th>
+                                    <th>Découvrir</th>
                                     {/* Ajouter une collone lieux */}
                                     {sessionStorage.getItem("isAdmin") == 'true' && <th>Modifier</th>}
                                 </tr>
@@ -98,7 +110,11 @@ function ModifierSalarie() {
                                         </td>
                                         <td className="hide-on-tablet" data-label="Fonction">{person.fonction || 'N/A'}</td>
                                         <td data-label="Services">{person.localisation || 'N/A'}</td>
+                                        <td>V</td>
+                                        <td><button onClick={() => routeur.push(`/Annuaire/Salarie/${person.id}`)}
+                                            className="modifier-btn">Voir</button></td>
                                         {sessionStorage.getItem("isAdmin") == 'true' && (
+
                                             <td data-label="Actions">
                                                 <button
                                                     onClick={() => routeur.push(`/Annuaire/${person.id}`)}
@@ -108,11 +124,15 @@ function ModifierSalarie() {
                                                 </button>
                                             </td>
                                         )}
+
                                     </tr>
                                 ))}
+
                             </tbody>
                         </table>
+
                     </div>
+
                 ) : search.length > 0 ? (
                     <p className="no-results">Aucun résultat trouvé pour "{search}"</p>
                 ) : null}

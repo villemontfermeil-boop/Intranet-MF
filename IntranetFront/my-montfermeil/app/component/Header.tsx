@@ -157,10 +157,11 @@ function Header({ nom }: { nom: string | null }) {
                     {clientConnected ? (
                         <>
                             <button type="button" onClick={() => setClickedOUT(true)}>
-                                Logout
+                                Déconnexion
                             </button>
-                            {admin && <button type="button" onClick={() => router.push('/Nouveau/Salarie')}>Admin Panel</button>}
+                            {admin && <button type="button" onClick={() => router.push('/Nouveau/Salarie')}>Nouvelle agent</button>}
                             <button type="button" onClick={() => router.push('/Annuaire/Salarie')}>Les agents</button>
+                            {admin && <button type='button' onClick={()=> router.push("/Nouveau/Article")}>Nouvelle article</button>}
                         </>
                     ) : (
                         <>
