@@ -84,10 +84,6 @@ function AdminPanel() {
     if (isAdmin == true) {
         return (
             <div>
-                <h1>
-                    Admin Panel
-
-                </h1>
                 <div className="form-container">
                     <h2>Créer un nouveau salarié</h2>
                     <form onSubmit={handleSubmit}>
@@ -232,6 +228,7 @@ function AdminPanel() {
                         <button type="submit">Créer</button>
                     </form>
                 </div>
+                <p style={{textAlign: "center"}}>*Seule les administrateurs peuvent créer un salarié *</p>
             </div>
         )
     } else {
