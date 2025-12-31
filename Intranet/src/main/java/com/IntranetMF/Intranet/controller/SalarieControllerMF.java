@@ -1,6 +1,9 @@
 package com.IntranetMF.Intranet.controller;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -153,11 +156,21 @@ public class SalarieControllerMF {
         var salarieOpt = salarieControllerMF.findByMail(mail);
         if (salarieOpt.isPresent()) {
             SalarieMF salarie = salarieOpt.get();
-            LocalDateTime localDateTime = LocalDateTime.now();
+
+            ZonedDateTime parisTime = ZonedDateTime.now(ZoneId.of("Europe/Paris"));
+            LocalDateTime localDateTime = parisTime.toLocalDateTime();
+
             if (passwordEncoder.matches(password, salarie.getPassword())) {
                 salarie.setIsConnected(true);
                 salarie.setBeginLogin(localDateTime);
+
                 salarieControllerMF.save(salarie);
+
+                // Pour voir qui c'est connecter
+                System.out.println("Salarier:" + salarie);
+                System.out.println("Heure système : " + LocalDateTime.now());
+                System.out.println("Heure UTC : " + Instant.now());
+                System.out.println("Fuseau par défaut : " + ZoneId.systemDefault());
                 return salarie;
             } else {
                 throw new RuntimeException("Invalid account: ");
@@ -174,10 +187,19 @@ public class SalarieControllerMF {
         var salarieOpt = salarieControllerMF.findByMail(mail);
         if (salarieOpt.isPresent()) {
             SalarieMF salarie = salarieOpt.get();
-            LocalDateTime localDateTime = LocalDateTime.now();
+
+            ZonedDateTime parisTime = ZonedDateTime.now(ZoneId.of("Europe/Paris"));
+            LocalDateTime localDateTime = parisTime.toLocalDateTime();
+
             salarie.setIsConnected(false);
             salarie.setLastLogin(localDateTime);
             salarieControllerMF.save(salarie);
+
+            // Pour voir qui c'est déconnecter
+            System.out.println("Salarier:" + salarie);
+            System.out.println("Heure système : " + LocalDateTime.now());
+            System.out.println("Heure UTC : " + Instant.now());
+            System.out.println("Fuseau par défaut : " + ZoneId.systemDefault());
             return salarie;
         } else {
             throw new RuntimeException("Salarie not found");

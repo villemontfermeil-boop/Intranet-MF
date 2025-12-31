@@ -57,6 +57,7 @@ function HomePage() {
                         {value.mediaName && isVideo(value.mediaName) && (
                             <video controls  className="media">
                                 <source src={`${path}${value.mediaName}`} />
+                                <h1>${path} ${value.mediaName}</h1>
                             </video>
                         )}
 
