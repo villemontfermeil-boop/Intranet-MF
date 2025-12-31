@@ -1,6 +1,7 @@
 
 'use client';
 
+import { FallbackMode } from 'next/dist/lib/fallback';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 interface Props {
@@ -11,6 +12,14 @@ function SalarieModification() {
 
     const router = useRouter();
     const params = useParams();
+    const [isInPasswordMode, SetPasswordMode] = useState(false);
+    const show = !isInPasswordMode;
+    const [submitButton, SetSubmit] = useState<boolean>(false);
+
+    const [passwordForgot, setNewpassword] = useState({
+        mdp: ''
+    })
+
     const [button, setButton] = useState<boolean>(false);
     const login = sessionStorage.getItem('mail')
     const password = sessionStorage.getItem('MDP')
@@ -25,6 +34,11 @@ function SalarieModification() {
         localisationS: ''
     })
     const id = params.id
+    const idValue = id ?
+        (Array.isArray(id) ? id[0] : id) :
+        '';
+
+
     const credential = btoa(`${login}:${password}`)
     const api = async () => {
         try {
@@ -80,7 +94,7 @@ function SalarieModification() {
                     }).toString()
                 }
             );
-            console.log("Finn",personne);
+            console.log("Finn", personne);
             if (!response.ok) {
                 const errorText = await response.text();
                 throw new Error(`Erreur lors de la modification : ${errorText}`);
@@ -89,7 +103,7 @@ function SalarieModification() {
             const result = await response.json();
             console.log("Modification réussie :", result);
             // Redirection si tu veux
-            alert("Modification éffectuer evc succès"+  personne)
+            alert("Modification éffectuer evc succès" + personne)
             router.push("/");
         } catch (error) {
             console.error(error);
@@ -98,6 +112,32 @@ function SalarieModification() {
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         SetPersonne({ ...personne, [e.target.name]: e.target.value });
     };
+
+    const handlechangePassword = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+        setNewpassword({ ...passwordForgot, [e.target.name]: e.target.value })
+    }
+
+    async function passwordReset() {
+        try {
+
+
+            const response = await fetch("http://localhost:8080/salaries/PasswordReset", {
+                method: "PATCH",
+                headers: {
+                    "Authorization": `Basic ${credential}`,
+                    "Content-Type": "application/x-www-form-urlencoded"
+                },
+                body: new URLSearchParams({
+                    id: idValue || '',
+                    password: passwordForgot.mdp || ''
+                })
+            })
+            alert("Modification éffectuer avec succès");
+        } catch (error) {
+            console.log(error)
+        }
+
+    }
     useEffect(() => {
         if (sessionStorage.length == 0 || !sessionStorage.getItem('isAdmin')) {
             router.push('/')
@@ -111,13 +151,24 @@ function SalarieModification() {
             SendData(personne.fonction, personne.nom, personne.prenom, personne.mail, personne.tele, personne.localisationS, personne.telepro);
             setButton(false);
         }
-    }, [button])
+        if (submitButton && !button) {
+            passwordReset()
+            SetSubmit(false);
+        }
+    }, [button, submitButton])
+
+
 
     console.log(data)
     return (
-        <div>
+        <div style={{ placeItems: "center" }}>
             <h1>Voici l'id : {id} </h1>
-            <div>
+            <div style={{ placeItems: "center" }}>
+                <button hidden={isInPasswordMode} onClick={() => SetPasswordMode(true)}>Modifier le mots de passe</button>
+                <button hidden={show} onClick={() => SetPasswordMode(false)}>Modifier le salarié</button>
+
+            </div>
+            <div hidden={isInPasswordMode}>
                 <table
                     border={1}
                     style={{
@@ -314,7 +365,7 @@ function SalarieModification() {
 
 
 
-                                    
+
 
 
                                 </select>
@@ -335,6 +386,32 @@ function SalarieModification() {
                     </tbody>
                 </table>
 
+            </div>
+            <div hidden={show}>
+                <table border={1}
+                    style={{
+                        borderColor: "red",
+                        margin: "auto",
+                        width: "80%"
+                    }}
+
+                >
+                    <thead>
+                        <tr>
+                            <th>
+                                Nouveaux mots de passe:
+                            </th>
+                            <td>
+                                <input style={{ width: "95%" }} onChange={handlechangePassword} type="text" name="mdp" id="" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colSpan={2}>
+                                <button style={{ width: "100%" }} onClick={() => SetSubmit(true)} type="submit">Envoyer</button>
+                            </td>
+                        </tr>
+                    </thead>
+                </table>
             </div>
         </div>
     )
