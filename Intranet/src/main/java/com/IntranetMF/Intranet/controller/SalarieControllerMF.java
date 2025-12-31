@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -203,6 +204,27 @@ public class SalarieControllerMF {
             return salarie;
         } else {
             throw new RuntimeException("Salarie not found");
+        }
+    }
+
+    @PatchMapping("/PasswordReset")
+    public String passwordReset(@RequestParam Long id, @RequestParam String password) {
+        Optional<SalarieMF> salarie = salarieControllerMF.findById(id);
+        if (salarie.isPresent()) {
+            SalarieMF LeSalarier = salarie.get();
+
+            if (!checkingPassword(password).equals("OK")) {
+                throw new RuntimeException("Password validation failed: " + checkingPassword(password));
+            }
+
+            String encodedPassword = passwordEncoder.encode(password);
+            LeSalarier.setPassword(encodedPassword);
+
+            salarieControllerMF.save(LeSalarier);
+            System.out.println("Mots de passe: "+ password);
+            return "Réinitialisation éffectuer avec succes";
+        } else {
+            return "identifiant inconnue";
         }
     }
 
