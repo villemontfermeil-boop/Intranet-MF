@@ -4,6 +4,7 @@
 import { FallbackMode } from 'next/dist/lib/fallback';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { json } from 'stream/consumers';
 interface Props {
     params: { id: string };
 }
@@ -37,17 +38,12 @@ function SalarieModification() {
     const idValue = id ?
         (Array.isArray(id) ? id[0] : id) :
         '';
-
-
+    const number = parseInt(idValue)
     const credential = btoa(`${login}:${password}`)
     const api = async () => {
         try {
-            const reponse = await fetch(`http://localhost:8080/salaries/${id}`, {
-                method: "GET",
-                headers: {
-                    'Authorization': `Basic ${credential}`
-                }
-            })
+            const reponse = await fetch(`/api/Montfermeil/users/4`)
+            console.log(reponse)
             const result = await reponse.json();
             SetData(result);
             SetPersonne({
@@ -74,27 +70,30 @@ function SalarieModification() {
         localisationH: string,
         telpro: string
     ) {
+        const payload = new URLSearchParams({
+            nom: nomP,
+            prenom: prenomP,
+            mail: emailP,
+            numero: telephoneportableP,
+            numeroPro: telpro || '0',
+            fonction: fonction,
+            localisation: localisationH
+        });
+
         try {
-            const response = await fetch(
-                `http://localhost:8080/salaries/Modification/Salarie/${id}`,
-                {
-                    method: "PATCH",
-                    headers: {
-                        "Authorization": `Basic ${credential}`,
-                        "Content-Type": "application/x-www-form-urlencoded"
-                    },
-                    body: new URLSearchParams({
-                        nom: nomP,
-                        prenom: prenomP,
-                        mail: emailP,
-                        numero: telephoneportableP,
-                        numeroPro: telpro || '0',
-                        fonction: fonction,
-                        localisation: localisationH || "NON_DEFINI"
-                    }).toString()
-                }
-            );
-            console.log("Finn", personne);
+            const login = sessionStorage.getItem('mail');
+            const password = sessionStorage.getItem('MDP');
+            const credential = btoa(`${login}:${password}`);
+
+            const response = await fetch(`http://localhost:8080/salaries/Modification/Salarie/${idValue}`, {
+                method: "PATCH",
+                headers: {
+                    "Authorization": `Basic ${credential}`,
+                    "Content-Type": "application/x-www-form-urlencoded"
+                },
+                body: payload.toString()
+            });
+
             if (!response.ok) {
                 const errorText = await response.text();
                 throw new Error(`Erreur lors de la modification : ${errorText}`);
@@ -102,265 +101,263 @@ function SalarieModification() {
 
             const result = await response.json();
             console.log("Modification réussie :", result);
-            // Redirection si tu veux
-            alert("Modification éffectuer evc succès" + personne)
+            alert("Modification effectuée avec succès !");
             router.push("/");
         } catch (error) {
             console.error(error);
         }
     }
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-        SetPersonne({ ...personne, [e.target.name]: e.target.value });
-    };
-
-    const handlechangePassword = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-        setNewpassword({ ...passwordForgot, [e.target.name]: e.target.value })
-    }
-
-    async function passwordReset() {
-        try {
 
 
-            const response = await fetch("http://localhost:8080/salaries/PasswordReset", {
-                method: "PATCH",
-                headers: {
-                    "Authorization": `Basic ${credential}`,
-                    "Content-Type": "application/x-www-form-urlencoded"
-                },
-                body: new URLSearchParams({
-                    id: idValue || '',
-                    password: passwordForgot.mdp || ''
-                })
+const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    SetPersonne({ ...personne, [e.target.name]: e.target.value });
+};
+
+const handlechangePassword = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    setNewpassword({ ...passwordForgot, [e.target.name]: e.target.value })
+}
+
+async function passwordReset() {
+    try {
+
+
+        const response = await fetch("http://localhost:8080/salaries/PasswordReset", {
+            method: "PATCH",
+            headers: {
+                "Authorization": `Basic ${credential}`,
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
+            body: new URLSearchParams({
+                id: idValue || '',
+                password: passwordForgot.mdp || ''
             })
-            alert("Modification éffectuer avec succès");
-        } catch (error) {
-            console.log(error)
-        }
-
+        })
+        alert("Modification éffectuer avec succès");
+    } catch (error) {
+        console.log(error)
     }
-    useEffect(() => {
-        if (sessionStorage.length == 0 || !sessionStorage.getItem('isAdmin')) {
-            router.push('/')
-        } else {
-            api();
-        }
-    }, [])
 
-    useEffect(() => {
-        if (button) {
-            SendData(personne.fonction, personne.nom, personne.prenom, personne.mail, personne.tele, personne.localisationS, personne.telepro);
-            setButton(false);
-        }
-        if (submitButton && !button) {
-            passwordReset()
-            SetSubmit(false);
-        }
-    }, [button, submitButton])
+}
+useEffect(() => {
+    if (sessionStorage.length == 0 || !sessionStorage.getItem('isAdmin')) {
+        router.push('/')
+    } else {
+        api();
+    }
+}, [])
+
+useEffect(() => {
+    if (button) {
+        SendData(personne.fonction, personne.nom, personne.prenom, personne.mail, personne.tele, personne.localisationS, personne.telepro);
+        setButton(false);
+    }
+    if (submitButton && !button) {
+        passwordReset()
+        SetSubmit(false);
+    }
+}, [button, submitButton])
 
 
 
-    console.log(data)
-    return (
+console.log(data)
+return (
+    <div style={{ placeItems: "center" }}>
+        <h1>Voici l'id : {id} </h1>
         <div style={{ placeItems: "center" }}>
-            <h1>Voici l'id : {id} </h1>
-            <div style={{ placeItems: "center" }}>
-                <button hidden={isInPasswordMode} onClick={() => SetPasswordMode(true)}>Modifier le mots de passe</button>
-                <button hidden={show} onClick={() => SetPasswordMode(false)}>Modifier le salarié</button>
+            <button hidden={isInPasswordMode} onClick={() => SetPasswordMode(true)}>Modifier le mots de passe</button>
+            <button hidden={show} onClick={() => SetPasswordMode(false)}>Modifier le salarié</button>
 
-            </div>
-            <div hidden={isInPasswordMode}>
-                <table
-                    border={1}
-                    style={{
-                        borderColor: "red",
-                        margin: "auto",
-                        width: "80%"
-                    }}
-                >
-                    <thead>
-                        <tr>
-                            <th>Champ</th>
-                            <th>Valeur</th>
-                        </tr>
-                    </thead>
+        </div>
+        <div hidden={isInPasswordMode}>
+            <table
+                border={1}
+                style={{
+                    borderColor: "red",
+                    margin: "auto",
+                    width: "80%"
+                }}
+            >
+                <thead>
+                    <tr>
+                        <th>Champ</th>
+                        <th>Valeur</th>
+                    </tr>
+                </thead>
 
-                    <tbody>
-                        <tr>
-                            <th>Nom</th>
-                            <td>
-                                <input
-                                    name="nom"
-                                    type="text"
-                                    value={personne.nom}
-                                    onChange={handleChange}
+                <tbody>
+                    <tr>
+                        <th>Nom</th>
+                        <td>
+                            <input
+                                name="nom"
+                                type="text"
+                                value={personne.nom}
+                                onChange={handleChange}
+                            />
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <th>Prénom</th>
+                        <td>
+                            <input
+                                name="prenom"
+                                type="text"
+                                value={personne.prenom}
+                                onChange={handleChange}
+                                required
+                            />
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <th>Email</th>
+                        <td>
+                            <input
+                                name="mail"
+                                type="email"
+                                value={personne.mail}
+                                onChange={handleChange}
+                                required
+                            />
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <th>Téléphone</th>
+                        <td>
+                            <input
+                                name="tele"
+                                type="text"
+                                pattern='[0-9]{*,10}'
+                                value={personne.tele}
+                                onChange={handleChange}
+                                required
+                            />
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>TéléphonePro</th>
+                        <td>
+                            <input
+                                name="telepro"
+                                type="text"
+                                pattern='[0-9]{*,10}'
+                                value={personne.telepro}
+                                onChange={handleChange}
+                                required
+                            />
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <th>Localisation</th>
+                        <td>
+                            <div style={{ marginBottom: "5px" }}>
+                                <strong>Actuelle :</strong>
+                                <textarea
+                                    value={personne.localisationS}
+                                    disabled
+                                    readOnly
                                 />
-                            </td>
-                        </tr>
+                            </div>
 
-                        <tr>
-                            <th>Prénom</th>
-                            <td>
-                                <input
-                                    name="prenom"
-                                    type="text"
-                                    value={personne.prenom}
+                            <div>
+                                <strong>Nouvelle :</strong>
+                                <select
+                                    name="localisationS"
+                                    value={personne.localisationS}
                                     onChange={handleChange}
-                                    required
-                                />
-                            </td>
-                        </tr>
+                                >
+                                    <option value="NON_DEFINI">NON_DEFINI</option>
+                                    <option value="VILLE_ÉDUCATIVE">VILLE_ÉDUCATIVE</option>
+                                    <option value="PROSPERTCTIVE_ET_MUTATION_URBAINES">PROSPERTCTIVE_ET_MUTATION_URBAINES</option>
+                                    <option value="VILLE_CULTURELLE">VILLE_CULTURELLE</option>
+                                    <option value="VILLE_MODERNE">VILLE_MODERNE</option>
+                                    <option value="COHÉSION_LOCALE">COHÉSION_LOCALE</option>
+                                    <option value="VILLE_ATTRACTIVE">VILLE_ATTRACTIVE</option>
+                                    <option value="DIRECTION_GÉNÉRALE">DIRECTION_GÉNÉRALE</option>
+                                </select>
+                            </div>
+                        </td>
+                    </tr>
 
-                        <tr>
-                            <th>Email</th>
-                            <td>
-                                <input
-                                    name="mail"
-                                    type="email"
-                                    value={personne.mail}
-                                    onChange={handleChange}
-                                    required
-                                />
-                            </td>
-                        </tr>
-
-                        <tr>
-                            <th>Téléphone</th>
-                            <td>
-                                <input
-                                    name="tele"
-                                    type="text"
-                                    pattern='[0-9]{*,10}'
-                                    value={personne.tele}
-                                    onChange={handleChange}
-                                    required
-                                />
-                            </td>
-                        </tr>
-                        <tr>
-                            <th>TéléphonePro</th>
-                            <td>
-                                <input
-                                    name="telepro"
-                                    type="text"
-                                    pattern='[0-9]{*,10}'
-                                    value={personne.telepro}
-                                    onChange={handleChange}
-                                    required
-                                />
-                            </td>
-                        </tr>
-
-                        <tr>
-                            <th>Localisation</th>
-                            <td>
-                                <div style={{ marginBottom: "5px" }}>
-                                    <strong>Actuelle :</strong>
-                                    <textarea
-                                        value={personne.localisationS}
-                                        disabled
-                                        readOnly
-                                    />
-                                </div>
-
-                                <div>
-                                    <strong>Nouvelle :</strong>
-                                    <select
-                                        name="localisationS"
-                                        value={personne.localisationS}
-                                        onChange={handleChange}
-                                    >
-                                        <option value="NON_DEFINI">NON_DEFINI</option>
-                                        <option value="VILLE_ÉDUCATIVE">VILLE_ÉDUCATIVE</option>
-                                        <option value="PROSPERTCTIVE_ET_MUTATION_URBAINES">PROSPERTCTIVE_ET_MUTATION_URBAINES</option>
-                                        <option value="VILLE_CULTURELLE">VILLE_CULTURELLE</option>
-                                        <option value="VILLE_MODERNE">VILLE_MODERNE</option>
-                                        <option value="COHÉSION_LOCALE">COHÉSION_LOCALE</option>
-                                        <option value="VILLE_ATTRACTIVE">VILLE_ATTRACTIVE</option>
-                                        <option value="DIRECTION_GÉNÉRALE">DIRECTION_GÉNÉRALE</option>
-                                    </select>
-                                </div>
-                            </td>
-                        </tr>
-
-                        <tr>
-                            <th>Fonction</th>
-                            <td>
-                                {/* <input
+                    <tr>
+                        <th>Fonction</th>
+                        <td>
+                            {/* <input
                                     name="fonction"
                                     type="text"
                                     value={personne.fonction}
                                     onChange={handleChange}
                                     required
                                 /> */}
-                                <select
-                                    name="fonction"
-                                    value={personne.fonction}
-                                    onChange={handleChange}
-                                >
-                                    <option disabled>--Direction Générale--</option>
-                                    <option value="Police municipales">Police municipales</option>
-                                    <option value="Cabinet">Cabinet</option>
-                                    <option value="Communication">Communication</option>
+                            <select
+                                name="fonction"
+                                value={personne.fonction}
+                                onChange={handleChange}
+                            >
+                                <option disabled>--Direction Générale--</option>
+                                <option value="Police municipales">Police municipales</option>
+                                <option value="Cabinet">Cabinet</option>
+                                <option value="Communication">Communication</option>
 
 
-                                    <option disabled>--Ville éducative--</option>
-                                    <option value="4 Multi-accueils">4 Multi-acceuils</option>
-                                    <option value="Relais petite enfance">Relais petite enfance</option>
-                                    <option value="Scolaire restauration entretien">Scolaire restauration entretien</option>
-                                    <option value="Enfance">Enfance</option>
-                                    <option value="PRE">PRE</option>
-                                    <option value="Jeunesse">Jeunesse</option>
-                                    <option value="Animations sportives">Animations sportives</option>
-                                    <option value="PIJ">PIJ</option>
-                                    <option value="Mediation">Mediation</option>
+                                <option disabled>--Ville éducative--</option>
+                                <option value="4 Multi-accueils">4 Multi-acceuils</option>
+                                <option value="Relais petite enfance">Relais petite enfance</option>
+                                <option value="Scolaire restauration entretien">Scolaire restauration entretien</option>
+                                <option value="Enfance">Enfance</option>
+                                <option value="PRE">PRE</option>
+                                <option value="Jeunesse">Jeunesse</option>
+                                <option value="Animations sportives">Animations sportives</option>
+                                <option value="PIJ">PIJ</option>
+                                <option value="Mediation">Mediation</option>
 
 
-                                    <option disabled>--Prospective et mutations urbaines--</option>
-                                    <option value="Développement Urbain: Urbanisme">Développement Urbain: Urbanisme</option>
-                                    <option value="Développement Urbain: Foncier">Développement Urbain: Foncier</option>
-                                    <option value="Développement Urbain: PPSP">Développement Urbain: PPSP</option>
-                                    <option value="Stratégies territoriales">Stratégies territoriales</option>
-                                    <option value="Performance de l'habitat">Performance de l'habitat</option>
+                                <option disabled>--Prospective et mutations urbaines--</option>
+                                <option value="Développement Urbain: Urbanisme">Développement Urbain: Urbanisme</option>
+                                <option value="Développement Urbain: Foncier">Développement Urbain: Foncier</option>
+                                <option value="Développement Urbain: PPSP">Développement Urbain: PPSP</option>
+                                <option value="Stratégies territoriales">Stratégies territoriales</option>
+                                <option value="Performance de l'habitat">Performance de l'habitat</option>
 
 
-                                    <option disabled>--Ville attractive--</option>
-                                    <option value="Batiments">Batiments</option>
-                                    <option value="Festivités logistique">Festivités logistique</option>
-                                    <option value="Ville nourricière">Ville nourricière</option>
-                                    <option value="Transition énergétique">Transition énergétique</option>
-                                    <option value="Environnement">Environnement</option>
-                                    <option value="Mission d'appui">Mission d'appui</option>
-                                    <option value="Espace public">Espace public</option>
-
-
-
-                                    <option disabled>--Ville moderne--</option>
-                                    <option value="Ressources humaines">Ressources humaines</option>
-                                    <option value="Affaires juridiques">Affaires juridiques</option>
-                                    <option value="Commandes publique">Commandes publique</option>
-                                    <option value="Transformation numérique">Transformation numérique</option>
-                                    <option value="Finances">Finances</option>
-                                    <option value="Archives documentation">Archives documentation</option>
-                                    <option value="Guichet unique">Guichet unique</option>
-
-
-                                    <option disabled>--Cohésion local--</option>
-                                    <option value="Agora">Agora</option>
-                                    <option value="Vie des quartiers et citoyenneté">Vie des quartiers et citoyenneté</option>
-                                    <option value="Animation commerciale patrimoniale">Animation commerciale patrimoniale</option>
-                                    <option value="CCAS">CCAS</option>
-                                    <option value="Inclusion et développement numérique">Inclusion et développement numérique</option>
-
-
-                                    <option disabled>--Ville culturelle--</option>
-                                    <option value="Ecoles municipales">Ecoles municipales</option>
-                                    <option value="Programmation culturelle">Programmation culturelle</option>
-                                    <option value="Coopération culturelle-Médicis">Coopération culturelle-Médicis</option>
-                                    <option value="Grands évènements">Grands évènements</option>
-                                    <option value="Médiathèque-Ludothèque">Médiathèque-Ludothèque</option>
+                                <option disabled>--Ville attractive--</option>
+                                <option value="Batiments">Batiments</option>
+                                <option value="Festivités logistique">Festivités logistique</option>
+                                <option value="Ville nourricière">Ville nourricière</option>
+                                <option value="Transition énergétique">Transition énergétique</option>
+                                <option value="Environnement">Environnement</option>
+                                <option value="Mission d'appui">Mission d'appui</option>
+                                <option value="Espace public">Espace public</option>
 
 
 
+                                <option disabled>--Ville moderne--</option>
+                                <option value="Ressources humaines">Ressources humaines</option>
+                                <option value="Affaires juridiques">Affaires juridiques</option>
+                                <option value="Commandes publique">Commandes publique</option>
+                                <option value="Transformation numérique">Transformation numérique</option>
+                                <option value="Finances">Finances</option>
+                                <option value="Archives documentation">Archives documentation</option>
+                                <option value="Guichet unique">Guichet unique</option>
+
+
+                                <option disabled>--Cohésion local--</option>
+                                <option value="Agora">Agora</option>
+                                <option value="Vie des quartiers et citoyenneté">Vie des quartiers et citoyenneté</option>
+                                <option value="Animation commerciale patrimoniale">Animation commerciale patrimoniale</option>
+                                <option value="CCAS">CCAS</option>
+                                <option value="Inclusion et développement numérique">Inclusion et développement numérique</option>
+
+
+                                <option disabled>--Ville culturelle--</option>
+                                <option value="Ecoles municipales">Ecoles municipales</option>
+                                <option value="Programmation culturelle">Programmation culturelle</option>
+                                <option value="Coopération culturelle-Médicis">Coopération culturelle-Médicis</option>
+                                <option value="Grands évènements">Grands évènements</option>
+                                <option value="Médiathèque-Ludothèque">Médiathèque-Ludothèque</option>
 
 
 
@@ -368,53 +365,56 @@ function SalarieModification() {
 
 
 
-                                </select>
-                            </td>
-                        </tr>
 
-                        <tr>
-                            <td colSpan={2}>
-                                <button
-                                    style={{ width: "100%" }}
-                                    type="button"
-                                    onClick={() => setButton(true)}
-                                >
-                                    Envoyer
-                                </button>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
 
-            </div>
-            <div hidden={show}>
-                <table border={1}
-                    style={{
-                        borderColor: "red",
-                        margin: "auto",
-                        width: "80%"
-                    }}
 
-                >
-                    <thead>
-                        <tr>
-                            <th>
-                                Nouveaux mots de passe:
-                            </th>
-                            <td>
-                                <input style={{ width: "95%" }} onChange={handlechangePassword} type="text" name="mdp" id="" />
-                            </td>
-                        </tr>
-                        <tr>
-                            <td colSpan={2}>
-                                <button style={{ width: "100%" }} onClick={() => SetSubmit(true)} type="submit">Envoyer</button>
-                            </td>
-                        </tr>
-                    </thead>
-                </table>
-            </div>
+                            </select>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td colSpan={2}>
+                            <button
+                                style={{ width: "100%" }}
+                                type="button"
+                                onClick={() => setButton(true)}
+                            >
+                                Envoyer
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
         </div>
-    )
+        <div hidden={show}>
+            <table border={1}
+                style={{
+                    borderColor: "red",
+                    margin: "auto",
+                    width: "80%"
+                }}
+
+            >
+                <thead>
+                    <tr>
+                        <th>
+                            Nouveaux mots de passe:
+                        </th>
+                        <td>
+                            <input style={{ width: "95%" }} onChange={handlechangePassword} type="text" name="mdp" id="" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colSpan={2}>
+                            <button style={{ width: "100%" }} onClick={() => SetSubmit(true)} type="submit">Envoyer</button>
+                        </td>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
+)
 }
 
 export default SalarieModification;

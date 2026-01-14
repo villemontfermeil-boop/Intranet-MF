@@ -20,19 +20,11 @@ function ModifierSalarie() {
 
         const credential = btoa(`${identifiant}:${password}`)
         try {
-            const response = await fetch(`http://localhost:8080/salaries/Salarie/${encodeURIComponent(name)}`, {
-                method: "GET",
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                    'Authorization': `Basic ${credential}`
-                }
-
-
-            })
+            const response = await fetch(`/api/Montfermeil/users/Salarie/${name}`)
             const data = await response.json();
             Setpeople(data);
             SetVisible(true)
-
+            console.log(data)
 
 
         } catch (error) {
