@@ -10,7 +10,7 @@ function Header({ nom }: { nom: string | null }) {
     const [clicked, setClicked] = useState(false);
     const [clickedOUT, setClickedOUT] = useState(false);
     const [clientConnected, setClientConnected] = useState(false);
-    const admin = sessionStorage.getItem('isAdmin') === 'true';
+    const [admin, setAdmin] = useState(false);
     const router = useRouter();
     const [menu, SetMenu] = useState(false)
 
@@ -18,8 +18,14 @@ function Header({ nom }: { nom: string | null }) {
     // Use sessionStorage so the user stays logged on refresh but is cleared on tab close.
     useEffect(() => {
         // Initialize connection state from sessionStorage on mount
-        const isConnected = sessionStorage.getItem('isConnected') === 'true';
-        setClientConnected(isConnected);
+        try {
+            const isConnected = sessionStorage.getItem('isConnected') === 'true';
+            setClientConnected(isConnected);
+            setAdmin(sessionStorage.getItem('isAdmin') === 'true');
+        } catch (e) {
+            setClientConnected(false);
+            setAdmin(false);
+        }
 
         // Send a logout request to server when the page is being unloaded because of a close.
         // We try to skip sending on a reload by checking the navigation type.
@@ -97,7 +103,8 @@ function Header({ nom }: { nom: string | null }) {
             alert(`Bienvenue ${data.nom} ${data.prenom}`)
             console.log('Login successful', data);
             console.log('data', sessionStorage)
-
+            const othercredential = btoa(`${data.mail}:${password.value}`);
+            document.cookie = 'credential=' + othercredential + '; path=/';
 
             return true;
         } catch (error) {

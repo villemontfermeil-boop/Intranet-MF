@@ -24,15 +24,7 @@ function SalariePage() {
 
         const credential = btoa(`${identifiant}:${password}`)
         try {
-            const response = await fetch(`http://localhost:8080/salaries/${id}`, {
-                method: "GET",
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                    'Authorization': `Basic ${credential}`
-                }
-
-
-            })
+            const response = await fetch(`/api/Montfermeil/users/${id}`)
             const data = await response.json();
             SetSalarie(data);
 
