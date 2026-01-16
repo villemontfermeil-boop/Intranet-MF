@@ -99,6 +99,7 @@ public class SalarieControllerMF {
             salarier.setFonction(fonction);
             salarier.setLocalisation(
                     com.IntranetMF.Intranet.modele.LocalisationEnumMF.Localisation.valueOf(localisation));
+                    System.out.print(salarier);
             return salarieControllerMF.save(salarier); // sauvegarde de l'objet existant modifié
         } else {
             throw new RuntimeException("Aucun salarié trouvé pour cet ID: " + id);
@@ -140,6 +141,8 @@ public class SalarieControllerMF {
         newSalarie.setLocalisation(
                 com.IntranetMF.Intranet.modele.LocalisationEnumMF.Localisation.valueOf(localisation));
         newSalarie.setIsConnected(false);
+        
+                    System.out.print(newSalarie);
 
         return salarieControllerMF.save(newSalarie);
     }
@@ -221,7 +224,7 @@ public class SalarieControllerMF {
             LeSalarier.setPassword(encodedPassword);
 
             salarieControllerMF.save(LeSalarier);
-            System.out.println("Mots de passe: "+ password);
+            System.out.println("Mots de passe: " + password);
             return "Réinitialisation éffectuer avec succes";
         } else {
             return "identifiant inconnue";

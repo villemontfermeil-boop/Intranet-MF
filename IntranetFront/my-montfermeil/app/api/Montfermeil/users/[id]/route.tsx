@@ -5,7 +5,7 @@ type Context = {
     id: string;
   };
 };
-const backendUrl = process.env.BACKEND_API || "http://localhost:8080";
+const backendUrl = process.env.BACKEND_API;
 
 export async function GET(request: Request, context: any) {
   // support both Promise params (when framework provides) and plain object
@@ -23,7 +23,7 @@ export async function GET(request: Request, context: any) {
         const headers: Record<string, string> = {};
         if (credential) headers['Authorization'] = `Basic ${credential}`;
 
-        const resp = await fetch(`${backendUrl.replace(/\/$/, '')}/salaries/${id}`, { headers });
+        const resp = await fetch(`${process.env.BACKEND_API}/salaries/${id}`, { headers });
 
         const text = await resp.text();
 
