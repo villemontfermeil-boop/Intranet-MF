@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import './stylheader.css';
 import { useRouter } from 'next/navigation';
 import { Console } from 'console';
+import { json } from 'stream/consumers';
 
 //AJOUTER UN NOMBRE DE TENTATIVE DE CONNEXION
 
@@ -52,9 +53,10 @@ function Header({ nom }: { nom: string | null }) {
                 const data = new URLSearchParams({ mail }).toString();
 
                 // Use sendBeacon so the request is more likely to complete during unload
-                navigator.sendBeacon('http://localhost:8080/salaries/logout', data);
+                navigator.sendBeacon('/api/Montfermeil/users/logout', data);
             } catch (e) {
                 // best-effort; ignore errors during unload
+                console.log(e)
             }
         };
 
@@ -71,25 +73,25 @@ function Header({ nom }: { nom: string | null }) {
     async function handleLogin() {
         const email = document.getElementById('Email') as HTMLInputElement;
         const password = document.getElementById('Pass') as HTMLInputElement;
-
+        const FormBody = new URLSearchParams({
+            mail: email.value,
+            password: password.value
+        })
         if (!email || !password) return false;
 
         try {
-            const response = await fetch('http://localhost:8080/salaries/login', {
+            const response = await fetch('/api/Montfermeil/users/login', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                    'Authorization': 'Bearer intranetMF-token'
-                },
-                body: new URLSearchParams({
-                    mail: email.value,
-                    password: password.value
-                })
+                body: FormBody
             });
 
             const data = await response.json();
-
+           if(data.id == null || data.nom == null || data.prenom == null || data.isAdmin == null ||data.numero == null){
+               alert("Email invalide ou mot de passe incorrecte")
+            return false
+            }
             sessionStorage.setItem('id', data.id);
+            
             sessionStorage.setItem('nom', data.nom);
             sessionStorage.setItem('prenom', data.prenom);
             sessionStorage.setItem('mail', data.mail);
@@ -98,11 +100,16 @@ function Header({ nom }: { nom: string | null }) {
             sessionStorage.setItem('numero', data.numero);
             sessionStorage.setItem('MDP', password.value);
 
+            
             setClientConnected(true);
             router.refresh();
             alert(`Bienvenue ${data.nom} ${data.prenom}`)
+            console.log("BACKEND DATA:", data)
             console.log('Login successful', data);
             console.log('data', sessionStorage)
+            document.cookie = `Admin=${sessionStorage.getItem('isConnected')}; path=/`
+            document.cookie = `mail=${sessionStorage.getItem('mail')}; path=/`
+            document.cookie = `MDP=${password.value}; path=/`
             const othercredential = btoa(`${data.mail}:${password.value}`);
             document.cookie = 'credential=' + othercredential + '; path=/';
 
@@ -178,9 +185,9 @@ function Header({ nom }: { nom: string | null }) {
 
                         {clientConnected ? (
                             <>
-                               
 
-                                {admin && (
+
+                                {admin == true && (
                                     <button type="button" className='MenuButton' onClick={() => router.push('/Nouveau/Salarie')}>
                                         Nouvel agent
                                     </button>
@@ -190,13 +197,13 @@ function Header({ nom }: { nom: string | null }) {
                                     Les agents
                                 </button>
 
-                                {admin && (
+                                {admin == true && (
                                     <button type="button" className='MenuButton' onClick={() => router.push("/Nouveau/Article")}>
                                         Nouvel article
                                     </button>
                                 )}
-                                 <button type="button" className='MenuButton' onClick={() => setClickedOUT(true)}>
-                                    <u style={{color: "lightblue"}}>Déconnexion</u>
+                                <button type="button" className='MenuButton' onClick={() => setClickedOUT(true)}>
+                                    <u style={{ color: "lightblue" }}>Déconnexion</u>
                                 </button>
                             </>
                         ) : (
