@@ -1,38 +1,25 @@
 package com.IntranetMF.Intranet.controller;
 
-import java.nio.file.Paths;
-import java.time.LocalDateTime;
-
-import com.IntranetMF.Intranet.modele.ArticleMF;
-import com.IntranetMF.Intranet.modele.SalarieMF;
-import com.IntranetMF.Intranet.repository.ArticleInterfacesMF;
-import com.IntranetMF.Intranet.repository.SalarieInterfacesMF;
-
-import org.springframework.web.bind.annotation.RequestParam;
-
-import jakarta.websocket.server.PathParam;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-import org.springframework.web.multipart.MultipartFile;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.IntranetMF.Intranet.modele.ArticleMF;
+import com.IntranetMF.Intranet.modele.SalarieMF;
+import com.IntranetMF.Intranet.repository.ArticleInterfacesMF;
+import com.IntranetMF.Intranet.repository.SalarieInterfacesMF;
 
 @RestController
 @RequestMapping("/Article")
@@ -68,53 +55,56 @@ public class ArticleControllerMF {
             @RequestParam("salarieId") Long salarieId,
             @RequestParam("type") String type,
             @RequestParam("titre") String titre,
-            @RequestParam("file") MultipartFile file) {
+            @RequestParam(value = "file", required = false) MultipartFile file) { // <-- file optionnel
 
         try {
-            // 1. Vérifier que le fichier n'est pas vide
-            if (file.isEmpty()) {
-                return null;
+            String uniqueFileName = null; // Nom du fichier si présent
+
+            // 1. Vérifier que le fichier est présent et non vide
+            if (file != null && !file.isEmpty()) {
+                String originalFilename = file.getOriginalFilename();
+                String fileExtension = "";
+                if (originalFilename != null && originalFilename.contains(".")) {
+                    fileExtension = originalFilename.substring(originalFilename.lastIndexOf("."));
+                }
+                uniqueFileName = UUID.randomUUID().toString() + fileExtension;
+
+                // Créer le dossier uploads s'il n'existe pas
+                Path uploadDir = Paths.get("src/main/resources/static/uploads");
+                if (!Files.exists(uploadDir)) {
+                    Files.createDirectories(uploadDir);
+                }
+
+                // Sauvegarder le fichier
+                Path filePath = uploadDir.resolve(uniqueFileName);
+                Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
             }
 
-            // 2. Générer un nom unique pour le fichier
-            String originalFilename = file.getOriginalFilename();
-            String fileExtension = "";
-            if (originalFilename != null && originalFilename.contains(".")) {
-                fileExtension = originalFilename.substring(originalFilename.lastIndexOf("."));
-            }
-            String uniqueFileName = UUID.randomUUID().toString() + fileExtension;
-
-            // 3. Créer le dossier "uploads" s'il n'existe pas
-            Path uploadDir = Paths.get("src/main/resources/static/uploads");
-            if (!Files.exists(uploadDir)) {
-                Files.createDirectories(uploadDir);
-            }
-
-            // 4. Sauvegarder le fichier sur le disque
-            Path filePath = uploadDir.resolve(uniqueFileName);
-            Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
-
-            // 5. Trouver le salarié
+            // 2. Trouver le salarié
             SalarieMF salarie = salarieInterfacesMF.findById(salarieId)
                     .orElseThrow(() -> new RuntimeException("Salarié non trouvé avec ID: " + salarieId));
 
-            // 6. Créer l'article (comme ta méthode NewArticle mais avec fichier)
+            // 3. Créer l'article
             ArticleMF article = new ArticleMF();
             article.setDescription(description);
-            article.setCreation(); // Met la date actuelle
-            article.setMediaName(uniqueFileName); // Nom unique du fichier
-            article.setPath("/uploads/" + uniqueFileName); // Chemin d'accès
-            article.setSalarie(salarie);
+            article.setCreation(); // Date actuelle
             article.setTitre(titre);
             article.setType(com.IntranetMF.Intranet.modele.ArticleEnumMF.TypeArticle.valueOf(type));
+            article.setSalarie(salarie);
 
-            // 7. Sauvegarder dans la BDD
+            // 4. Si fichier présent, enregistrer le nom et chemin
+            if (uniqueFileName != null) {
+                article.setMediaName(uniqueFileName);
+                article.setPath("/uploads/" + uniqueFileName);
+            }
+
+            // 5. Sauvegarder dans la BDD
             articleControllerMF.save(article);
 
-            return  article;
+            return article;
 
         } catch (Exception e) {
-            e.printStackTrace(); // Pour voir l'erreur dans les logs
+            e.printStackTrace(); // Log
             return null;
         }
     }
