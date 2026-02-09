@@ -10,9 +10,9 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -225,6 +225,7 @@ public class SalarieControllerMF {
 
             salarieControllerMF.save(LeSalarier);
             System.out.println("Mots de passe: " + password);
+            System.out.println("Réinitialisation éffectuer avec succes");
             return "Réinitialisation éffectuer avec succes";
         } else {
             return "identifiant inconnue";

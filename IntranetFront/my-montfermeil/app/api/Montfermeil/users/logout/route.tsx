@@ -1,21 +1,24 @@
 import { error } from "console";
+import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
     const body = await request.formData();
-    const login = cookieStore.get('mail');
-    const password = cookieStore.get('MDP');
+    const cookieStore = await cookies();
+    const login = cookieStore.get('mail')?.value || "";
+    const password = cookieStore.get('MDP')?.value || "";
     const credential = btoa(`${login}:${password}`);
     try {
-        const Response = fetch(`${process.env.BACKEND_API}/salaries/logout`, {
+        const response =await  fetch(`${process.env.BACKEND_API}/salaries/logout`, {
+            method:"POST",
             headers: {
                 "Authorization": `Basic ${credential}`,
                 "Content-Type": "application/x-www-form-urlencoded"
             },
             body: new URLSearchParams(Object.fromEntries(body as any))
         })
-        console.log(Response)
-        const JSON = await (await Response).json();
+        console.log(response)
+        const JSON =await response.json();
         return new NextResponse(JSON, { status: 200 });
     }catch(Error){
         console.log(Error)

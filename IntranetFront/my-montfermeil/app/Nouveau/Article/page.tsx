@@ -5,7 +5,8 @@ import { useEffect, useState } from "react";
 import "@/app/Nouveau/Article/style.css";
 
 function CreationArticle() {
-    const path = "http://localhost:8080/Article/upload";
+    const path = process.env.UPLOAD;
+
     const [file, SetFile] = useState<File | null>();
     const [submit, SetisSubmit] = useState(false);
     const [result, SetResult] = useState([])
@@ -43,12 +44,12 @@ function CreationArticle() {
 
             const login = sessionStorage.getItem("mail")
             const password = sessionStorage.getItem("MDP")
-            const credential = btoa(`${login}:${password}`)
-            const reponse = await fetch(path, {
+
+
+            const reponse = await fetch("/api/Montfermeil/articles/upload", {
                 method: "POST",
-                headers: {
-                    'Authorization': `Basic ${credential}`
-                },
+
+                 
                 body: formData
             })
             SetResult(await reponse.json());

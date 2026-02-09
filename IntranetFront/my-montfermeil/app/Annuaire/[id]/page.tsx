@@ -117,18 +117,16 @@ function SalarieModification() {
 
     async function passwordReset() {
         try {
-
-
-            const response = await fetch("http://localhost:8080/salaries/PasswordReset", {
+            const users ={
+                id : idValue || '',
+                password: passwordForgot.mdp || ''
+            }
+            const response = await fetch("/api/Montfermeil/users/PasswordReset",{
                 method: "PATCH",
                 headers: {
-                    "Authorization": `Basic ${credential}`,
-                    "Content-Type": "application/x-www-form-urlencoded"
+                    'Content-Type': 'application/x-www-form-urlencoded',
                 },
-                body: new URLSearchParams({
-                    id: idValue || '',
-                    password: passwordForgot.mdp || ''
-                })
+                body: new URLSearchParams(users as Record<string, string>)
             })
             alert("Modification éffectuer avec succès");
         } catch (error) {

@@ -2,8 +2,7 @@
 import { useState, useEffect } from 'react';
 import './stylheader.css';
 import { useRouter } from 'next/navigation';
-import { Console } from 'console';
-import { json } from 'stream/consumers';
+
 
 //AJOUTER UN NOMBRE DE TENTATIVE DE CONNEXION
 
@@ -86,12 +85,12 @@ function Header({ nom }: { nom: string | null }) {
             });
 
             const data = await response.json();
-           if(data.id == null || data.nom == null || data.prenom == null || data.isAdmin == null ||data.numero == null){
-               alert("Email invalide ou mot de passe incorrecte")
-            return false
+            if (data.id == null || data.nom == null || data.prenom == null || data.isAdmin == null || data.numero == null) {
+                alert("Email invalide ou mot de passe incorrecte")
+                return false
             }
             sessionStorage.setItem('id', data.id);
-            
+
             sessionStorage.setItem('nom', data.nom);
             sessionStorage.setItem('prenom', data.prenom);
             sessionStorage.setItem('mail', data.mail);
@@ -100,7 +99,7 @@ function Header({ nom }: { nom: string | null }) {
             sessionStorage.setItem('numero', data.numero);
             sessionStorage.setItem('MDP', password.value);
 
-            
+
             setClientConnected(true);
             router.refresh();
             alert(`Bienvenue ${data.nom} ${data.prenom}`)
@@ -125,18 +124,33 @@ function Header({ nom }: { nom: string | null }) {
        ========================= */
     async function handleLogout() {
 
-        const credential = btoa(`${sessionStorage.getItem('mail')}:${sessionStorage.getItem('MDP')}`);
+        // const credential = btoa(`${sessionStorage.getItem('mail')}:${sessionStorage.getItem('MDP')}`);
+
         try {
-            await fetch('http://localhost:8080/salaries/logout', {
-                method: 'POST',
+            // await fetch('http://localhost:8080/salaries/logout', {
+            //     method: 'POST',
+            //     headers: {
+            //         'Content-Type': 'application/x-www-form-urlencoded',
+            //         'Authorization': `Basic ${credential}`
+            //     },
+            //     body: new URLSearchParams({
+            //         mail: sessionStorage.getItem('mail') || ''
+            //     })
+            // });
+
+            await fetch("/api/Montfermeil/users/logout", {
+                method: "POST",
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
-                    'Authorization': `Basic ${credential}`
                 },
                 body: new URLSearchParams({
                     mail: sessionStorage.getItem('mail') || ''
                 })
-            });
+            })
+            sessionStorage.clear()
+             document.cookie = "mail=; Max-Age=0; path=/";
+        document.cookie = "MDP=; Max-Age=0; path=/";
+        document.cookie = "credential=; Max-Age=0; path=/";
         } catch (e) {
             console.error('Logout error:', e);
         }
