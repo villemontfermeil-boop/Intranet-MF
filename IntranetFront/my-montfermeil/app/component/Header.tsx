@@ -124,20 +124,8 @@ function Header({ nom }: { nom: string | null }) {
        ========================= */
     async function handleLogout() {
 
-        // const credential = btoa(`${sessionStorage.getItem('mail')}:${sessionStorage.getItem('MDP')}`);
 
         try {
-            // await fetch('http://localhost:8080/salaries/logout', {
-            //     method: 'POST',
-            //     headers: {
-            //         'Content-Type': 'application/x-www-form-urlencoded',
-            //         'Authorization': `Basic ${credential}`
-            //     },
-            //     body: new URLSearchParams({
-            //         mail: sessionStorage.getItem('mail') || ''
-            //     })
-            // });
-
             await fetch("/api/Montfermeil/users/logout", {
                 method: "POST",
                 headers: {
@@ -209,6 +197,9 @@ function Header({ nom }: { nom: string | null }) {
 
                                 <button type="button" className='MenuButton' onClick={() => router.push('/Annuaire/Salarie')}>
                                     Les agents
+                                </button>
+                                <button type='button' className='MenuButton' onClick={() => router.push('/Transport')}>
+                                    Transport
                                 </button>
 
                                 {admin == true && (

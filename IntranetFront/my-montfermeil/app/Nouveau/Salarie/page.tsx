@@ -63,7 +63,7 @@ function AdminPanel() {
             console.log(response);
             console.log("Headers:", Object.fromEntries(response.headers.entries()));
             alert(`${newSalarie.nom} ${newSalarie.prenom} à été ajouter`)
-            // router.push('/')
+            router.push('/')
         } catch (error) {
             console.log(error);
 
