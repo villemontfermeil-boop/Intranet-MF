@@ -38,6 +38,9 @@ public class SecurityConfig {
                         .requestMatchers("/salaries/login").permitAll()
                         .requestMatchers("/Article/upload").authenticated()
                         .requestMatchers("/media/**").permitAll()
+
+                        //à verifier
+                        .requestMatchers("/uploads/Photos/**").permitAll()
                         
                         // ADMIN
                         .requestMatchers("/salaries/NewSalarie").hasRole("ADMIN")
@@ -46,6 +49,7 @@ public class SecurityConfig {
                         .requestMatchers("/salaries/{id}").hasAnyRole("USER", "ADMIN")
                         .requestMatchers("/salaries/logout").authenticated()
                         .requestMatchers("/Salarie/{email}").authenticated()
+                        .requestMatchers("/Photo").authenticated()
                         .requestMatchers("/Article/newArticle").authenticated()
                         .requestMatchers("/Modification/Salarie/{id}").hasRole("ADMIN")
 

@@ -4,16 +4,31 @@ import { Params } from "next/dist/server/request/params";
 import { useParams } from "next/navigation";
 import { Router, useRouter } from "next/router";
 import { useEffect, useState } from "react";
-
+import { json } from "stream/consumers";
+import "./style";
 
 
 
 
 function SalariePage() {
     const params = useParams();
-    const id = params?.id ? parseInt(params.id as string) : 0;
+    const id = params?.id ? Number(params.id) : undefined;
     const [salarie, SetSalarie] = useState<any>({})
+    const [image , SetImage] = useState<any>({});
+    const profileImage = `http://localhost:8080/uploads/Photos/${image.photo}`
     
+    console.log("Il contien :" ,image
+
+    )
+    
+    //  const profileImage =  async () => {
+    //     try {
+    //       return  await fetch(`/api/Montfermeil/users/Photo/Profile/${image.photo}`)
+             
+    //     }catch(e){
+    //         console.log(e)
+    //     }
+    // }
     if (sessionStorage.length == 0 || sessionStorage.length == null) {
        window.location.href="/"
     }
@@ -39,13 +54,30 @@ function SalariePage() {
     }
 
     useEffect(() => {
-
+ if (!id || isNaN(id)) return;
         LookingForid(id)
-    }, [])
-    console.log(salarie)
+        getProfile(id)
+    }, [id])
+
+
+
+    async function getProfile(oneId: number){
+        try{
+            const reponse = await fetch(`/api/Montfermeil/users/Photo/${oneId}`)
+            const json = await reponse.json();
+            
+            SetImage(json);
+console.log(json);
+        }catch(e){
+            console.log(e);
+        }
+    } 
     return (
         <div>
-            <div style={{ placeItems: "center" }}>
+            <div>
+                {image.status != 500 ?<img src={profileImage} alt="" /> : <img style={{width: "200px", height:"200px"}} className="PP" src="/cercle-bleu-utilisateur-blanc_78370-4707.avif" alt="" />}
+            </div>
+            <div style={{ placeItems: "start end" }}>
                 <h1>
                     <u>
                         {salarie.nom}
