@@ -91,8 +91,8 @@ function ModifierSalarie() {
                                     <tr key={index}>
                                         <td data-label="Nom">{person.nom || 'N/A'}</td>
                                         <td data-label="Prénom">{person.prenom || 'N/A'}</td>
-                                        <td data-label="Téléphone">{person.numero || 'N/A'}</td>
-                                        <td className="hide-on-mobile" data-label="Tél. Pro">{person.telephonepro || 'N/A'}</td>
+                                        <td data-label="Téléphone"><a href={`tel:${person.numero || 'N/A'}`}>{person.numero || 'N/A'}</a></td>
+                                        <td className="hide-on-mobile" data-label="Tél. Pro"><a href={`tel:${person.telephonepro || 'N/A'}`}>{person.telephonepro || 'N/A'}</a></td>
                                         <td data-label="Email">
                                             <a href={`mailto:${person.mail || 'N/A'}`}>
                                                 {person.mail || 'N/A'}

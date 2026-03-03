@@ -4,9 +4,10 @@ import './stylheader.css';
 
 function footer() {
 
+    const hauteurFooter = "50px"
 
     return (
-        <footer className="site-footer" >
+        <footer className="site-footer" style={{marginTop: hauteurFooter, position: "relative"}} >
             <div className="footer-content">
                 <p>© 2025 site intranet de Montfermeil. Réservés au agents de la mairire.</p>
                 <div className="footer-links">

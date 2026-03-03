@@ -28,7 +28,7 @@ function RootLayout({ children }: { children: React.ReactNode }) {
 
 
         </div>
-          <Footer />
+          <Footer  />
 
 
       </body>

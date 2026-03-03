@@ -101,7 +101,7 @@ function Header({ nom }: { nom: string | null }) {
             sessionStorage.setItem('localisation', data.localisation);
             sessionStorage.setItem('fonction', data.fonction);
             sessionStorage.setItem('telephonepro', data.telephonepro);
-            
+
 
 
             setClientConnected(true);
@@ -118,7 +118,7 @@ function Header({ nom }: { nom: string | null }) {
             return true;
         } catch (error) {
             alert('Email invalide ou mot de passe incorrecte')
-            
+
             return false;
         }
     }
@@ -140,9 +140,9 @@ function Header({ nom }: { nom: string | null }) {
                 })
             })
             sessionStorage.clear()
-             document.cookie = "mail=; Max-Age=0; path=/";
-        document.cookie = "MDP=; Max-Age=0; path=/";
-        document.cookie = "credential=; Max-Age=0; path=/";
+            document.cookie = "mail=; Max-Age=0; path=/";
+            document.cookie = "MDP=; Max-Age=0; path=/";
+            document.cookie = "credential=; Max-Age=0; path=/";
         } catch (e) {
             console.error('Logout error:', e);
         }
@@ -155,25 +155,25 @@ function Header({ nom }: { nom: string | null }) {
 
     useEffect(() => {
         const performLogin = async () => {
-        if (clicked) {
-            const success = await handleLogin();  
-            if (success) {
-                setClicked(false);
-                location.reload()
-            }else{
-                             setClicked(false)
+            if (clicked) {
+                const success = await handleLogin();
+                if (success) {
+                    setClicked(false);
+                    location.reload()
+                } else {
+                    setClicked(false)
 
 
+                }
             }
-        }
-        
-        if (clickedOUT) {
-            await handleLogout();  
-            setClickedOUT(false);
-        }
-    };
-    
-    performLogin();
+
+            if (clickedOUT) {
+                await handleLogout();
+                setClickedOUT(false);
+            }
+        };
+
+        performLogin();
     }, [clicked, clickedOUT]);
 
 
@@ -217,11 +217,11 @@ function Header({ nom }: { nom: string | null }) {
                                     Transport
                                 </button>
 
-                                {admin == true && (
-                                    <button type="button" className='MenuButton' onClick={() => router.push("/Nouveau/Article")}>
-                                        Nouvel article
-                                    </button>
-                                )}
+
+                                <button type="button" className='MenuButton' onClick={() => router.push("/Nouveau/Article")}>
+                                    Nouvel article
+                                </button>
+
                                 <button type='button' className='MenuButton' onClick={() => router.push('/Profil')} > Mon profil </button>
 
                                 <button type="button" className='MenuButton' onClick={() => setClickedOUT(true)}>

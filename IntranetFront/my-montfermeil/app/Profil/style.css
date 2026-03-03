@@ -1,7 +1,9 @@
 .PhotoCLass {
     position: relative;
     width: 200px;
-    margin: 20px auto; /* centre proprement */
+    margin: auto;
+    float: left;
+    margin-left: 155px;
 }
 
 .Conteneur {

@@ -6,6 +6,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -38,6 +39,7 @@ public class PhotoControllerMF {
     }
 
     @PostMapping("/Nouveaux")
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<String> newPhoto(@RequestParam("file") MultipartFile file, @RequestParam Long id) {
         if (!file.getContentType().startsWith("image/")) {
             return ResponseEntity.badRequest().body("Fichier invalide");
@@ -46,6 +48,9 @@ public class PhotoControllerMF {
         Optional<SalarieMF> verificationDuSalarie = salarieMF.findById(id);
         if (verificationDuSalarie.isPresent()) {
             SalarieMF salarie = verificationDuSalarie.get();
+             if (salarie.getIsConnected() == false){
+                throw new RuntimeException("L'utilisateur doit etre connecter sur le site");
+            }
             Optional<PhotoMF> photo = photoInterfacesMF.findBySalarie(salarie);
 
             if (photo.isPresent()) {
@@ -86,12 +91,14 @@ public class PhotoControllerMF {
     }
 
     @GetMapping("/Profile/{id}")
+    @PreAuthorize("hasRole('USER')")
     public Optional<PhotoMF> getProfileImage(@PathVariable Long id) {
         Optional<SalarieMF> salarie = salarieMF.findById(id);
 
         if (salarie.isPresent()) {
             Optional<PhotoMF> profil = photoInterfacesMF.findBySalarie(salarie.get());
             if (profil.isPresent()) {
+                
                 return profil;
             } else {
                 throw new RuntimeException("Salarie not found with id: " + id);
@@ -103,6 +110,7 @@ public class PhotoControllerMF {
     }
 
     @PutMapping("/Modifier")
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<String> modifyProfileImage(
             @RequestParam("file") MultipartFile file,
             @RequestParam Long id) {
@@ -114,6 +122,9 @@ public class PhotoControllerMF {
             SalarieMF Lesalarier = salarier.get();
             System.out.println("Salarié trouvé: " + Lesalarier.getNom() + " " + Lesalarier.getPrenom());
 
+            if (Lesalarier.getIsConnected() == false){
+                throw new RuntimeException("L'utilisateur doit etre connecter sur le site");
+            }
             Optional<PhotoMF> unePhoto = photoInterfacesMF.findBySalarie(Lesalarier);
 
             if (unePhoto.isPresent()) {

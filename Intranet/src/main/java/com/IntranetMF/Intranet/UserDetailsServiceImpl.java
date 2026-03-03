@@ -27,7 +27,7 @@ public class UserDetailsServiceImpl implements UserDetailsService  {
 
         List<GrantedAuthority> authority = new ArrayList<>();
 
-        if(unSalarie.getIsAdmin() && unSalarie.getIsAdmin() != null){
+        if(unSalarie.getIsAdmin() != null && unSalarie.getIsAdmin()){
             authority.add( new SimpleGrantedAuthority("ROLE_ADMIN"));
             System.out.println("Vous etes connecter en tant qu'admin");
         }else{
