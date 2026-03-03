@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import com.IntranetMF.Intranet.modele.SalarieMF;
 import com.IntranetMF.Intranet.repository.SalarieInterfacesMF;
@@ -37,21 +38,26 @@ public class SalarieControllerMF {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('USER')")
     public SalarieMF getMethodName(@PathVariable Long id) {
         var salarieOpt = salarieControllerMF.findById(id);
         if (salarieOpt.isPresent()) {
-            return salarieOpt.get();
+            SalarieMF salarie = salarieOpt.get();
+           
+            return salarie;
         } else {
             throw new RuntimeException("Salarie not found with id: " + id);
         }
     }
 
     @GetMapping("/")
+    @PreAuthorize("hasRole('ADMIN')")
     public Iterable<SalarieMF> getAllSalaries() {
         return salarieControllerMF.findAll();
     }
 
     @GetMapping("/Salarie/{nom}")
+    @PreAuthorize("hasRole('USER')")
     public List<SalarieMF> findSalarierbymail(@PathVariable String nom) {
 
         String[] coupage = nom.trim().split("\\s+"); // Séparer en mots
@@ -78,6 +84,7 @@ public class SalarieControllerMF {
     }
 
     @PatchMapping("/Modification/Salarie/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public SalarieMF ModifyASalarier(
             @PathVariable Long id,
             @RequestParam String nom,
@@ -108,6 +115,7 @@ public class SalarieControllerMF {
 
     @Transactional
     @PostMapping("/NewSalarie")
+    @PreAuthorize("hasRole('ADMIN')")
     public SalarieMF createSalarie(
             @RequestParam String nom,
             @RequestParam String prenom,
@@ -192,6 +200,10 @@ public class SalarieControllerMF {
         if (salarieOpt.isPresent()) {
             SalarieMF salarie = salarieOpt.get();
 
+             if (salarie.getIsConnected() == false){
+                throw new RuntimeException("L'utilisateur doit etre connecter sur le site");
+            }
+
             ZonedDateTime parisTime = ZonedDateTime.now(ZoneId.of("Europe/Paris"));
             LocalDateTime localDateTime = parisTime.toLocalDateTime();
 
@@ -211,6 +223,7 @@ public class SalarieControllerMF {
     }
 
     @PatchMapping("/PasswordReset")
+    @PreAuthorize("hasRole('ADMIN')")
     public String passwordReset(@RequestParam Long id, @RequestParam String password) {
         Optional<SalarieMF> salarie = salarieControllerMF.findById(id);
         if (salarie.isPresent()) {

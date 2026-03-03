@@ -4,9 +4,13 @@ import com.IntranetMF.Intranet.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
@@ -17,14 +21,25 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import java.util.List;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity(
+    prePostEnabled = true,
+    securedEnabled = true,
+    jsr250Enabled = true
+)
 public class SecurityConfig {
 
     @Autowired
     private UserDetailsServiceImpl userDetailsService;
 
+
+   @Bean
+    public RoleHierarchy roleHierarchy() {
+        return RoleHierarchyImpl.fromHierarchy("ROLE_ADMIN > ROLE_USER");
+    }
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -53,6 +68,7 @@ public class SecurityConfig {
                         .requestMatchers("/Photo").authenticated()
                         .requestMatchers("/Article/newArticle").authenticated()
                         .requestMatchers("/Modification/Salarie/{id}").hasRole("ADMIN")
+                        .requestMatchers("/salaries/PasswordReset").hasRole("ADMIN")
 
                         .anyRequest().authenticated() // tout le reste nécessite auth
                 )
@@ -71,6 +87,8 @@ public class SecurityConfig {
 
         return auth.build();
     }
+
+    
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
