@@ -1,7 +1,6 @@
 
 'use client';
 
-import { FallbackMode } from 'next/dist/lib/fallback';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { json } from 'stream/consumers';

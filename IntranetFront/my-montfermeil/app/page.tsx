@@ -67,9 +67,9 @@ function HomePage() {
                 <u>Bienvenue sur l'intranet de la ville de montfermeil 2.0</u>
             </h1>
 
-            <div className="articles-container">
+            <div className="articles-container" style={{alignItems:"center"}}>
                 {data.map((value, index) => (
-                    <div key={index} style={{ border: "3px solid #3498db", placeItems: "center", marginTop: "5%" }}>
+                    <div key={index} style={{ border: "3px solid #3498db", placeItems: "center", marginTop: "5%" , textAlign:"center"}}>
 
                         <h4><u>{value.titre}</u></h4>
                         <p>Créer le : {value.creation}</p>

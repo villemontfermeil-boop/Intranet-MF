@@ -20,14 +20,19 @@ function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <body>
-        <div>
+        
           <Header nom={fullname} />
+        
+        <div>{children}
+
+
+
         </div>
-        <div>{children}</div>
-        <div>
           <Footer />
-        </div>
+
+
       </body>
+
     </html>
   );
 }

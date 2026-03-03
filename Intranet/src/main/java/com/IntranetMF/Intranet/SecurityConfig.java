@@ -49,6 +49,7 @@ public class SecurityConfig {
                         .requestMatchers("/salaries/{id}").hasAnyRole("USER", "ADMIN")
                         .requestMatchers("/salaries/logout").authenticated()
                         .requestMatchers("/Salarie/{email}").authenticated()
+                        .requestMatchers("/Photo/Nouveaux").authenticated()
                         .requestMatchers("/Photo").authenticated()
                         .requestMatchers("/Article/newArticle").authenticated()
                         .requestMatchers("/Modification/Salarie/{id}").hasRole("ADMIN")

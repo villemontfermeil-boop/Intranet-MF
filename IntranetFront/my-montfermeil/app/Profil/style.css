@@ -1,0 +1,36 @@
+.PhotoCLass {
+    position: relative;
+    width: 200px;
+    margin: 20px auto; /* centre proprement */
+}
+
+.Conteneur {
+    width: 100%;
+    display: block;
+}
+
+.PP {
+    position: absolute;
+    top: 45px;
+    left: 40px;
+    width: 125px;
+    height: 125px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+.layout {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 50px;
+    flex-wrap: wrap; /* évite les bugs si écran petit */
+}
+.MyTable{
+    margin-top: 50px;
+}
+.MenuButtonN {
+        width: 100%;
+        margin: 5px 0;
+        text-align: center;
+        margin-left: 2px;
+    }
