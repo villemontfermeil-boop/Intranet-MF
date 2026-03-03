@@ -3,7 +3,7 @@
     width: 200px;
     margin: auto;
     float: left;
-    margin-left: 350px;
+    margin-left: 180px;
 }
 
 .Conteneur {
@@ -19,4 +19,9 @@
     height: 125px;
     object-fit: cover;
     border-radius: 8px; /* optionnel */
+}
+.tableau{
+    margin: auto;
+    position: relative;
+
 }

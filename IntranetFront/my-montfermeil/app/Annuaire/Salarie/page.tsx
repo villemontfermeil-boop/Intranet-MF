@@ -81,7 +81,6 @@ function ModifierSalarie() {
                                     <th>Email</th>
                                     <th className="hide-on-tablet">Fonction</th>
                                     <th>Services</th>
-                                    <th>Lieux</th>
                                     <th>Découvrir</th>
                                     {/* Ajouter une collone lieux */}
                                     {sessionStorage.getItem("isAdmin") == 'true' && <th>Modifier</th>}
@@ -101,7 +100,6 @@ function ModifierSalarie() {
                                         </td>
                                         <td className="hide-on-tablet" data-label="Fonction">{person.fonction || 'N/A'}</td>
                                         <td data-label="Services">{person.localisation || 'N/A'}</td>
-                                        <td>V</td>
                                         <td><button onClick={() => routeur.push(`/Annuaire/Salarie/${person.id}`)}
                                             className="modifier-btn">Voir</button></td>
                                         {sessionStorage.getItem("isAdmin") == 'true' && (
