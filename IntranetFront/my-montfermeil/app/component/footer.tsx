@@ -6,7 +6,7 @@ function footer() {
 
 
     return (
-        <footer className="site-footer">
+        <footer className="site-footer" >
             <div className="footer-content">
                 <p>© 2025 site intranet de Montfermeil. Réservés au agents de la mairire.</p>
                 <div className="footer-links">

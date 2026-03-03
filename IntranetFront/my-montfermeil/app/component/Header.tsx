@@ -98,6 +98,10 @@ function Header({ nom }: { nom: string | null }) {
             sessionStorage.setItem('isConnected', 'true');
             sessionStorage.setItem('numero', data.numero);
             sessionStorage.setItem('MDP', password.value);
+            sessionStorage.setItem('localisation', data.localisation);
+            sessionStorage.setItem('fonction', data.fonction);
+            sessionStorage.setItem('telephonepro', data.telephonepro);
+            
 
 
             setClientConnected(true);
@@ -111,10 +115,10 @@ function Header({ nom }: { nom: string | null }) {
             document.cookie = `MDP=${password.value}; path=/`
             const othercredential = btoa(`${data.mail}:${password.value}`);
             document.cookie = 'credential=' + othercredential + '; path=/';
-
             return true;
         } catch (error) {
             alert('Email invalide ou mot de passe incorrecte')
+            
             return false;
         }
     }
@@ -150,15 +154,26 @@ function Header({ nom }: { nom: string | null }) {
     }
 
     useEffect(() => {
+        const performLogin = async () => {
         if (clicked) {
-            handleLogin();
-            setClicked(false);
-        }
+            const success = await handleLogin();  
+            if (success) {
+                setClicked(false);
+                location.reload()
+            }else{
+                             setClicked(false)
 
+
+            }
+        }
+        
         if (clickedOUT) {
-            handleLogout();
+            await handleLogout();  
             setClickedOUT(false);
         }
+    };
+    
+    performLogin();
     }, [clicked, clickedOUT]);
 
 
@@ -207,9 +222,12 @@ function Header({ nom }: { nom: string | null }) {
                                         Nouvel article
                                     </button>
                                 )}
+                                <button type='button' className='MenuButton' onClick={() => router.push('/Profil')} > Mon profil </button>
+
                                 <button type="button" className='MenuButton' onClick={() => setClickedOUT(true)}>
                                     <u style={{ color: "lightblue" }}>Déconnexion</u>
                                 </button>
+
                             </>
                         ) : (
                             <>

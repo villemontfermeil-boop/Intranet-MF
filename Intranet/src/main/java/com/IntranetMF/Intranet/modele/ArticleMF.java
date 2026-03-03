@@ -36,7 +36,7 @@ public class ArticleMF {
     @Column(name = "TITRE_MF")
     private String titre;
 
-    @Column(name = "DESCRIPTION_MF", nullable = false)
+    @Column(name = "DESCRIPTION_MF", nullable = false, columnDefinition="TEXT")
     private String description;
 
     @Column(name = "DATE_CREATION", nullable = false)

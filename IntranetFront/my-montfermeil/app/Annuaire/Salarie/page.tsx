@@ -1,6 +1,5 @@
 'use client'
 
-import { defaultConfig } from "next/dist/server/config-shared";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react"
 import "@/app/Annuaire/Salarie/style.css";

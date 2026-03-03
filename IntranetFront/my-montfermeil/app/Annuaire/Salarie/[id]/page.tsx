@@ -1,83 +1,105 @@
 'use client';
 
-import { Params } from "next/dist/server/request/params";
 import { useParams } from "next/navigation";
-import { Router, useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import { json } from "stream/consumers";
-import "./style";
-
-
-
+import "./style.css";
 
 function SalariePage() {
     const params = useParams();
     const id = params?.id ? Number(params.id) : undefined;
-    const [salarie, SetSalarie] = useState<any>({})
-    const [image , SetImage] = useState<any>({});
-    const profileImage = `http://localhost:8080/uploads/Photos/${image.photo}`
     
-    console.log("Il contien :" ,image
+    // États pour les données
+    const [salarie, setSalarie] = useState<any>({});
+    const [image, setImage] = useState<any>({});
+    const [loading, setLoading] = useState(true); // État de chargement
+    
+    const profileImage = `http://localhost:8080/uploads/Photos/${image.photo}`;
+    
+    console.log("Il contient :", image);
 
-    )
-    
-    //  const profileImage =  async () => {
-    //     try {
-    //       return  await fetch(`/api/Montfermeil/users/Photo/Profile/${image.photo}`)
-             
-    //     }catch(e){
-    //         console.log(e)
-    //     }
-    // }
-    if (sessionStorage.length == 0 || sessionStorage.length == null) {
-       window.location.href="/"
+    // Redirection si non connecté
+    if (typeof window !== 'undefined' && (sessionStorage.length === 0 || sessionStorage.length == null)) {
+        window.location.href = "/";
     }
+
     async function LookingForid(id: number) {
-
-        const identifiant = sessionStorage.getItem("mail")
-        const password = sessionStorage.getItem("MDP")
-
-        const credential = btoa(`${identifiant}:${password}`)
+        const identifiant = sessionStorage.getItem("mail");
+        const password = sessionStorage.getItem("MDP");
+        const credential = btoa(`${identifiant}:${password}`);
+        
         try {
-            const response = await fetch(`/api/Montfermeil/users/${id}`)
+            const response = await fetch(`/api/Montfermeil/users/${id}`);
             const data = await response.json();
-            SetSalarie(data);
-
-
-
+            setSalarie(data);
         } catch (error) {
-            console.log(error)
+            console.log(error);
+        }
+    }
 
-
-
+    async function getProfile(oneId: number) {
+        try {
+            const reponse = await fetch(`/api/Montfermeil/users/Photo/${oneId}`);
+            const json = await reponse.json();
+            setImage(json);
+            console.log(json);
+        } catch (e) {
+            console.log(e);
         }
     }
 
     useEffect(() => {
- if (!id || isNaN(id)) return;
-        LookingForid(id)
-        getProfile(id)
-    }, [id])
+        if (!id || isNaN(id)) return;
+        
+        // Chargement des données
+        const loadData = async () => {
+            setLoading(true);
+            await Promise.all([
+                LookingForid(id),
+                getProfile(id)
+            ]);
+            setLoading(false);
+        };
+        
+        loadData();
+    }, [id]);
 
+    // 🔹 AFFICHAGE DU CHARGEMENT
+    if (loading) {
+        return (
+            <div style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                height: "100vh",
+                flexDirection: "column"
+            }}>
+                <div className="spinner"></div>
+                <p style={{ marginTop: "20px", fontSize: "18px" }}>
+                    Chargement du profil...
+                </p>
+                
+                <style jsx>{`
+                    .spinner {
+                        border: 4px solid rgba(0, 0, 0, 0.1);
+                        width: 50px;
+                        height: 50px;
+                        border-radius: 50%;
+                        border-left-color: #09f;
+                        animation: spin 1s linear infinite;
+                    }
+                    
+                    @keyframes spin {
+                        0% { transform: rotate(0deg); }
+                        100% { transform: rotate(360deg); }
+                    }
+                `}</style>
+            </div>
+        );
+    }
 
-
-    async function getProfile(oneId: number){
-        try{
-            const reponse = await fetch(`/api/Montfermeil/users/Photo/${oneId}`)
-            const json = await reponse.json();
-            
-            SetImage(json);
-console.log(json);
-        }catch(e){
-            console.log(e);
-        }
-    } 
     return (
         <div>
-            <div>
-                {image.status != 500 ?<img src={profileImage} alt="" /> : <img style={{width: "200px", height:"200px"}} className="PP" src="/cercle-bleu-utilisateur-blanc_78370-4707.avif" alt="" />}
-            </div>
-            <div style={{ placeItems: "start end" }}>
+            <div style={{ placeItems: "center" }}>
                 <h1>
                     <u>
                         {salarie.nom}
@@ -85,8 +107,18 @@ console.log(json);
                         {salarie.prenom}
                     </u>
                 </h1>
-                <table border={1} style={{ textAlign: "center" }} >
-                    <thead >
+                
+                <div className="PhotoCLass">
+                    <img src="/cadre.png" className="Conteneur" alt="cadre" />
+
+                    {image.status !== 500 
+                        ? <img src={profileImage} className="PP" alt="photo profil" />
+                        : <img className="PP" src="/cerclePhoto.png" alt="photo par défaut" />
+                    }
+                </div>
+                
+                <table border={1} style={{ textAlign: "center", marginRight: "200px" }}>
+                    <thead>
                         <tr>
                             <th style={{ paddingRight: "50%" }}>
                                 Fonction:
@@ -124,7 +156,7 @@ console.log(json);
                                 Email:
                             </th>
                             <td>
-                               <a href={`mailTo:${salarie.mail}`}> {salarie.mail}</a>
+                               <a href={`mailto:${salarie.mail}`}> {salarie.mail}</a>
                             </td>
                         </tr>
                         <tr>
@@ -132,10 +164,12 @@ console.log(json);
                                 Statut sur le site :
                             </th>
                             <td>
-                                {salarie.isConnected ? <img src="/checkbox.png" style={{ width: "10%" }} /> : <img src="/cross.png" style={{ width: "10%" }} />}
+                                {salarie.isConnected ? 
+                                    <img src="/checkbox.png" style={{ width: "10%" }} alt="connecté" /> : 
+                                    <img src="/cross.png" style={{ width: "10%" }} alt="déconnecté" />
+                                }
                             </td>
                         </tr>
-
                     </thead>
                 </table>
             </div>

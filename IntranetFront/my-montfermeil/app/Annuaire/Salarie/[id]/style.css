@@ -1,0 +1,22 @@
+.PhotoCLass {
+    position: relative;
+    width: 200px;
+    margin: auto;
+    float: left;
+    margin-left: 350px;
+}
+
+.Conteneur {
+    width: 100%;
+    display: block;
+}
+
+.PP {
+    position: absolute;
+    top: 45px;       /* ajuste selon ton cadre */
+    left: 40px;      /* ajuste selon ton cadre */
+    width: 125px;    /* taille de la zone intérieure */
+    height: 125px;
+    object-fit: cover;
+    border-radius: 8px; /* optionnel */
+}
