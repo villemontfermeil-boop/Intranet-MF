@@ -45,7 +45,7 @@ public class ArticleControllerMF {
 
     @GetMapping("/getArticle")
     public List<ArticleMF> getArticle() {
-        return articleControllerMF.findAll();
+        return articleControllerMF.findAllByOrderByDateDesc();
 
     }
 

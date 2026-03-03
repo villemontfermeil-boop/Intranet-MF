@@ -117,7 +117,7 @@ function SalariePage() {
                     }
                 </div>
                 
-                <table border={1} style={{ textAlign: "center", marginRight: "200px" }}>
+                <table border={1} className="tableau" style={{ textAlign: "center", marginRight: "50px" }}>
                     <thead>
                         <tr>
                             <th style={{ paddingRight: "50%" }}>
