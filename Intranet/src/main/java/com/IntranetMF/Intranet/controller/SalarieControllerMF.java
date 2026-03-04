@@ -169,6 +169,11 @@ public class SalarieControllerMF {
         if (salarieOpt.isPresent()) {
             SalarieMF salarie = salarieOpt.get();
 
+
+            
+             if (salarie.getIsConnected() == true){
+                throw new RuntimeException("L'utilisateur est déja connecter");
+            }
             ZonedDateTime parisTime = ZonedDateTime.now(ZoneId.of("Europe/Paris"));
             LocalDateTime localDateTime = parisTime.toLocalDateTime();
 

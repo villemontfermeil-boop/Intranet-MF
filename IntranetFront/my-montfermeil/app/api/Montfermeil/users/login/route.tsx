@@ -18,7 +18,8 @@ export async function POST(request: Request) {
         console.log(request)
         return NextResponse.json(data, { status: 200 })
     } catch (error) {
-        console.log(error)
-        return NextResponse.json(error, { status: 500 })
-    }
+    console.log("ALORS: "+ error);
+    const message = error instanceof Error ? error.message : "Une erreur est survenue";
+    return new NextResponse(message, { status: 401 });
+}
 }
