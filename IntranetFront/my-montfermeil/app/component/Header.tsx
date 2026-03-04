@@ -117,8 +117,8 @@ function Header({ nom }: { nom: string | null }) {
             document.cookie = 'credential=' + othercredential + '; path=/';
             return true;
         } catch (error) {
-            alert('Email invalide ou mot de passe incorrecte')
-
+            console.log(error)
+            alert("Email invalide ou mot de passe incorrecte ET vérifié également que vous n'etes pas déja connecter sur le site depuis un autre navigateur")
             return false;
         }
     }
