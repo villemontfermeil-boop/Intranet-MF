@@ -3,9 +3,9 @@
 
 
 function PrivacyPage() {
-    
-    return(<div style={styles.page}>
-        
+
+    return (<div style={styles.page}>
+
         <div style={styles.container}>
             <h1 style={styles.title}>Intranet de la Ville de Montfermeil</h1>
 
@@ -70,8 +70,7 @@ function PrivacyPage() {
             </section>
 
             <p style={styles.footer}>
-                En accédant à cet intranet, l’utilisateur reconnaît avoir pris connaissance
-                de ces règles et s’engage à les respecter.
+                L’accès à cet intranet est réservé aux agents de la mairie. En l’utilisant, l’utilisateur reconnaît son statut et s’engage à en respecter les règles d’usage.
             </p>
         </div>
     </div>);

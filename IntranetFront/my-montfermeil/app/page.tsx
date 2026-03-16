@@ -173,14 +173,14 @@ function HomePage() {
                         value.type == "Évennement" ? {
 
 
-                            border: "2px solid #c41e3a",
+                            border: "2px solid #3498db",
                             borderRadius: "12px",
                             padding: "25px",
                             marginTop: "5%",
                             textAlign: "center",
                             backgroundColor: "#fff8f8",
                             boxShadow: "0 6px 18px rgba(196, 30, 58, 0.15)",
-                            borderTop: "6px solid #c41e3a",
+                            borderTop: "6px solid #3c1ec4",
                             position: "relative",
                             fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
                             width: Awidth,
