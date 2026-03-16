@@ -218,9 +218,9 @@ function Header({ nom }: { nom: string | null }) {
                                 </button>
 
 
-                                <button type="button" className='MenuButton' onClick={() => router.push("/Nouveau/Article")}>
+                                {sessionStorage.length >0 &&sessionStorage.getItem('fonction') == "Communication"  && <button type="button" className='MenuButton' onClick={() => router.push("/Nouveau/Article")}>
                                     Nouvel article
-                                </button>
+                                </button>}
 
                                 <button type='button' className='MenuButton' onClick={() => router.push('/Profil')} > Mon profil </button>
 

@@ -3,6 +3,7 @@
 import { exit } from "process";
 import { useEffect, useState } from "react";
 import "@/app/Nouveau/Article/style.css";
+import { useRouter } from "next/navigation";
 
 function CreationArticle() {
     const path = process.env.UPLOAD;
@@ -10,6 +11,8 @@ function CreationArticle() {
     const [file, SetFile] = useState<File | null>();
     const [submit, SetisSubmit] = useState(false);
     const [result, SetResult] = useState([])
+    const router = useRouter();
+
     const [article, SetArticle] = useState({
         Titre: '',
         Desc: '',
@@ -18,12 +21,19 @@ function CreationArticle() {
         MediaNom: file?.name
     })
 
+    useEffect(() => {
+
+        if (sessionStorage.length == 0 || sessionStorage.getItem('fonction') != "Communication") {
+            router.push('/');
+        }
+    })
+
     async function HandleSubmit() {
         try {
-            
+
             const formData = new FormData();
 
-            
+
             formData.append('description', article.Desc);
             formData.append('titre', article.Titre);
             formData.append('type', article.Types);
@@ -31,11 +41,11 @@ function CreationArticle() {
             const salarieId = sessionStorage.getItem('id');
             if (salarieId) {
                 formData.append('salarieId', salarieId);
-            }else{
+            } else {
                 return alert("aucun ID")
             }
 
-           
+
             if (article.Media) {
                 formData.append('file', article.Media);
             }
@@ -49,11 +59,11 @@ function CreationArticle() {
             const reponse = await fetch("/api/Montfermeil/articles/upload", {
                 method: "POST",
 
-                 
+
                 body: formData
             })
             SetResult(await reponse.json());
-            alert("Votre Article a été ajouter") 
+            alert("Votre Article a été ajouter")
             console.log(article)
 
         } catch (error) {
@@ -93,7 +103,11 @@ function CreationArticle() {
         }
     }, [submit])
     return (
+
         <div style={{ placeItems: "center" }}>
+            {
+          sessionStorage.length == 0 ||  sessionStorage.getItem('fonction') == "Communication" ?
+            <div>
             <h1><u>Bienvenue dans la création d'un article</u></h1>
             <p style={{textAlign: "center"}}>Notes: il est préférable pour les media que vous allez ajouter, <br/>qu'il soit en extension (Images :"jpg", "jpeg", "png", "gif","webp"; Video : "mp4", "webm", "ogg";)</p>
 
@@ -146,6 +160,10 @@ function CreationArticle() {
                     </tr>
                 </thead>
             </table>
+            </div>
+            : <div>
+                <h1>Interdit</h1>
+                </div>}
         </div>
     )
 }
