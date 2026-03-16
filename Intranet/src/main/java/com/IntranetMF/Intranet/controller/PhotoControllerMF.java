@@ -115,6 +115,8 @@ public class PhotoControllerMF {
             @RequestParam("file") MultipartFile file,
             @RequestParam Long id) {
 
+                //Vérifier que c'est bien un fichier .jpg /.png
+
         System.out.println("Recherche du salarié avec l'ID: " + id);
         Optional<SalarieMF> salarier = salarieMF.findById(id);
 
