@@ -11,6 +11,7 @@ function AdminPanel() {
 
     const [isAdmin, setIsadmin] = useState<boolean>(false)
     const router = useRouter();
+    const [loading, setLoading] = useState(false); // État de chargement
 
     const [newSalarie, setNewSalarie] = useState({
         nom: '',
@@ -31,46 +32,87 @@ function AdminPanel() {
         setNewSalarie({ ...newSalarie, [e.target.name]: e.target.value });
     };
 
+    function motDePasseValide(mdp: string): boolean {
+        const pattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
+        return pattern.test(mdp);
+    }
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         console.log('Données du formulaire :', newSalarie);
 
-        // if(newSalarie.password.length<8  ){
+        if (!motDePasseValide(newSalarie.password)) {
+            alert("Mot de passe invalide, assuré vous d'avoir mis au moins:  une minuscule, une majuscule, un chiffre/nombre ,un caractère spécial")
+        } else {
 
-        // }
+            try {
+                setLoading(true); // Début du chargement
 
-        try {
-            const idnetifiantAdmin = sessionStorage.getItem("mail");
-            const passwordAdmin = sessionStorage.getItem("MDP");
-            const credential = btoa(`${idnetifiantAdmin}:${passwordAdmin}`)
+                const idnetifiantAdmin = sessionStorage.getItem("mail");
+                const passwordAdmin = sessionStorage.getItem("MDP");
+                const credential = btoa(`${idnetifiantAdmin}:${passwordAdmin}`)
 
-            //zone a supprimer en prod
+                //zone a supprimer en prod
 
-            console.log("Credential", sessionStorage);
-            console.log("Data", newSalarie);
+                console.log("Credential", sessionStorage);
+                console.log("Data", newSalarie);
 
-            //
-        
-            const response = await fetch("/api/Montfermeil/users/NewSalarie", {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
+                //
 
-                },
-                body: new URLSearchParams(newSalarie as Record<string, string>)
+                const response = await fetch("/api/Montfermeil/users/NewSalarie", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+
+                    },
+                    body: new URLSearchParams(newSalarie as Record<string, string>)
+                }
+                );
+                console.log(response);
+                console.log("Headers:", Object.fromEntries(response.headers.entries()));
+                setLoading(false); // Fin du chargement (succès ou erreur)
+
+                alert(`${newSalarie.nom} ${newSalarie.prenom} à été ajouter`)
+                router.push('/')
+            } catch (error) {
+                console.log(error);
+
+
             }
-            );
-            console.log(response);
-            console.log("Headers:", Object.fromEntries(response.headers.entries()));
-            alert(`${newSalarie.nom} ${newSalarie.prenom} à été ajouter`)
-            router.push('/')
-        } catch (error) {
-            console.log(error);
-
-
         }
     }
+if (loading) {
+        return (
+            <div style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                height: "100vh",
+                flexDirection: "column"
+            }}>
+                <div className="spinner"></div>
+                <p style={{ marginTop: "20px", fontSize: "18px", color: "#666" }}>
+                    Ajout du salarié..
+                </p>
 
+                <style jsx>{`
+                    .spinner {
+                        border: 4px solid rgba(0, 0, 0, 0.1);
+                        width: 50px;
+                        height: 50px;
+                        border-radius: 50%;
+                        border-left-color: #3498db;
+                        animation: spin 1s linear infinite;
+                    }
+                    
+                    @keyframes spin {
+                        0% { transform: rotate(0deg); }
+                        100% { transform: rotate(360deg); }
+                    }
+                `}</style>
+            </div>
+        );
+    }
     if (isAdmin == true) {
         return (
             <div>
@@ -208,6 +250,7 @@ function AdminPanel() {
                             <option value="Police municipales">Police municipales</option>
                             <option value="Cabinet">Cabinet</option>
                             <option value="Communication">Communication</option>
+                            <option value="Courrier">Courrier</option>
 
 
 

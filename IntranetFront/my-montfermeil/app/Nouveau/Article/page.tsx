@@ -65,6 +65,7 @@ function CreationArticle() {
             SetResult(await reponse.json());
             alert("Votre Article a été ajouter")
             console.log(article)
+            SetisSubmit(false)
 
         } catch (error) {
             console.log(error)

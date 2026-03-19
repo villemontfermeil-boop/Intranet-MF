@@ -15,11 +15,12 @@ function SalarieModification() {
     const [isInPasswordMode, SetPasswordMode] = useState(false);
     const show = !isInPasswordMode;
     const [submitButton, SetSubmit] = useState<boolean>(false);
+    const [echouay, setEchouay] = useState<boolean>(true)
 
     const [passwordForgot, setNewpassword] = useState({
         mdp: ''
     })
-
+    const [loading, setLoading] = useState(true); // État de chargement
     const [button, setButton] = useState<boolean>(false);
     const login = sessionStorage.getItem('mail')
     const password = sessionStorage.getItem('MDP')
@@ -54,6 +55,8 @@ function SalarieModification() {
                 fonction: result.fonction ?? '',
                 localisationS: result.localisation ?? 'NON_DEFINI'
             });
+            setLoading(false); // Début du chargement
+
         } catch (error) {
             console.log(error)
             console.log(credential)
@@ -87,9 +90,9 @@ function SalarieModification() {
             const response = await fetch(`/api/Montfermeil/users/Modification/Salarie/${idValue}`, {
                 method: "PATCH",
                 headers: {
-                    "Content-Type": "application/json"
+                    "Content-Type": "application/x-www-form-urlencoded"
                 },
-                body: JSON.stringify(payload)
+                body: payload
             });
 
             if (!response.ok) {
@@ -113,23 +116,33 @@ function SalarieModification() {
     const handlechangePassword = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         setNewpassword({ ...passwordForgot, [e.target.name]: e.target.value })
     }
+    function motDePasseValide(mdp: string): boolean {
+        const pattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
+        return pattern.test(mdp);
+    }
 
     async function passwordReset() {
-        try {
-            const users ={
-                id : idValue || '',
-                password: passwordForgot.mdp || ''
+        if (motDePasseValide(passwordForgot.mdp)) {
+            try {
+                const users = {
+                    id: idValue || '',
+                    password: passwordForgot.mdp || ''
+                }
+                const response = await fetch("/api/Montfermeil/users/PasswordReset", {
+                    method: "PATCH",
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: new URLSearchParams(users as Record<string, string>)
+                })
+                alert("Modification éffectuer avec succès");
+                router.push('/')
+
+            } catch (error) {
+                console.log(error)
             }
-            const response = await fetch("/api/Montfermeil/users/PasswordReset",{
-                method: "PATCH",
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: new URLSearchParams(users as Record<string, string>)
-            })
-            alert("Modification éffectuer avec succès");
-        } catch (error) {
-            console.log(error)
+        } else {
+            setEchouay(false);
         }
 
     }
@@ -152,7 +165,40 @@ function SalarieModification() {
         }
     }, [button, submitButton])
 
+    if (loading) {
+        return (
+            <div style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                height: "100vh",
+                flexDirection: "column"
+            }}>
+                <div className="spinner"></div>
+                <p style={{ marginTop: "20px", fontSize: "18px", color: "#666" }}>
+                    Chargement du salarié..
+                </p>
 
+                <style jsx>{`
+                    .spinner {
+                        border: 4px solid rgba(0, 0, 0, 0.1);
+                        width: 50px;
+                        height: 50px;
+                        border-radius: 50%;
+                        border-left-color: #3498db;
+                        animation: spin 1s linear infinite;
+                    }
+                    
+                    @keyframes spin {
+                        0% { transform: rotate(0deg); }
+                        100% { transform: rotate(360deg); }
+                    }
+                `}</style>
+            </div>
+        );
+    }
+
+  
 
     console.log(data)
     return (
@@ -397,7 +443,7 @@ function SalarieModification() {
                                 Nouveaux mots de passe:
                             </th>
                             <td>
-                                <input style={{ width: "95%" }} onChange={handlechangePassword} type="text" name="mdp" id="" />
+                                <input style={{ width: "95%" }} onChange={handlechangePassword} type="password" name="mdp" id="" />
                             </td>
                         </tr>
                         <tr>
@@ -407,7 +453,10 @@ function SalarieModification() {
                         </tr>
                     </thead>
                 </table>
+                <div hidden={echouay}><h4 style={{ color: "red", textAlign: "center" }}><u>Faites en sorte que le mots de passe soit avec : 1 Majuscule, 1 Minuscule, 1 Charactère spéciale, 1 Nombre/Chiffre et que le mot de passe soit superieur à 8 </u></h4></div>
+
             </div>
+
         </div>
     )
 }
