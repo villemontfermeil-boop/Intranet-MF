@@ -27,3 +27,10 @@
 2026-03-19T09:25:39.008150100 - Jake Finn vient de se déconnecter
 2026-03-19T09:25:41.977753300 - LEMOINE Xavier vient de se connecter
 2026-03-19T09:25:58.572906400 - Un salarié a rechercher: a
+2026-03-19T09:30:45.730610900 - LEMOINE Xavier vient de se déconnecter
+2026-03-19T09:30:51.508476500 - Jake Finn vient de se connecter
+2026-03-19T09:41:10.541036200 - Un admin a ajouter : Macron  Emmanuelle
+2026-03-19T09:41:18.059742300 - Jake Finn vient de se déconnecter
+2026-03-19T09:41:21.922154 - Macron  Emmanuelle vient de se connecter
+2026-03-19T09:47:06.756649 - Macron  Émmanuel  vient de se déconnecter
+2026-03-19T09:48:10.858087400 - Macron  Émmanuel  vient de se connecter

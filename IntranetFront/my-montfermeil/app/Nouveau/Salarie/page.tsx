@@ -23,6 +23,8 @@ function AdminPanel() {
         localisation: 'NON_DEFINI',
         fonction: 'NON_DEFINI'
     })
+
+    const [passwordVerif, setPasswordVerif] = useState<String>("");
     useEffect(() => {
         const visiteur = sessionStorage.getItem('isAdmin');
         setIsadmin(visiteur === "true");
@@ -44,44 +46,49 @@ function AdminPanel() {
         if (!motDePasseValide(newSalarie.password)) {
             alert("Mot de passe invalide, assuré vous d'avoir mis au moins:  une minuscule, une majuscule, un chiffre/nombre ,un caractère spécial")
         } else {
+            if (passwordVerif != newSalarie.password) {
+                alert("Mot de passe invalide, assuré vous d'avoir mis le même mot de passe sur les 2 champs")
 
-            try {
-                setLoading(true); // Début du chargement
+            } else {
 
-                const idnetifiantAdmin = sessionStorage.getItem("mail");
-                const passwordAdmin = sessionStorage.getItem("MDP");
-                const credential = btoa(`${idnetifiantAdmin}:${passwordAdmin}`)
+                try {
+                    setLoading(true); // Début du chargement
 
-                //zone a supprimer en prod
+                    const idnetifiantAdmin = sessionStorage.getItem("mail");
+                    const passwordAdmin = sessionStorage.getItem("MDP");
+                    const credential = btoa(`${idnetifiantAdmin}:${passwordAdmin}`)
 
-                console.log("Credential", sessionStorage);
-                console.log("Data", newSalarie);
+                    //zone a supprimer en prod
 
-                //
+                    console.log("Credential", sessionStorage);
+                    console.log("Data", newSalarie);
 
-                const response = await fetch("/api/Montfermeil/users/NewSalarie", {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
+                    //
 
-                    },
-                    body: new URLSearchParams(newSalarie as Record<string, string>)
+                    const response = await fetch("/api/Montfermeil/users/NewSalarie", {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+
+                        },
+                        body: new URLSearchParams(newSalarie as Record<string, string>)
+                    }
+                    );
+                    console.log(response);
+                    console.log("Headers:", Object.fromEntries(response.headers.entries()));
+                    setLoading(false); // Fin du chargement (succès ou erreur)
+
+                    alert(`${newSalarie.nom} ${newSalarie.prenom} à été ajouter`)
+                    router.push('/')
+                } catch (error) {
+                    console.log(error);
+
+
                 }
-                );
-                console.log(response);
-                console.log("Headers:", Object.fromEntries(response.headers.entries()));
-                setLoading(false); // Fin du chargement (succès ou erreur)
-
-                alert(`${newSalarie.nom} ${newSalarie.prenom} à été ajouter`)
-                router.push('/')
-            } catch (error) {
-                console.log(error);
-
-
             }
         }
     }
-if (loading) {
+    if (loading) {
         return (
             <div style={{
                 display: "flex",
@@ -168,6 +175,13 @@ if (loading) {
                             required
                         />
 
+                        <input
+                            type="password"
+                            name="passwordVerif"
+                            placeholder="Réentrez le Mot de passe"
+                            onChange={(e) => setPasswordVerif(e.target.value.toString())}
+                            required
+                        />
                         <select name="localisation" value={newSalarie.localisation || 'NON_DEFINI'} onChange={handleChange}>
                             <option value="NON_DEFINI">NON DEFINI</option>
                             <option value="VILLE_ÉDUCATIVE">VILLE ÉDUCATIVE</option>
