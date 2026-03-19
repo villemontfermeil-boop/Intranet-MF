@@ -62,7 +62,11 @@ function Moi() {
       setLoading(false);
     }
   }
-
+useEffect(()=>{
+  if(sessionStorage.length == 0 || !sessionStorage.getItem("isConnected")){
+    location.href= "/";
+  }
+},[])
   // Chargement initial
   useEffect(() => {
     getProfile(person.id);

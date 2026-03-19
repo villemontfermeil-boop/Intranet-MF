@@ -16,7 +16,10 @@ import java.nio.file.Path;
 import java.nio.file.Files;
 import java.io.File;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -113,7 +116,7 @@ public class ArticleControllerMF {
                 article.setMediaName(uniqueFileName);
                 article.setPath("/uploads/" + uniqueFileName);
             }
-            String text = salarie.getNom() + " " + salarie.getPrenom() + " à publier un article appelé : "+ titre;
+            String text = salarie.getNom() + " " + salarie.getPrenom() + " à publier un article appelé : " + titre;
 
             logContenu(text);
             // 5. Sauvegarder dans la BDD
@@ -125,6 +128,45 @@ public class ArticleControllerMF {
             e.printStackTrace(); // Log
             return null;
         }
+    }
+
+    @DeleteMapping("/deleteArticle/{id}")
+    public ResponseEntity<String> deleteArticle(
+            @PathVariable Long id,
+            @RequestParam("nom") String nom,
+            @RequestParam("Prenom") String prenom) {
+
+        Optional<ArticleMF> article = articleControllerMF.findById(id);
+
+        if (article.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("L'article n'a pas été trouvé");
+        }
+
+        ArticleMF articleMF = article.get();
+        String pathFichier = articleMF.getPath();
+
+        if (pathFichier != null && !pathFichier.trim().isEmpty()) {
+            try {
+                Path chemin = Paths.get(pathFichier);
+                Files.deleteIfExists(chemin);
+                System.out.println("Fichier supprimé : " + chemin);
+            } catch (IOException e) {
+                System.out.println("Erreur suppression fichier : " + e.getMessage());
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body("Erreur lors de la suppression du fichier");
+            }
+        } else {
+            System.out.println("Aucun fichier à supprimer pour cet article");
+        }
+
+        articleControllerMF.deleteById(id);
+
+        String text = nom + " " + prenom + " a supprimé l'article : " + articleMF.getTitre();
+        logContenu(text);
+
+        return ResponseEntity.status(HttpStatus.ACCEPTED)
+                .body("L'article a bien été supprimé");
     }
 
     public void logContenu(String message) {

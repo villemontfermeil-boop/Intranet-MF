@@ -140,7 +140,7 @@ function SalariePage() {
                                 Numero:
                             </th>
                             <td>
-                                {salarie.numero}
+                                 <a href={"tel:"+salarie.numero}>{salarie.numero} </a>
                             </td>
                         </tr>
                         <tr>
@@ -148,7 +148,7 @@ function SalariePage() {
                                 Téléphone pro:
                             </th>
                             <td>
-                                {salarie.telephonepro || 'NON_DÉFINI'}
+                                <a href={"tel:"+salarie.telephonepro || 'NON_DÉFINI'}>{salarie.telephonepro || 'NON_DÉFINI'}</a>
                             </td>
                         </tr>
                         <tr>

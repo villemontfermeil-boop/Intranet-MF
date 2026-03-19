@@ -49,10 +49,12 @@ function Header({ nom }: { nom: string | null }) {
                 const mail = sessionStorage.getItem('mail');
                 if (!mail) return;
 
-                const data = new URLSearchParams({ mail }).toString();
+                const body = new Blob(
+                    [new URLSearchParams({ mail }).toString()],
+                    { type: "application/x-www-form-urlencoded" }
+                );
 
-                // Use sendBeacon so the request is more likely to complete during unload
-                navigator.sendBeacon('/api/Montfermeil/users/logout', data);
+                navigator.sendBeacon('/api/Montfermeil/users/logout', body);
             } catch (e) {
                 // best-effort; ignore errors during unload
                 console.log(e)
@@ -218,7 +220,7 @@ function Header({ nom }: { nom: string | null }) {
                                 </button>
 
 
-                                {sessionStorage.length >0 &&sessionStorage.getItem('fonction') == "Communication"  && <button type="button" className='MenuButton' onClick={() => router.push("/Nouveau/Article")}>
+                                {sessionStorage.length > 0 && sessionStorage.getItem('fonction') == "Communication" && <button type="button" className='MenuButton' onClick={() => router.push("/Nouveau/Article")}>
                                     Nouvel article
                                 </button>}
 

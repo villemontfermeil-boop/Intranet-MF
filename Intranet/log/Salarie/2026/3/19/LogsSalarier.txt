@@ -1,0 +1,16 @@
+2026-03-19T12:27:47.083186400 - Macron  Émmanuel  vient de se déconnecter
+2026-03-19T12:27:50.820543 - Macron  Émmanuel  vient de se connecter
+2026-03-19T12:41:21.172784900 - Macron  Émmanuel  vient de se connecter
+2026-03-19T15:28:26.398078100 - Macron  Émmanuel  . A été rechercher.
+2026-03-19T15:28:28.137615900 - Macron  Émmanuel  . A été rechercher.
+2026-03-19T15:32:50.014603900 - Un salarié a rechercher: a
+2026-03-19T15:33:07.783056 - COULIBALY Yahaya . A été rechercher.
+2026-03-19T15:33:09.483936 - COULIBALY Yahaya . A été rechercher.
+2026-03-19T15:33:15.802433500 - Un salarié a rechercher: m
+2026-03-19T15:33:16.274898300 - Un salarié a rechercher: mb
+2026-03-19T15:33:25.033168900 - Mbappé Kylian . A été rechercher.
+2026-03-19T15:33:26.595965300 - Mbappé Kylian . A été rechercher.
+2026-03-19T15:37:51.771451800 - Mbappé Kylian . A été rechercher.
+2026-03-19T15:37:54.228093 - Mbappé Kylian . A été rechercher.
+2026-03-19T15:43:04.704360600 - Booming Métro vient de se connecter
+2026-03-19T15:43:21.695441900 - Lena Wilk Anna vient de se connecter
