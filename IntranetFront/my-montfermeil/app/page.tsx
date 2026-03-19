@@ -8,7 +8,6 @@ function HomePage() {
     const [data, setData] = useState<any[]>([]);
     const [loading, setLoading] = useState(true); // État de chargement
     const [error, setError] = useState<string | null>(null); // État d'erreur
-
     const router = useRouter();
 
     const prefix = process.env.NEXT_PUBLIC_PREFIX ?? "";
@@ -70,6 +69,36 @@ function HomePage() {
             setError("Impossible de charger les articles. Veuillez réessayer plus tard.");
         } finally {
             setLoading(false); // Fin du chargement (succès ou erreur)
+        }
+    }
+
+    async function deleteArticle(Articleid: string) {
+        setLoading(true)
+        const nom = sessionStorage.getItem("nom") || '';
+        const prenom = sessionStorage.getItem("prenom") || '';
+        const body = new URLSearchParams({ nom, Prenom: prenom });
+        console.log("nom", nom)
+        console.log("id", Articleid)
+        try {
+            const reponse = await fetch(`/api/Montfermeil/articles/delete/${Articleid}`, {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded"
+                },
+
+                body: body.toString()
+            })
+            if (reponse.ok) {
+        setLoading(false)
+
+                alert("suprression éffectuer: " + reponse);
+                console.log(reponse)
+                router.refresh()
+            }
+        } catch (ex) {
+            console.log(ex)
+        setLoading(false)
+
         }
     }
 
@@ -258,17 +287,27 @@ function HomePage() {
 
                                             }
                     }>
+                        {sessionStorage.getItem("isConnected") == "true" && sessionStorage.getItem("fonction") == "Communication" ? <button onClick={() => deleteArticle(value.id.toString())} style={{ width: "50px", height: "40px" }}>
+                            <img src="/cross.png" alt="" style={{ width: "30px", height: "30px" }} />
+
+                        </button> : ""
+
+                        }
                         <h4><u>{value.titre}</u></h4>
                         <p>Créé le : {value.creation}</p>
 
                         {sessionStorage.getItem("isConnected") == "true" ? (
-                            <p>
-                                Par: <u>
-                                    <a className="author-link" onClick={() => router.push(`/Annuaire/Salarie/${value.salarie.id}`)}>
-                                        {value.salarie.nom} {value.salarie.prenom}
-                                    </a>
-                                </u>
-                            </p>
+                            <div>
+
+                                <p>
+                                    Par: <u>
+                                        <a className="author-link" onClick={() => router.push(`/Annuaire/Salarie/${value.salarie.id}`)}>
+                                            {value.salarie.nom} {value.salarie.prenom}
+                                        </a>
+                                    </u>
+                                </p>
+
+                            </div>
                         ) : (
                             <p>Par: {value.salarie.nom} {value.salarie.prenom}</p>
                         )}
@@ -432,9 +471,9 @@ function HomePage() {
                         padding: "10px",
                         backgroundColor: "#f0e6ff",
                         borderRadius: "8px",
-                        border: "1px solid #9b59b6", 
+                        border: "1px solid #9b59b6",
                         boxShadow: "0 2px 8px rgba(155, 89, 182, 0.15)",
-                        borderLeft: "1px solid #8e44ad"  
+                        borderLeft: "1px solid #8e44ad"
                     }}>
                         <div style={{
                             width: "30px",
