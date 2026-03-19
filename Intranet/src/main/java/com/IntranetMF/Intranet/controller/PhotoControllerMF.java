@@ -13,12 +13,14 @@ import org.springframework.web.multipart.MultipartFile;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
-
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.StandardCopyOption;
+import java.nio.file.StandardOpenOption;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.UUID;
 import com.IntranetMF.Intranet.repository.PhotoInterfacesMF;
 import com.IntranetMF.Intranet.modele.PhotoMF;
@@ -32,6 +34,10 @@ public class PhotoControllerMF {
     private final String uploadDir = "uploads/Photos";
     private final PhotoInterfacesMF photoInterfacesMF;
     private final SalarieInterfacesMF salarieMF;
+
+    private String logDir = "log/Photo/" + LocalDate.now().getYear() + "/"
+            + LocalDate.now().getMonthValue() + "/"
+            + LocalDate.now().getDayOfMonth();
 
     public PhotoControllerMF(PhotoInterfacesMF photoInterfacesMF, SalarieInterfacesMF salarieMF) {
         this.photoInterfacesMF = photoInterfacesMF;
@@ -48,7 +54,7 @@ public class PhotoControllerMF {
         Optional<SalarieMF> verificationDuSalarie = salarieMF.findById(id);
         if (verificationDuSalarie.isPresent()) {
             SalarieMF salarie = verificationDuSalarie.get();
-             if (salarie.getIsConnected() == false){
+            if (salarie.getIsConnected() == false) {
                 throw new RuntimeException("L'utilisateur doit etre connecter sur le site");
             }
             Optional<PhotoMF> photo = photoInterfacesMF.findBySalarie(salarie);
@@ -83,6 +89,11 @@ public class PhotoControllerMF {
             photoInterfacesMF.save(unePhotoMF);
 
             System.out.print("Le salarié" + unSalarie.getNom() + " " + unSalarie.getPrenom() + " à changer son profil");
+
+            String text = unSalarie.getNom() + " " + unSalarie.getPrenom() + " à changer sa photo de profil : "
+                    + nomDuFichier;
+
+            logContenu(text);
             return ResponseEntity.ok("Image ajouter à " + LocalDate.now());
         } catch (IOException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Il y'a une erreur");
@@ -98,7 +109,10 @@ public class PhotoControllerMF {
         if (salarie.isPresent()) {
             Optional<PhotoMF> profil = photoInterfacesMF.findBySalarie(salarie.get());
             if (profil.isPresent()) {
-                
+
+                String text = "Un salarié à chercher le photo de profil de :" + salarie.get().getNom() + " "
+                        + salarie.get().getPrenom();
+                logContenu(text);
                 return profil;
             } else {
                 throw new RuntimeException("Salarie not found with id: " + id);
@@ -115,7 +129,7 @@ public class PhotoControllerMF {
             @RequestParam("file") MultipartFile file,
             @RequestParam Long id) {
 
-                //Vérifier que c'est bien un fichier .jpg /.png
+        // Vérifier que c'est bien un fichier .jpg /.png
 
         System.out.println("Recherche du salarié avec l'ID: " + id);
         Optional<SalarieMF> salarier = salarieMF.findById(id);
@@ -124,7 +138,7 @@ public class PhotoControllerMF {
             SalarieMF Lesalarier = salarier.get();
             System.out.println("Salarié trouvé: " + Lesalarier.getNom() + " " + Lesalarier.getPrenom());
 
-            if (Lesalarier.getIsConnected() == false){
+            if (Lesalarier.getIsConnected() == false) {
                 throw new RuntimeException("L'utilisateur doit etre connecter sur le site");
             }
             Optional<PhotoMF> unePhoto = photoInterfacesMF.findBySalarie(Lesalarier);
@@ -133,15 +147,13 @@ public class PhotoControllerMF {
                 PhotoMF nouvellePhoto = unePhoto.get();
 
                 try {
-           
+
                     String ancienNomFichier = nouvellePhoto.getPhoto();
                     System.out.println("Ancien fichier: " + ancienNomFichier);
 
-                   
                     String nouveauNomFichier = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
                     Path nouveauChemin = Paths.get(uploadDir, nouveauNomFichier);
 
-                
                     if (ancienNomFichier != null && !ancienNomFichier.isEmpty()) {
                         Path ancienChemin = Paths.get(uploadDir, ancienNomFichier);
                         if (Files.exists(ancienChemin)) {
@@ -167,6 +179,11 @@ public class PhotoControllerMF {
                     System.out.println("Le salarié " + Lesalarier.getNom() + " " + Lesalarier.getPrenom() +
                             " a changé son image le " + LocalDate.now());
 
+                    String text = "Le salarié " + Lesalarier.getNom() + " " + Lesalarier.getPrenom() +
+                            " a changé son image le " + LocalDate.now();
+                          
+                    logContenu(text);
+
                     return ResponseEntity.status(HttpStatus.ACCEPTED)
                             .body("Image modifiée avec succès ");
 
@@ -181,6 +198,29 @@ public class PhotoControllerMF {
         }
 
         return ResponseEntity.badRequest().body("Salarié non trouvé : " + id);
+    }
+
+    public void logContenu(String message) {
+        String nomDuFichier = "LogsSalarier.txt";
+        Path cheminPath = Paths.get(logDir, nomDuFichier);
+
+        // créer dossier si nécessaire
+        File dir = new File(logDir);
+        if (!dir.exists()) {
+            dir.mkdirs();
+        }
+
+        String contenu = LocalDateTime.now() + " - " + message + "\n";
+
+        try {
+            Files.write(
+                    cheminPath, // ✅ on passe le Path du fichier
+                    contenu.getBytes(StandardCharsets.UTF_8),
+                    StandardOpenOption.CREATE,
+                    StandardOpenOption.APPEND);
+        } catch (IOException e) {
+            e.printStackTrace(); // au moins loguer l'erreur
+        }
     }
 
 }

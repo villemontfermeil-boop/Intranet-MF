@@ -1,12 +1,20 @@
 package com.IntranetMF.Intranet.controller;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.nio.file.StandardOpenOption;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.nio.file.Path;
+import java.nio.file.Files;
+import java.io.File;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,6 +35,9 @@ import com.IntranetMF.Intranet.repository.SalarieInterfacesMF;
 public class ArticleControllerMF {
     private final ArticleInterfacesMF articleControllerMF;
     private final SalarieInterfacesMF salarieInterfacesMF;
+    private String logDir = "log/Article/" + LocalDate.now().getYear() + "/"
+            + LocalDate.now().getMonthValue() + "/"
+            + LocalDate.now().getDayOfMonth();
 
     public ArticleControllerMF(ArticleInterfacesMF articleControllerMF, SalarieInterfacesMF salarieInterfacesMF) {
         this.articleControllerMF = articleControllerMF;
@@ -37,6 +48,9 @@ public class ArticleControllerMF {
     public Optional<ArticleMF> GetArticleWithId(@PathVariable Long id) {
         Optional<ArticleMF> article = articleControllerMF.findById(id);
         if (article.isPresent()) {
+            String text = "Un salarier à chercher l'article" + article.get().getTitre();
+
+            logContenu(text);
             return article;
         } else {
             throw new RuntimeException("Salarie not found with id: " + id);
@@ -99,7 +113,9 @@ public class ArticleControllerMF {
                 article.setMediaName(uniqueFileName);
                 article.setPath("/uploads/" + uniqueFileName);
             }
+            String text = salarie.getNom() + " " + salarie.getPrenom() + " à publier un article appelé : "+ titre;
 
+            logContenu(text);
             // 5. Sauvegarder dans la BDD
             articleControllerMF.save(article);
 
@@ -108,6 +124,29 @@ public class ArticleControllerMF {
         } catch (Exception e) {
             e.printStackTrace(); // Log
             return null;
+        }
+    }
+
+    public void logContenu(String message) {
+        String nomDuFichier = "LogsSalarier.txt";
+        Path cheminPath = Paths.get(logDir, nomDuFichier);
+
+        // créer dossier si nécessaire
+        File dir = new File(logDir);
+        if (!dir.exists()) {
+            dir.mkdirs();
+        }
+
+        String contenu = LocalDateTime.now() + " - " + message + "\n";
+
+        try {
+            Files.write(
+                    cheminPath, // ✅ on passe le Path du fichier
+                    contenu.getBytes(StandardCharsets.UTF_8),
+                    StandardOpenOption.CREATE,
+                    StandardOpenOption.APPEND);
+        } catch (IOException e) {
+            e.printStackTrace(); // au moins loguer l'erreur
         }
     }
 

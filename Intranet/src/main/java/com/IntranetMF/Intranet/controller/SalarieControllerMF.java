@@ -1,5 +1,9 @@
 package com.IntranetMF.Intranet.controller;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -8,6 +12,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -19,10 +24,16 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.security.access.prepost.PreAuthorize;
 
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+import java.nio.file.Files;
+import java.time.LocalDate;
 import com.IntranetMF.Intranet.modele.SalarieMF;
 import com.IntranetMF.Intranet.repository.SalarieInterfacesMF;
 
 import jakarta.transaction.Transactional;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 
 @RestController
 @RequestMapping("/salaries")
@@ -30,6 +41,10 @@ public class SalarieControllerMF {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+    private String logDir = "log/Salarie/"
+            + LocalDate.now().getYear() + "/"
+            + LocalDate.now().getMonthValue() + "/"
+            + LocalDate.now().getDayOfMonth();
 
     public final SalarieInterfacesMF salarieControllerMF;
 
@@ -43,16 +58,22 @@ public class SalarieControllerMF {
         var salarieOpt = salarieControllerMF.findById(id);
         if (salarieOpt.isPresent()) {
             SalarieMF salarie = salarieOpt.get();
-           
+            String text = salarie.getNom() + " " + salarie.getPrenom() + " . A été rechercher.";
+            logContenu(text);
             return salarie;
         } else {
             throw new RuntimeException("Salarie not found with id: " + id);
         }
+
     }
 
     @GetMapping("/")
     @PreAuthorize("hasRole('ADMIN')")
     public Iterable<SalarieMF> getAllSalaries() {
+
+        String text = "Un admin à recherecher tout les utilisateur";
+        logContenu(text);
+
         return salarieControllerMF.findAll();
     }
 
@@ -77,9 +98,11 @@ public class SalarieControllerMF {
         }
 
         if (!salarie.isEmpty()) {
+            String text = "Un salarié a rechercher: " + nom;
+            logContenu(text);
             return salarie;
         } else {
-            throw new RuntimeException("Aucun salarié trouvé pour : " + nom);
+           return  List.of();
         }
     }
 
@@ -90,10 +113,17 @@ public class SalarieControllerMF {
             @RequestParam String nom,
             @RequestParam String prenom,
             @RequestParam String mail,
-            @RequestParam Integer numero,
-            @RequestParam Integer numeroPro,
+            @RequestParam String numero,
+            @RequestParam String numeroPro,
             @RequestParam String fonction,
             @RequestParam String localisation) {
+
+        if (!numero.matches("\\d+")) {
+            throw new IllegalArgumentException("Numéro invalide : uniquement des chiffres autorisés");
+        }
+        if (!numeroPro.matches("\\d+")) {
+            throw new IllegalArgumentException("Numéro invalide : uniquement des chiffres autorisés");
+        }
 
         var salarierOpt = salarieControllerMF.findById(id);
         if (salarierOpt.isPresent()) {
@@ -106,7 +136,10 @@ public class SalarieControllerMF {
             salarier.setFonction(fonction);
             salarier.setLocalisation(
                     com.IntranetMF.Intranet.modele.LocalisationEnumMF.Localisation.valueOf(localisation));
-                    System.out.print(salarier);
+            System.out.print(salarier);
+
+            String text = "Un admin a modifier : " + salarier.getNom() + " " + salarier.getPrenom();
+            logContenu(text);
             return salarieControllerMF.save(salarier); // sauvegarde de l'objet existant modifié
         } else {
             throw new RuntimeException("Aucun salarié trouvé pour cet ID: " + id);
@@ -120,8 +153,8 @@ public class SalarieControllerMF {
             @RequestParam String nom,
             @RequestParam String prenom,
             @RequestParam String mail,
-            @RequestParam Integer numero,
-            @RequestParam Integer numeroPro,
+            @RequestParam String numero,
+            @RequestParam String numeroPro,
             @RequestParam String fonction,
             @RequestParam String password,
             @RequestParam String localisation,
@@ -131,6 +164,13 @@ public class SalarieControllerMF {
         // throw new RuntimeException("Unauthorized: Admin access required to create a
         // new salarie.");
         // }
+
+        if (!numero.matches("\\d+")) {
+            throw new IllegalArgumentException("Numéro invalide : uniquement des chiffres autorisés");
+        }
+        if (!numeroPro.matches("\\d+")) {
+            throw new IllegalArgumentException("Numéro invalide : uniquement des chiffres autorisés");
+        }
         SalarieMF newSalarie = new SalarieMF();
         newSalarie.setNom(nom);
         newSalarie.setPrenom(prenom);
@@ -149,9 +189,10 @@ public class SalarieControllerMF {
         newSalarie.setLocalisation(
                 com.IntranetMF.Intranet.modele.LocalisationEnumMF.Localisation.valueOf(localisation));
         newSalarie.setIsConnected(false);
-        
-                    System.out.print(newSalarie);
 
+        System.out.print(newSalarie);
+        String text = "Un admin a ajouter : " + nom + " " + prenom ;
+        logContenu(text);
         return salarieControllerMF.save(newSalarie);
     }
 
@@ -169,9 +210,7 @@ public class SalarieControllerMF {
         if (salarieOpt.isPresent()) {
             SalarieMF salarie = salarieOpt.get();
 
-
-            
-             if (salarie.getIsConnected() == true){
+            if (salarie.getIsConnected() == true) {
                 throw new RuntimeException("L'utilisateur est déja connecter");
             }
             ZonedDateTime parisTime = ZonedDateTime.now(ZoneId.of("Europe/Paris"));
@@ -188,6 +227,10 @@ public class SalarieControllerMF {
                 System.out.println("Heure système : " + LocalDateTime.now());
                 System.out.println("Heure UTC : " + Instant.now());
                 System.out.println("Fuseau par défaut : " + ZoneId.systemDefault());
+
+                String text = salarie.getNom() + " " + salarie.getPrenom() + " vient de se connecter";
+
+                logContenu(text);
                 return salarie;
             } else {
                 throw new RuntimeException("Invalid account: ");
@@ -205,7 +248,7 @@ public class SalarieControllerMF {
         if (salarieOpt.isPresent()) {
             SalarieMF salarie = salarieOpt.get();
 
-             if (salarie.getIsConnected() == false){
+            if (salarie.getIsConnected() == false) {
                 throw new RuntimeException("L'utilisateur doit etre connecter sur le site");
             }
 
@@ -221,6 +264,11 @@ public class SalarieControllerMF {
             System.out.println("Heure système : " + LocalDateTime.now());
             System.out.println("Heure UTC : " + Instant.now());
             System.out.println("Fuseau par défaut : " + ZoneId.systemDefault());
+
+            String text = salarie.getNom() + " " + salarie.getPrenom() + " vient de se déconnecter";
+
+            logContenu(text);
+
             return salarie;
         } else {
             throw new RuntimeException("Salarie not found");
@@ -244,6 +292,11 @@ public class SalarieControllerMF {
             salarieControllerMF.save(LeSalarier);
             System.out.println("Mots de passe: " + password);
             System.out.println("Réinitialisation éffectuer avec succes");
+
+            String text = LeSalarier.getNom() + " " + LeSalarier.getPrenom() + " vient de sont mot de passe changer";
+
+                logContenu(text);
+
             return "Réinitialisation éffectuer avec succes";
         } else {
             return "identifiant inconnue";
@@ -269,12 +322,35 @@ public class SalarieControllerMF {
             return "Password must contain at least one lowercase letter.";
         } else if (!password.matches(".*\\d.*")) {
             return "Password must contain at least one digit.";
-        } else if (!password.matches(".*[!@#$%^&*()].*")) {
+        } else if (!password.matches(".*[\\W_].*")) {
             return "Password must contain at least one special character (!@#$%^&*()).";
         } else {
             return "OK";
         }
 
+    }
+
+    public void logContenu(String message) {
+        String nomDuFichier = "LogsSalarier.txt";
+        Path cheminPath = Paths.get(logDir, nomDuFichier);
+
+        // créer dossier si nécessaire
+        File dir = new File(logDir);
+        if (!dir.exists()) {
+            dir.mkdirs();
+        }
+
+        String contenu = LocalDateTime.now() + " - " + message + "\n";
+
+        try {
+            Files.write(
+                    cheminPath, // ✅ on passe le Path du fichier
+                    contenu.getBytes(StandardCharsets.UTF_8),
+                    StandardOpenOption.CREATE,
+                    StandardOpenOption.APPEND);
+        } catch (IOException e) {
+            e.printStackTrace(); // au moins loguer l'erreur
+        }
     }
 
 }

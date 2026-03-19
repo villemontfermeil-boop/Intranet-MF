@@ -33,10 +33,10 @@ public class SalarieMF {
     private String mail;
     
     @Column(name= "TELEPHONE_MF")
-    private Integer numero;
+    private String numero;
 
     @Column(name= "TELEPHONE_PRO")
-    private Integer numeroPro;
+    private String numeroPro;
 
     @Column(name= "FONCTION_MF")
     private String fonction;
@@ -77,7 +77,7 @@ public class SalarieMF {
     public String getFonction() {
         return fonction;
     }
-    public Integer getNumero() {
+    public String getNumero() {
         return numero;
     }
     public Localisation getLocalisation() {
@@ -103,7 +103,7 @@ public class SalarieMF {
         return isAdmin;
     }
 
-    public Integer getTelephonepro(){
+    public String getTelephonepro(){
         return numeroPro;
     }
 
@@ -123,7 +123,7 @@ public class SalarieMF {
     public void setFonction(String fonction) {
         this.fonction = fonction;
     }
-    public void setNumero(Integer numero) {
+    public void setNumero(String numero) {
         this.numero = numero;
     }
     public void setLocalisation(Localisation localisation) {
@@ -148,7 +148,7 @@ public class SalarieMF {
     public void setIsAdmin(Boolean isAdmin) {
         this.isAdmin = isAdmin;
     }
-    public void setTelPro(Integer tel){
+    public void setTelPro(String tel){
         this.numeroPro = tel;
     }
     
