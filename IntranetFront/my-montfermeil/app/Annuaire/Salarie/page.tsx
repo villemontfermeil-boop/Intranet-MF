@@ -71,7 +71,7 @@ function ModifierSalarie() {
 
                 {pepole.length > 0 ? (
                     <div className="table-container">
-                        <table className="montableau">
+                        <table className="montableau" style={{ fontFamily: '"Brown Pro", sans-serif' }}>
                             <thead>
                                 <tr>
                                     <th>Nom</th>
@@ -79,8 +79,8 @@ function ModifierSalarie() {
                                     <th>Téléphone</th>
                                     <th className="hide-on-mobile">Tél. Pro</th>
                                     <th>Email</th>
-                                    <th className="hide-on-tablet">Fonction</th>
-                                    <th>Services</th>
+                                    <th className="hide-on-tablet">Service</th>
+                                    <th>Localisation</th>
                                     <th>Découvrir</th>
                                     {/* Ajouter une collone lieux */}
                                     {sessionStorage.getItem("isAdmin") == 'true' && <th>Modifier</th>}

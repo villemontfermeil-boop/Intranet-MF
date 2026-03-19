@@ -292,7 +292,7 @@ function SalarieModification() {
                         </tr>
 
                         <tr>
-                            <th>Localisation</th>
+                            <th>Service</th>
                             <td>
                                 <div style={{ marginBottom: "5px" }}>
                                     <strong>Actuelle :</strong>
@@ -324,7 +324,7 @@ function SalarieModification() {
                         </tr>
 
                         <tr>
-                            <th>Fonction</th>
+                            <th>Service</th>
                             <td>
                                 {/* <input
                                     name="fonction"

@@ -121,7 +121,7 @@ function SalariePage() {
                     <thead>
                         <tr>
                             <th style={{ paddingRight: "50%" }}>
-                                Fonction:
+                                Service:
                             </th>
                             <td>
                                 {salarie.fonction}

@@ -109,7 +109,7 @@ function PageTransport() {
     return (
         <div>
             <h3 style={{textAlign: "center"}}><u >Choisissez le transport qui vous intéresse</u></h3>
-            <div style={{alignItems: "center", display: "flex", justifyContent: "center", gap: "20px"}}>
+            <div style={{alignItems: "center", display: "flex", justifyContent: "center", gap: "20px", fontFamily: '"Brown Pro", sans-serif'}}>
                 <button onClick={() => setChoix(Transport.T4)}><img style={{width: '50px', height: "50px"}} src={"/t4.png"}/></button>
                 <button onClick={() => setChoix(Transport[1])}><img style={{width: '50px', height: "50px"}} src={"/bus-1.png"}/></button>
                 <button onClick={() => setChoix(Transport[5])}>5</button>
