@@ -66,6 +66,7 @@ function CreationArticle() {
             alert("Votre Article a été ajouter")
             console.log(article)
             SetisSubmit(false)
+            router.push('/')
 
         } catch (error) {
             console.log(error)
