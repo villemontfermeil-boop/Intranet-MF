@@ -182,7 +182,7 @@ function AdminPanel() {
                             onChange={(e) => setPasswordVerif(e.target.value.toString())}
                             required
                         />
-                        <select name="localisation" value={newSalarie.localisation || 'NON_DEFINI'} onChange={handleChange}>
+                        <select style={{ fontFamily: '"Brown Pro", sans-serif' }} name="localisation" value={newSalarie.localisation || 'NON_DEFINI'} onChange={handleChange}>
                             <option value="NON_DEFINI">NON DEFINI</option>
                             <option value="VILLE_ÉDUCATIVE">VILLE ÉDUCATIVE</option>
 
@@ -195,7 +195,7 @@ function AdminPanel() {
                             <option value="DIRECTION_GÉNÉRALE">DIRECTION GÉNÉRALE</option>
                         </select>
 
-                        <select
+                        <select style={{ fontFamily: '"Brown Pro", sans-serif' }}
                             name="fonction"
                             value={newSalarie.fonction}
                             onChange={handleChange}

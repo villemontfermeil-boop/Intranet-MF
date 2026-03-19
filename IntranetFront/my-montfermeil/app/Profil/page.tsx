@@ -215,7 +215,7 @@ useEffect(()=>{
             <table border={1} className="MyTable">
               <tbody>
                 <tr>
-                  <th>Fonction:</th>
+                  <th>Service:</th>
                   <td>{person.fonction}</td>
                 </tr>
                 <tr>

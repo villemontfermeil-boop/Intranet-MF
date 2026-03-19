@@ -9,7 +9,7 @@ function ApplicationSite() {
     const routeur = useRouter()
     return (
         <div style={{placeItems: "center"}}>
-            <h2><u>Vous pouvez interagir avec les images, ils vous redirigeront vers les pages concernées.</u></h2>
+            <h2 style={{textAlign: "center"}}><u>Vous pouvez interagir avec les images, ils vous redirigeront vers les pages concernées.</u></h2>
             <table border={1}>
                 <tbody>
                     <tr>
