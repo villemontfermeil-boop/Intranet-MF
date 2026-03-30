@@ -77,3 +77,8 @@
 2026-03-19T16:47:32.825805100 - Un admin a modifier : MAXIMUS Julie
 2026-03-19T16:47:40.377546500 - Un salarié a rechercher: M
 2026-03-19T16:47:40.618360900 - Un salarié a rechercher: MA
+2026-03-19T17:00:03.802121300 - Un salarié a rechercher: l
+2026-03-19T17:00:19.190988700 - Un salarié a rechercher: h
+2026-03-19T17:00:47.122973900 - Jake Finn vient de se déconnecter
+2026-03-19T17:08:39.811899800 - Jake Finn vient de se connecter
+2026-03-19T17:08:42.676688 - Jake Finn vient de se déconnecter
