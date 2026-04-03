@@ -1,0 +1,14 @@
+2026-04-03T10:17:54.141998200 - Jake Finn vient de se connecter
+2026-04-03T10:17:58.098130300 - Jake Finn vient de se déconnecter
+2026-04-03T10:18:16.918625100 - Macron  Émmanuel  . A été rechercher.
+2026-04-03T10:18:18.933959900 - Macron  Émmanuel  . A été rechercher.
+2026-04-03T10:19:37.855962100 - Un salarié a rechercher: jea
+2026-04-03T10:19:37.860045900 - Un salarié a rechercher: jean
+2026-04-03T10:19:37.877591100 - Un salarié a rechercher: je
+2026-04-03T10:19:37.885437400 - Un salarié a rechercher: j
+2026-04-03T10:20:01.055747600 - Un salarié a rechercher: jea
+2026-04-03T10:20:01.395681700 - Un salarié a rechercher: je
+2026-04-03T10:20:01.540384600 - Un salarié a rechercher: j
+2026-04-03T10:20:01.777211300 - Un salarié a rechercher: a
+2026-04-03T10:20:34.078718100 - COULIBALY Yahaya . A été rechercher.
+2026-04-03T10:20:35.155926 - COULIBALY Yahaya . A été rechercher.
