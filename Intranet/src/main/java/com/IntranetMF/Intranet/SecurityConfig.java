@@ -25,21 +25,17 @@ import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity(
-    prePostEnabled = true,
-    securedEnabled = true,
-    jsr250Enabled = true
-)
+@EnableMethodSecurity(prePostEnabled = true, securedEnabled = true, jsr250Enabled = true)
 public class SecurityConfig {
 
     @Autowired
     private UserDetailsServiceImpl userDetailsService;
 
-
-   @Bean
+    @Bean
     public RoleHierarchy roleHierarchy() {
         return RoleHierarchyImpl.fromHierarchy("ROLE_ADMIN > ROLE_USER");
     }
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -47,16 +43,17 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         // ROUTES PUBLIQUES
-
+                        .requestMatchers("/Oublie/modifier/motdepasse").permitAll()
                         .requestMatchers("/uploads/**").permitAll()
                         .requestMatchers("/Article/getArticle").permitAll()
                         .requestMatchers("/salaries/login").permitAll()
+                        .requestMatchers("/Oublie/motDePasse").permitAll()
                         .requestMatchers("/Article/upload").authenticated()
                         .requestMatchers("/media/**").permitAll()
 
-                        //à verifier
+                        // à verifier
                         .requestMatchers("/uploads/Photos/**").permitAll()
-                        
+
                         // ADMIN
                         .requestMatchers("/salaries/NewSalarie").hasRole("ADMIN")
 
@@ -87,8 +84,6 @@ public class SecurityConfig {
 
         return auth.build();
     }
-
-    
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
