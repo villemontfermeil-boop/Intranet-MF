@@ -13,6 +13,7 @@ function Header({ nom }: { nom: string | null }) {
     const [admin, setAdmin] = useState(false);
     const router = useRouter();
     const [menu, SetMenu] = useState(false)
+    const [Entrer, SetEntrer] = useState(false)
 
 
     // Use sessionStorage so the user stays logged on refresh but is cleared on tab close.
@@ -176,7 +177,7 @@ function Header({ nom }: { nom: string | null }) {
         };
 
         performLogin();
-    }, [clicked, clickedOUT]);
+    }, [clicked, clickedOUT, Entrer]);
 
 
 
@@ -198,6 +199,8 @@ function Header({ nom }: { nom: string | null }) {
                     </button>
 
                     <div className={`menu-container ${menu ? "open" : ""}`}>
+                        <a href='/Nouveau/MotsDePasse' onMouseEnter={()=> SetEntrer(true)}  onMouseLeave={() => SetEntrer(false)}style={Entrer ? {color: "lightblue"} : {}}> Mots de passe oublié ? </a>
+
                         <button type="button" className='MenuButton' onClick={() => router.push('/Application')}>
                             Application
                         </button>
@@ -233,9 +236,11 @@ function Header({ nom }: { nom: string | null }) {
                             </>
                         ) : (
                             <>
+
                                 <input type="text" placeholder="Email" id="Email" required />
                                 <input type="password" placeholder="Password" id="Pass" required />
                                 <button type="button" onClick={() => setClicked(true)}>Login</button>
+
                             </>
                         )}
                     </div>
