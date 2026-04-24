@@ -21,6 +21,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import java.util.List;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 
 @Configuration
@@ -47,6 +48,8 @@ public class SecurityConfig {
                         .requestMatchers("/uploads/**").permitAll()
                         .requestMatchers("/Article/getArticle").permitAll()
                         .requestMatchers("/salaries/login").permitAll()
+                        .requestMatchers("/salaries/logout").permitAll()
+                        .requestMatchers("/auth/sync").permitAll()
                         .requestMatchers("/Oublie/motDePasse").permitAll()
                         .requestMatchers("/Article/upload").authenticated()
                         .requestMatchers("/media/**").permitAll()
@@ -58,18 +61,20 @@ public class SecurityConfig {
                         .requestMatchers("/salaries/NewSalarie").hasRole("ADMIN")
 
                         // USER & ADMIN
-                        .requestMatchers("/salaries/{id}").hasAnyRole("USER", "ADMIN")
-                        .requestMatchers("/salaries/logout").authenticated()
+                        .requestMatchers("/salaries/{id}").permitAll()
                         .requestMatchers("/Salarie/{email}").authenticated()
                         .requestMatchers("/Photo/Nouveaux").authenticated()
-                        .requestMatchers("/Photo").authenticated()
+                        .requestMatchers("/Photo/Modifier").authenticated()
+                        .requestMatchers("/Photo/Profile/**").permitAll()
                         .requestMatchers("/Article/newArticle").authenticated()
                         .requestMatchers("/Modification/Salarie/{id}").hasRole("ADMIN")
                         .requestMatchers("/salaries/PasswordReset").hasRole("ADMIN")
 
-                        .anyRequest().authenticated() // tout le reste nécessite auth
+                        .anyRequest().permitAll() // tout le reste nécessite auth
                 )
-                .httpBasic(Customizer.withDefaults());
+                .oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> {
+                    jwt.jwtAuthenticationConverter(new JwtAuthenticationConverter());
+                }));
 
         return http.build();
     }
@@ -92,7 +97,8 @@ public class SecurityConfig {
         // a modifier avec les vrai adresse ip
         config.setAllowedOrigins(List.of("http://localhost:3000", "http://127.0.0.1:3000",
                 "http://localhost:3001",
-                "http://localhost"));
+                "http://localhost",
+                "https://keycloak.montfermeil.local:3000"));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);

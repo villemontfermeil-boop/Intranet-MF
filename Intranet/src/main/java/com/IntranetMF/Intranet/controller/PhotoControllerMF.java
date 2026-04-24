@@ -45,13 +45,13 @@ public class PhotoControllerMF {
     }
 
     @PostMapping("/Nouveaux")
-    @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<String> newPhoto(@RequestParam("file") MultipartFile file, @RequestParam Long id) {
+    // @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<String> newPhoto(@RequestParam("file") MultipartFile file, @RequestParam String mail) {
         if (!file.getContentType().startsWith("image/")) {
             return ResponseEntity.badRequest().body("Fichier invalide");
 
         }
-        Optional<SalarieMF> verificationDuSalarie = salarieMF.findById(id);
+        Optional<SalarieMF> verificationDuSalarie = salarieMF.findByMail(mail);
         if (verificationDuSalarie.isPresent()) {
             SalarieMF salarie = verificationDuSalarie.get();
             if (salarie.getIsConnected() == false) {
@@ -80,7 +80,7 @@ public class PhotoControllerMF {
 
             Files.copy(file.getInputStream(), cheminPath, StandardCopyOption.REPLACE_EXISTING);
 
-            SalarieMF unSalarie = salarieMF.findById(id).orElseThrow(() -> new RuntimeException("Salarié non trouver"));
+            SalarieMF unSalarie = salarieMF.findByMail(mail).orElseThrow(() -> new RuntimeException("Salarié non trouver"));
             PhotoMF unePhotoMF = new PhotoMF();
             unePhotoMF.setModification();
             unePhotoMF.setPhoto(nomDuFichier);
@@ -102,7 +102,7 @@ public class PhotoControllerMF {
     }
 
     @GetMapping("/Profile/{id}")
-    @PreAuthorize("hasRole('USER')")
+    // @PreAuthorize("hasRole('USER')")
     public Optional<PhotoMF> getProfileImage(@PathVariable Long id) {
         Optional<SalarieMF> salarie = salarieMF.findById(id);
 
@@ -124,15 +124,14 @@ public class PhotoControllerMF {
     }
 
     @PutMapping("/Modifier")
-    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<String> modifyProfileImage(
             @RequestParam("file") MultipartFile file,
-            @RequestParam Long id) {
+            @RequestParam String email) {
 
         // Vérifier que c'est bien un fichier .jpg /.png
 
-        System.out.println("Recherche du salarié avec l'ID: " + id);
-        Optional<SalarieMF> salarier = salarieMF.findById(id);
+        System.out.println("Recherche du salarié avec l'ID: " + email);
+        Optional<SalarieMF> salarier = salarieMF.findByMail(email);
 
         if (salarier.isPresent()) {
             SalarieMF Lesalarier = salarier.get();
@@ -193,11 +192,11 @@ public class PhotoControllerMF {
                             .body("Erreur IO: " + ex.getMessage());
                 }
             } else {
-                return ResponseEntity.badRequest().body("Photo non trouvée pour le salarié ID: " + id);
+                return ResponseEntity.badRequest().body("Photo non trouvée pour le salarié : " + email);
             }
         }
 
-        return ResponseEntity.badRequest().body("Salarié non trouvé : " + id);
+        return ResponseEntity.badRequest().body("Salarié non trouvé : " + email);
     }
 
     public void logContenu(String message) {

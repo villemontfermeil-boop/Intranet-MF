@@ -16,12 +16,11 @@ function Moi() {
     telpro: sessionStorage.getItem("telephonepro"),
     id: sessionStorage.getItem("id") || "",
   });
-
   // États pour l'image et le chargement
   const [image, setImage] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  
+
   // États pour l'édition
   const [editing, setEditing] = useState(false);
   const [file, setFile] = useState<File | null>(null);
@@ -41,17 +40,17 @@ function Moi() {
       setLoading(false);
       return;
     }
-    
+
     try {
       setLoading(true);
       setError(null);
-      
+
       const response = await fetch(`/api/Montfermeil/users/Photo/${oneId}`);
-      
+
       if (!response.ok) {
         throw new Error(`Erreur HTTP: ${response.status}`);
       }
-      
+
       const data = await response.json();
       setImage(data);
     } catch (e) {
@@ -62,11 +61,12 @@ function Moi() {
       setLoading(false);
     }
   }
-useEffect(()=>{
-  if(sessionStorage.length == 0 || !sessionStorage.getItem("isConnected")){
-    location.href= "/";
-  }
-},[])
+  useEffect(() => {
+    if (sessionStorage.length == 0 || !sessionStorage.getItem("isConnected")) {
+      location.href = "/";
+    }
+
+  }, [])
   // Chargement initial
   useEffect(() => {
     getProfile(person.id);
@@ -81,13 +81,23 @@ useEffect(()=>{
 
     const FD = new FormData();
     FD.append("file", file as File);
-    FD.append("id", sessionStorage.getItem("id") as string);
+    const email = sessionStorage.getItem("mail")
+
+    if (!email) {
+      alert("Email introuvable, reconnecte-toi")
+      return
+    }
+console.log("EMAIL ENVOYÉ =", email)
+    FD.append("email", email)
 
     try {
       setUploading(true);
-      
+
       const response = await fetch("api/Montfermeil/users/Photo/NewPhoto", {
         method: "PUT",
+        headers: {
+          Authorization: `Bearer ${sessionStorage.getItem('token')}`
+        },
         body: FD
       });
 
@@ -120,16 +130,16 @@ useEffect(()=>{
   // Afficher un loader pendant le chargement initial
   if (loading) {
     return (
-      <div style={{ 
-        display: "flex", 
-        justifyContent: "center", 
-        alignItems: "center", 
+      <div style={{
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
         height: "100vh",
         flexDirection: "column"
       }}>
         <div className="spinner"></div>
         <p style={{ marginTop: "20px" }}>Chargement de votre profil...</p>
-        
+
         {/* Style pour le spinner */}
         <style jsx>{`
           .spinner {
@@ -153,16 +163,16 @@ useEffect(()=>{
   // Afficher une erreur si le chargement a échoué
   if (error) {
     return (
-      <div style={{ 
-        display: "flex", 
-        justifyContent: "center", 
-        alignItems: "center", 
+      <div style={{
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
         height: "100vh",
         flexDirection: "column",
         color: "red"
       }}>
         <p>❌ {error}</p>
-        <button 
+        <button
           onClick={() => getProfile(person.id)}
           style={{
             marginTop: "20px",
@@ -267,7 +277,7 @@ useEffect(()=>{
                   <td colSpan={2}>
                     <button
                       onClick={handleSubmit}
-                      style={{ 
+                      style={{
                         width: "100%",
                         padding: "10px",
                         backgroundColor: uploading ? "#ccc" : "#007bff",

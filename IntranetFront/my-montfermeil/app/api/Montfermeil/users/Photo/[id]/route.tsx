@@ -15,20 +15,17 @@ export async function GET(
 
         const backendUrl = process.env.BACKEND_API;
       
-        const cookiestore = await cookies();
-        const login = cookiestore.get('mail')?.value || "";
-        const password = cookiestore.get('MDP')?.value || "";
-        const credential = btoa(`${login}:${password}`);
+        const auth = request.headers.get("Authorization")
 
         try{
             const reponse = await fetch(`${backendUrl}/Photo/Profile/${id}`, {
                 method : "GET",
                 headers:{
-                    "Authorization" : `Basic ${credential}` 
+                    Authorization : auth || ''
                 } 
             })
             const json = await reponse.json();
-            console.log(json);
+            console.log("Lejson", json);
             return NextResponse.json(json, {status: 200});
             
         }catch(e){

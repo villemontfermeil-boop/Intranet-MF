@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import { cookies } from "next/headers";
 type Context = {
   params: {
     id: string;
@@ -17,32 +16,19 @@ export async function GET(request: Request, context: any) {
     return NextResponse.json({ error: 'Missing or invalid id parameter' }, { status: 400 });
   }
     try {
-        const cookiestore = await cookies();
-        const credential = cookiestore.get('credential')?.value || '';
+        const auth = request.headers.get("Authorization");
+        
+        const resp = await fetch(`${process.env.BACKEND_API}/salaries/${id}`, { 
+          headers:{
+            Autorization : auth || ''
+          }
+         });
 
-        const headers: Record<string, string> = {};
-        if (credential) headers['Authorization'] = `Basic ${credential}`;
-
-        const resp = await fetch(`${process.env.BACKEND_API}/salaries/${id}`, { headers });
-
-        const text = await resp.text();
-
-        if (!resp.ok) {
-            console.error('[api-test] backend returned', resp.status, text);
-            return NextResponse.json({ error: text || resp.statusText }, { status: resp.status });
-        }
-
-        if (!text) return NextResponse.json(null, { status: resp.status });
-
-        try {
-            const parsed = JSON.parse(text);
-            return NextResponse.json(parsed, { status: resp.status });
-        } catch (e) {
-            // Not JSON — return raw text
-            return new Response(text, { status: resp.status });
-        }
-    } catch (e: any) {
-        console.error('[api-test] fetch error', e);
-        return NextResponse.json({ error: String(e) }, { status: 500 });
+        const text = await resp.json();
+         console.log(text)
+        return NextResponse.json(text, {status : 200})
+    }catch(ex){
+      console.log("érreur",ex)
+      return NextResponse.json(ex, {status: 500})
     }
 }
