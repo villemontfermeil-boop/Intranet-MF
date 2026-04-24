@@ -16,10 +16,15 @@ function ModifierSalarie() {
 
         const identifiant = sessionStorage.getItem("mail")
         const password = sessionStorage.getItem("MDP")
+        const token = sessionStorage.getItem("token")
 
         const credential = btoa(`${identifiant}:${password}`)
         try {
-            const response = await fetch(`/api/Montfermeil/users/Salarie/${name}`)
+            const response = await fetch(`/api/Montfermeil/users/Salarie/${name}`,{
+                headers:{
+                    Authorization: `Bearer ${token}`
+                }
+            })
             const data = await response.json();
             Setpeople(data);
             SetVisible(true)

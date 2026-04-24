@@ -8,16 +8,16 @@ export async function GET(
   const { name } = await context.params;   
   const cookieStore = await cookies();     
   const credential = cookieStore.get("credential")?.value;
-
+ const authHeader = request.headers.get('authorization');
   console.log("Fetching data for name =", name);
-  console.log("credential =", credential);
+  console.log("credential =", authHeader);
 
   try {
     const response = await fetch(
       `${process.env.BACKEND_API}/salaries/Salarie/${encodeURIComponent(name)}`,
       {
         headers: {
-          Authorization: `Basic ${credential}`
+          Authorization: authHeader || ''
         }
       }
     );

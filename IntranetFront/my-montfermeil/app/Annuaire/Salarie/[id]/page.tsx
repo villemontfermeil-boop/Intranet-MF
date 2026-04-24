@@ -7,14 +7,14 @@ import "./style.css";
 function SalariePage() {
     const params = useParams();
     const id = params?.id ? Number(params.id) : undefined;
-    
+
     // États pour les données
     const [salarie, setSalarie] = useState<any>({});
     const [image, setImage] = useState<any>({});
     const [loading, setLoading] = useState(true); // État de chargement
-    
+
     const profileImage = `http://localhost:8080/uploads/Photos/${image.photo}`;
-    
+
     console.log("Il contient :", image);
 
     // Redirection si non connecté
@@ -23,12 +23,13 @@ function SalariePage() {
     }
 
     async function LookingForid(id: number) {
-        const identifiant = sessionStorage.getItem("mail");
-        const password = sessionStorage.getItem("MDP");
-        const credential = btoa(`${identifiant}:${password}`);
-        
+        const token = sessionStorage.getItem("token")
         try {
-            const response = await fetch(`/api/Montfermeil/users/${id}`);
+            const response = await fetch(`/api/Montfermeil/users/${id}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
             const data = await response.json();
             setSalarie(data);
         } catch (error) {
@@ -38,7 +39,12 @@ function SalariePage() {
 
     async function getProfile(oneId: number) {
         try {
-            const reponse = await fetch(`/api/Montfermeil/users/Photo/${oneId}`);
+            const token = sessionStorage.getItem("token");
+            const reponse = await fetch(`/api/Montfermeil/users/Photo/${oneId}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
             const json = await reponse.json();
             setImage(json);
             console.log(json);
@@ -49,7 +55,7 @@ function SalariePage() {
 
     useEffect(() => {
         if (!id || isNaN(id)) return;
-        
+
         // Chargement des données
         const loadData = async () => {
             setLoading(true);
@@ -59,7 +65,7 @@ function SalariePage() {
             ]);
             setLoading(false);
         };
-        
+
         loadData();
     }, [id]);
 
@@ -77,7 +83,7 @@ function SalariePage() {
                 <p style={{ marginTop: "20px", fontSize: "18px" }}>
                     Chargement du profil...
                 </p>
-                
+
                 <style jsx>{`
                     .spinner {
                         border: 4px solid rgba(0, 0, 0, 0.1);
@@ -107,16 +113,16 @@ function SalariePage() {
                         {salarie.prenom}
                     </u>
                 </h1>
-                
+
                 <div className="PhotoCLass">
                     <img src="/cadre.png" className="Conteneur" alt="cadre" />
 
-                    {image.status !== 500 
+                    {image.status !== 500
                         ? <img src={profileImage} className="PP" alt="photo profil" />
                         : <img className="PP" src="/cerclePhoto.png" alt="photo par défaut" />
                     }
                 </div>
-                
+
                 <table border={1} className="tableau" style={{ textAlign: "center", marginRight: "50px" }}>
                     <thead>
                         <tr>
@@ -140,7 +146,7 @@ function SalariePage() {
                                 Numero:
                             </th>
                             <td>
-                                 <a href={"tel:"+salarie.numero}>{salarie.numero} </a>
+                                <a href={"tel:" + salarie.numero}>{salarie.numero} </a>
                             </td>
                         </tr>
                         <tr>
@@ -148,7 +154,7 @@ function SalariePage() {
                                 Téléphone pro:
                             </th>
                             <td>
-                                <a href={"tel:"+salarie.telephonepro || 'NON_DÉFINI'}>{salarie.telephonepro || 'NON_DÉFINI'}</a>
+                                <a href={"tel:" + salarie.telephonepro || 'NON_DÉFINI'}>{salarie.telephonepro || 'NON_DÉFINI'}</a>
                             </td>
                         </tr>
                         <tr>
@@ -156,7 +162,7 @@ function SalariePage() {
                                 Email:
                             </th>
                             <td>
-                               <a href={`mailto:${salarie.mail}`}> {salarie.mail}</a>
+                                <a href={`mailto:${salarie.mail}`}> {salarie.mail}</a>
                             </td>
                         </tr>
                         <tr>
@@ -164,8 +170,8 @@ function SalariePage() {
                                 Statut sur le site :
                             </th>
                             <td>
-                                {salarie.isConnected ? 
-                                    <img src="/checkbox.png" style={{ width: "10%" }} alt="connecté" /> : 
+                                {salarie.isConnected ?
+                                    <img src="/checkbox.png" style={{ width: "10%" }} alt="connecté" /> :
                                     <img src="/cross.png" style={{ width: "10%" }} alt="déconnecté" />
                                 }
                             </td>

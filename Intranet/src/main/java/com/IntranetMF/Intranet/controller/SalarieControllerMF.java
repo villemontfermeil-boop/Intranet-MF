@@ -4,43 +4,35 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
-import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
+import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.security.access.prepost.PreAuthorize;
+import java.util.Optional;
 
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Files;
-import java.time.LocalDate;
 import com.IntranetMF.Intranet.modele.SalarieMF;
 import com.IntranetMF.Intranet.repository.SalarieInterfacesMF;
 
 import jakarta.transaction.Transactional;
-import org.springframework.http.ResponseEntity;
-import org.springframework.http.HttpStatus;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 
 @RestController
 @RequestMapping("/salaries")
 public class SalarieControllerMF {
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
     private String logDir = "log/Salarie/"
             + LocalDate.now().getYear() + "/"
             + LocalDate.now().getMonthValue() + "/"
@@ -48,12 +40,14 @@ public class SalarieControllerMF {
 
     public final SalarieInterfacesMF salarieControllerMF;
 
+    @PersistenceContext
+    private EntityManager entityManager;
+
     public SalarieControllerMF(SalarieInterfacesMF salarieControllerMF) {
         this.salarieControllerMF = salarieControllerMF;
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('USER')")
     public SalarieMF getMethodName(@PathVariable Long id) {
         var salarieOpt = salarieControllerMF.findById(id);
         if (salarieOpt.isPresent()) {
@@ -67,8 +61,19 @@ public class SalarieControllerMF {
 
     }
 
+    @GetMapping("/email/{email}")
+    public SalarieMF getEmail(@PathVariable String email) {
+        Optional<SalarieMF> unSalarie = salarieControllerMF.findByMail(email);
+        
+        if (unSalarie.isPresent()) {
+            return unSalarie.get();
+        } else {
+            throw new RuntimeException("Salarie not found with email: " + email);
+
+        }
+    }
+
     @GetMapping("/")
-    @PreAuthorize("hasRole('ADMIN')")
     public Iterable<SalarieMF> getAllSalaries() {
 
         String text = "Un admin à recherecher tout les utilisateur";
@@ -78,7 +83,6 @@ public class SalarieControllerMF {
     }
 
     @GetMapping("/Salarie/{nom}")
-    @PreAuthorize("hasRole('USER')")
     public List<SalarieMF> findSalarierbymail(@PathVariable String nom) {
 
         String[] coupage = nom.trim().split("\\s+"); // Séparer en mots
@@ -102,12 +106,11 @@ public class SalarieControllerMF {
             logContenu(text);
             return salarie;
         } else {
-           return  List.of();
+            return List.of();
         }
     }
 
     @PatchMapping("/Modification/Salarie/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
     public SalarieMF ModifyASalarier(
             @PathVariable Long id,
             @RequestParam String nom,
@@ -148,7 +151,6 @@ public class SalarieControllerMF {
 
     @Transactional
     @PostMapping("/NewSalarie")
-    @PreAuthorize("hasRole('ADMIN')")
     public SalarieMF createSalarie(
             @RequestParam String nom,
             @RequestParam String prenom,
@@ -156,14 +158,7 @@ public class SalarieControllerMF {
             @RequestParam String numero,
             @RequestParam String numeroPro,
             @RequestParam String fonction,
-            @RequestParam String password,
-            @RequestParam String localisation,
-            @RequestHeader(value = "X-Admin-Token", required = false) String adminToken) {
-
-        // if (adminToken == null || !adminToken.equals("adminMF-token")){
-        // throw new RuntimeException("Unauthorized: Admin access required to create a
-        // new salarie.");
-        // }
+            @RequestParam String localisation) {
 
         if (!numero.matches("\\d+")) {
             throw new IllegalArgumentException("Numéro invalide : uniquement des chiffres autorisés");
@@ -179,155 +174,96 @@ public class SalarieControllerMF {
         newSalarie.setNumero(numero);
         newSalarie.setFonction(fonction);
 
-        if (!checkingPassword(password).equals("OK")) {
-            throw new RuntimeException("Password validation failed: " + checkingPassword(password));
-        }
-
-        String encodedPassword = passwordEncoder.encode(password);
-        newSalarie.setPassword(encodedPassword);
         newSalarie.setIsAdmin(false);
         newSalarie.setLocalisation(
                 com.IntranetMF.Intranet.modele.LocalisationEnumMF.Localisation.valueOf(localisation));
         newSalarie.setIsConnected(false);
 
         System.out.print(newSalarie);
-        String text = "Un admin a ajouter : " + nom + " " + prenom ;
+        String text = "Un admin a ajouter : " + nom + " " + prenom;
         logContenu(text);
         return salarieControllerMF.save(newSalarie);
     }
 
-    @PostMapping("/login")
-    public SalarieMF loginSalarie(
-            @RequestParam String mail,
-            @RequestParam String password,
-            @RequestHeader(value = "Authorization", required = true) String authorization) {
+    @PostMapping("/sync")
+    public SalarieMF syncUser(@RequestBody Map<String, String> userData) {
+        String email = userData.get("email");
 
-        if (authorization == null || !authorization.equals("Bearer intranetMF-token")) {
-            throw new RuntimeException("Unauthorized: Valid token required to login.");
-        }
+        var salarieOpt = salarieControllerMF.findByMail(email);
 
-        var salarieOpt = salarieControllerMF.findByMail(mail);
         if (salarieOpt.isPresent()) {
-            SalarieMF salarie = salarieOpt.get();
-
-            if (salarie.getIsConnected() == true) {
-                throw new RuntimeException("L'utilisateur est déja connecter");
-            }
-            ZonedDateTime parisTime = ZonedDateTime.now(ZoneId.of("Europe/Paris"));
-            LocalDateTime localDateTime = parisTime.toLocalDateTime();
-
-            if (passwordEncoder.matches(password, salarie.getPassword())) {
-                salarie.setIsConnected(true);
-                salarie.setBeginLogin(localDateTime);
-
-                salarieControllerMF.save(salarie);
-
-                // Pour voir qui c'est connecter
-                System.out.println("Salarier:" + salarie);
-                System.out.println("Heure système : " + LocalDateTime.now());
-                System.out.println("Heure UTC : " + Instant.now());
-                System.out.println("Fuseau par défaut : " + ZoneId.systemDefault());
-
-                String text = salarie.getNom() + " " + salarie.getPrenom() + " vient de se connecter";
-
-                logContenu(text);
-                return salarie;
-            } else {
-                throw new RuntimeException("Invalid account: ");
-            }
-        } else {
-            throw new RuntimeException("Invalid account: ");
+            SalarieMF existing = salarieOpt.get();
+            existing.setIsConnected(true);
+            // Update other fields if needed
+            existing.setNom(userData.get("nom"));
+            existing.setPrenom(userData.get("prenom"));
+            return salarieControllerMF.save(existing);
         }
+
+        // Create new
+        SalarieMF newUser = new SalarieMF();
+        newUser.setMail(email);
+        newUser.setNom(userData.get("nom"));
+        newUser.setPrenom(userData.get("prenom"));
+        newUser.setIsConnected(true);
+        newUser.setIsAdmin(false);
+        // Set defaults
+        newUser.setLocalisation(com.IntranetMF.Intranet.modele.LocalisationEnumMF.Localisation.NON_DEFINI); // Assuming
+                                                                                                            // default
+        newUser.setNumero("0000000000"); // Default
+        newUser.setTelPro("0000000000"); // Default
+        newUser.setFonction("User"); // Default
+
+        String text = "Nouveau utilisateur synchronisé : " + userData.get("nom") + " " + userData.get("prenom");
+        logContenu(text);
+        return salarieControllerMF.save(newUser);
     }
 
     @PostMapping("/logout")
-    public SalarieMF logoutSalarie(
-            @RequestParam String mail) {
+    @Transactional
+    public SalarieMF logoutSalarie(@RequestBody Map<String, String> userData) {
+        System.out.println("\n====================================");
+        System.out.println("🔓 LOGOUT REQUEST START");
+        System.out.println("UserData: " + userData);
+        System.out.println("====================================\n");
 
-        var salarieOpt = salarieControllerMF.findByMail(mail);
+        String email = userData.getOrDefault("mail", userData.get("email"));
+        System.out.println("📧 Looking for email: " + email);
+
+        if (email == null || email.isEmpty()) {
+            System.out.println("❌ ERROR: Email is required for logout");
+            throw new RuntimeException("Email is required for logout");
+        }
+
+        var salarieOpt = salarieControllerMF.findByMail(email);
+
         if (salarieOpt.isPresent()) {
             SalarieMF salarie = salarieOpt.get();
-
-            if (salarie.getIsConnected() == false) {
-                throw new RuntimeException("L'utilisateur doit etre connecter sur le site");
-            }
-
-            ZonedDateTime parisTime = ZonedDateTime.now(ZoneId.of("Europe/Paris"));
-            LocalDateTime localDateTime = parisTime.toLocalDateTime();
+            System.out.println("✅ User found - Name: " + salarie.getNom() + " " + salarie.getPrenom());
+            System.out.println("   Current isConnected: " + salarie.getIsConnected());
+            System.out.println("   Current beginLogin: " + salarie.getBeginLogin());
 
             salarie.setIsConnected(false);
-            salarie.setLastLogin(localDateTime);
-            salarieControllerMF.save(salarie);
+            salarie.setLastLogin(LocalDateTime.now());
+            System.out.println("   Set isConnected to: " + salarie.getIsConnected());
+            System.out.println("   Set lastLogin to: " + salarie.getLastLogin());
 
-            // Pour voir qui c'est déconnecter
-            System.out.println("Salarier:" + salarie);
-            System.out.println("Heure système : " + LocalDateTime.now());
-            System.out.println("Heure UTC : " + Instant.now());
-            System.out.println("Fuseau par défaut : " + ZoneId.systemDefault());
+            SalarieMF saved = salarieControllerMF.save(salarie);
+            entityManager.flush(); // Force immediate database update
+            System.out.println("   Saved - isConnected is now: " + saved.getIsConnected());
+            System.out.println("   Saved - lastLogin is now: " + saved.getLastLogin());
 
-            String text = salarie.getNom() + " " + salarie.getPrenom() + " vient de se déconnecter";
+            String logText = "🔓 DÉCONNEXION: " + salarie.getNom() + " " + salarie.getPrenom() + " s'est déconnecté à "
+                    + salarie.getLastLogin();
+            System.out.println(logText);
+            logContenu(logText);
 
-            logContenu(text);
-
-            return salarie;
+            System.out.println("✅ LOGOUT SUCCESS\n");
+            return saved;
         } else {
-            throw new RuntimeException("Salarie not found");
+            System.out.println("❌ User NOT found with email: " + email);
+            throw new RuntimeException("Salarie not found with email: " + email);
         }
-    }
-
-    @PatchMapping("/PasswordReset")
-    @PreAuthorize("hasRole('ADMIN')")
-    public String passwordReset(@RequestParam Long id, @RequestParam String password) {
-        Optional<SalarieMF> salarie = salarieControllerMF.findById(id);
-        if (salarie.isPresent()) {
-            SalarieMF LeSalarier = salarie.get();
-
-            if (!checkingPassword(password).equals("OK")) {
-                throw new RuntimeException("Password validation failed: " + checkingPassword(password));
-            }
-
-            String encodedPassword = passwordEncoder.encode(password);
-            LeSalarier.setPassword(encodedPassword);
-
-            salarieControllerMF.save(LeSalarier);
-            System.out.println("Mots de passe: " + password);
-            System.out.println("Réinitialisation éffectuer avec succes");
-
-            String text = LeSalarier.getNom() + " " + LeSalarier.getPrenom() + " vient de sont mot de passe changer";
-
-                logContenu(text);
-
-            return "Réinitialisation éffectuer avec succes";
-        } else {
-            return "identifiant inconnue";
-        }
-    }
-
-    /*
-     * Cette méthode vérifie si le mot de passe respecte les critères de sécurité
-     * suivants :
-     * - Au moins 8 caractères de long
-     * - Contient au moins une lettre majuscule
-     * - Contient au moins une lettre minuscule
-     * - Contient au moins un chiffre
-     * - Contient au moins un caractère spécial (!@#$%^&*())
-     */
-
-    public String checkingPassword(String password) {
-        if (password.length() < 8) {
-            return "Password must be at least 8 characters long.";
-        } else if (!password.matches(".*[A-Z].*")) {
-            return "Password must contain at least one uppercase letter.";
-        } else if (!password.matches(".*[a-z].*")) {
-            return "Password must contain at least one lowercase letter.";
-        } else if (!password.matches(".*\\d.*")) {
-            return "Password must contain at least one digit.";
-        } else if (!password.matches(".*[\\W_].*")) {
-            return "Password must contain at least one special character (!@#$%^&*()).";
-        } else {
-            return "OK";
-        }
-
     }
 
     public void logContenu(String message) {
