@@ -66,6 +66,7 @@ public class SecurityConfig {
                         .requestMatchers("/Photo/Nouveaux").authenticated()
                         .requestMatchers("/Photo/Modifier").authenticated()
                         .requestMatchers("/Photo/Profile/**").permitAll()
+                        .requestMatchers("/Organisme/**").permitAll()
                         .requestMatchers("/Article/newArticle").authenticated()
                         .requestMatchers("/Modification/Salarie/{id}").hasRole("ADMIN")
                         .requestMatchers("/salaries/PasswordReset").hasRole("ADMIN")
