@@ -1,4 +1,5 @@
 package com.IntranetMF.Intranet.controller;
+import java.util.Optional;
 
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -12,20 +13,24 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 
 import com.IntranetMF.Intranet.modele.LocalisationEnumMF.Localisation;
+import com.IntranetMF.Intranet.modele.OganigrameMF;
 import com.IntranetMF.Intranet.modele.SalarieMF;
 import com.IntranetMF.Intranet.repository.SalarieInterfacesMF;
+import com.IntranetMF.Intranet.repository.OrganismeInterfacesMF;
 
 @RestController
 @RequestMapping("/auth")
 public class KeycloakAuthController {
 
     private final SalarieInterfacesMF salarieRepository;
+    private final OrganismeInterfacesMF oganigrameMF;
 
     @PersistenceContext
     private EntityManager entityManager;
 
-    public KeycloakAuthController(SalarieInterfacesMF salarieRepository) {
+    public KeycloakAuthController(SalarieInterfacesMF salarieRepository, OrganismeInterfacesMF oganigrameMF) {
         this.salarieRepository = salarieRepository;
+        this.oganigrameMF = oganigrameMF;
     }
 
     /**
@@ -69,16 +74,31 @@ public class KeycloakAuthController {
             System.out.println("   Saved beginLogin: " + saved.getBeginLogin() + "\n");
             return saved;
         }
+        SalarieMF newUser = new SalarieMF();
+       
+       Long organigrammeId = Long.parseLong(userData.getOrDefault("organisation", "0"));
+        Optional<OganigrameMF> uneOrganisation = oganigrameMF.findById(organigrammeId);
+        if(!uneOrganisation.isPresent()){
+            String defaultValue = "3";
+                organigrammeId = Long.parseLong(defaultValue);
+        Optional<OganigrameMF> uneOrganisation2 = oganigrameMF.findById(organigrammeId);
 
+        newUser.setOrganigramme(uneOrganisation2.get());
+
+        }else{
+        newUser.setOrganigramme(uneOrganisation.get());
+
+        }
         // Create new user
         System.out.println("📝 Creating new user...");
-        SalarieMF newUser = new SalarieMF();
         newUser.setMail(email);
         newUser.setNom(userData.getOrDefault("nom", ""));
         newUser.setPrenom(userData.getOrDefault("prenom", ""));
         newUser.setIsConnected(true);
         newUser.setBeginLogin(LocalDateTime.now());
         newUser.setIsAdmin(false);
+
+        
 
         if (userData.get("localisation").equals("VILLE_╔DUCA")) {
             newUser.setLocalisation(Localisation.VILLE_ÉDUCATIVE);

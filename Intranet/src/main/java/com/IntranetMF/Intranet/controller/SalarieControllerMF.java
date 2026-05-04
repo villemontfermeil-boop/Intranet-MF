@@ -23,7 +23,9 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Files;
 import com.IntranetMF.Intranet.modele.SalarieMF;
+import com.IntranetMF.Intranet.modele.OganigrameMF;
 import com.IntranetMF.Intranet.repository.SalarieInterfacesMF;
+import com.IntranetMF.Intranet.repository.OrganismeInterfacesMF;
 
 import jakarta.transaction.Transactional;
 import jakarta.persistence.EntityManager;
@@ -39,12 +41,14 @@ public class SalarieControllerMF {
             + LocalDate.now().getDayOfMonth();
 
     public final SalarieInterfacesMF salarieControllerMF;
+    public final OrganismeInterfacesMF oganigrameMF;
 
     @PersistenceContext
     private EntityManager entityManager;
 
-    public SalarieControllerMF(SalarieInterfacesMF salarieControllerMF) {
+    public SalarieControllerMF(SalarieInterfacesMF salarieControllerMF, OrganismeInterfacesMF oganigrameMF) {
         this.salarieControllerMF = salarieControllerMF;
+        this.oganigrameMF = oganigrameMF;
     }
 
     @GetMapping("/{id}")
@@ -64,7 +68,7 @@ public class SalarieControllerMF {
     @GetMapping("/email/{email}")
     public SalarieMF getEmail(@PathVariable String email) {
         Optional<SalarieMF> unSalarie = salarieControllerMF.findByMail(email);
-        
+
         if (unSalarie.isPresent()) {
             return unSalarie.get();
         } else {
@@ -178,6 +182,12 @@ public class SalarieControllerMF {
         newSalarie.setLocalisation(
                 com.IntranetMF.Intranet.modele.LocalisationEnumMF.Localisation.valueOf(localisation));
         newSalarie.setIsConnected(false);
+
+        int intNum = 1;
+        Long longNum = Long.valueOf(intNum);
+        Optional<OganigrameMF> og = oganigrameMF.findById(longNum);
+
+        newSalarie.setOrganigramme(og.get());
 
         System.out.print(newSalarie);
         String text = "Un admin a ajouter : " + nom + " " + prenom;

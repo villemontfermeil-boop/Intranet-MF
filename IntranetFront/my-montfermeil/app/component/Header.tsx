@@ -48,7 +48,8 @@ function Header({ nom }: { nom: string | null }) {
                         prenom: user?.given_name || '',
                         localisation: user?.department || '',
                         mobilePro: user?.mobile || '',
-                        telephoneNumber: user?.telephoneNumber || ''
+                        telephoneNumber: user?.telephoneNumber || '',
+                        organisation : user?.company || '',
                     };
 
                     console.log("SENDING SYNC DATA:", syncData);
