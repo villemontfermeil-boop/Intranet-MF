@@ -128,8 +128,10 @@ function Header({ nom }: { nom: string | null }) {
                 try {
                     await fetch('/api/Montfermeil/users/logout', {
                         method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ email: userEmail })
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: new URLSearchParams({
+                            email: userEmail 
+                        })
                     });
                 } catch (e) {
                     console.error('Backend logout error:', e);
