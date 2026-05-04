@@ -231,13 +231,12 @@ public class SalarieControllerMF {
 
     @PostMapping("/logout")
     @Transactional
-    public SalarieMF logoutSalarie(@RequestBody Map<String, String> userData) {
+    public SalarieMF logoutSalarie(@RequestParam String email) {
         System.out.println("\n====================================");
         System.out.println("🔓 LOGOUT REQUEST START");
-        System.out.println("UserData: " + userData);
+        System.out.println("UserData: " + email);
         System.out.println("====================================\n");
 
-        String email = userData.getOrDefault("mail", userData.get("email"));
         System.out.println("📧 Looking for email: " + email);
 
         if (email == null || email.isEmpty()) {
