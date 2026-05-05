@@ -53,6 +53,7 @@ public class SecurityConfig {
                         .requestMatchers("/Oublie/motDePasse").permitAll()
                         .requestMatchers("/Article/upload").authenticated()
                         .requestMatchers("/media/**").permitAll()
+                        .requestMatchers("/organigramme/{id}").permitAll()
 
                         // à verifier
                         .requestMatchers("/uploads/Photos/**").permitAll()

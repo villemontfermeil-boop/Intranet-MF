@@ -66,5 +66,17 @@ public class OrganismeControllerMF {
         return OG;
     }
     
+    @GetMapping("/organigramme/{id}")
+    public OganigrameMF getOrganigrammeById(@PathVariable Long id){
+        Optional<OganigrameMF> OG = OrganismMF.findById(id);
+        
+        if(OG.isPresent()){
+            return OG.get();
+
+        }else{
+        throw new RuntimeException("Aucun organisme avec cette id : " + id);
+
+        }
+    }
 
 }

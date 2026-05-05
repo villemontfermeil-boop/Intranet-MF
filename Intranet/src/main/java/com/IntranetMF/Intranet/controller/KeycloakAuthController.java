@@ -109,7 +109,7 @@ public class KeycloakAuthController {
         // Set defaults for required fields
         newUser.setNumero(userData.getOrDefault("telephoneNumber",""));
         newUser.setTelPro(userData.getOrDefault("mobilePro",""));
-        newUser.setFonction("User");
+        newUser.setFonction(userData.getOrDefault("fonction", "NON_DEFINI"));
 
         SalarieMF saved = salarieRepository.save(newUser);
         entityManager.flush(); // Force immediate database update

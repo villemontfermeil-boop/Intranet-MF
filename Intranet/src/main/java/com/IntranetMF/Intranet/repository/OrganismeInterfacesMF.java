@@ -5,9 +5,10 @@ import java.util.Optional;
 import java.time.LocalDateTime;
 import java.time.LocalDate;
 
-import com.IntranetMF.Intranet.modele.ArticleMF;
+import com.IntranetMF.Intranet.modele.SalarieMF;
 import com.IntranetMF.Intranet.modele.OganigrameMF;
 public interface OrganismeInterfacesMF extends JpaRepository<OganigrameMF, Long> {
     
+
 
 }

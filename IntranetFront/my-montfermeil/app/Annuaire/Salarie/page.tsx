@@ -80,7 +80,6 @@ function ModifierSalarie() {
                             <thead>
                                 <tr>
                                     <th>Nom</th>
-                                    <th>Prénom</th>
                                     <th>Téléphone</th>
                                     <th className="hide-on-mobile">Tél. Pro</th>
                                     <th>Email</th>
@@ -94,19 +93,18 @@ function ModifierSalarie() {
                             <tbody>
                                 {pepole.map((person, index) => (
                                     <tr key={index}>
-                                        <td data-label="Nom">{person.nom || 'N/A'}</td>
-                                        <td data-label="Prénom">{person.prenom || 'N/A'}</td>
-                                        <td data-label="Téléphone"><a href={`tel:${person.numero || 'N/A'}`}>{person.numero || 'N/A'}</a></td>
-                                        <td className="hide-on-mobile" data-label="Tél. Pro"><a href={`tel:${person.telephonepro || 'N/A'}`}>{person.telephonepro || 'N/A'}</a></td>
+                                        <td data-label="Nom">{person.nom || 'N/A'} {person.prenom || 'N/A'}</td>
+                                        <td data-label="Téléphone">{person.numero == null? <p>Aucun</p> : <a href={`tel:${person.numero}`}>{person.numero}</a>}</td>
+                                        <td className="hide-on-mobile" data-label="Tél. Pro">{person.telephonepro == null? <p>Aucun</p> : <a href={`tel:${person.telephonepro}`}>{person.telephonepro}</a>}</td>
                                         <td data-label="Email">
                                             <a href={`mailto:${person.mail || 'N/A'}`}>
                                                 {person.mail || 'N/A'}
                                             </a>
                                         </td>
                                         <td className="hide-on-tablet" data-label="Fonction">{person.fonction || 'N/A'}</td>
-                                        <td data-label="Services">{person.localisation || 'N/A'}</td>
+                                        <td data-label="Services"><a href={`/Annuaire/Organisme/${person.organigramme.id}`}>{person.organigramme.label || 'N/A'}</a></td>
                                         <td><button onClick={() => routeur.push(`/Annuaire/Salarie/${person.id}`)}
-                                            className="modifier-btn">Voir</button></td>
+                                            className="modifier-btn">Voir le profil</button></td>
                                         {sessionStorage.getItem("isAdmin") == 'true' && (
 
                                             <td data-label="Actions">

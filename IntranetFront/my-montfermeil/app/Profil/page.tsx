@@ -11,7 +11,7 @@ function Moi() {
     prenom: sessionStorage.getItem("prenom") || "",
     mail: sessionStorage.getItem("mail") || "",
     numero: sessionStorage.getItem("numero") || "",
-    localisation: sessionStorage.getItem("localisation"),
+    Service: sessionStorage.getItem("localisation"),
     fonction: sessionStorage.getItem("fonction"),
     telpro: sessionStorage.getItem("telephonepro"),
     id: sessionStorage.getItem("id") || "",
@@ -226,11 +226,14 @@ console.log("EMAIL ENVOYÉ =", email)
               <tbody>
                 <tr>
                   <th>Service:</th>
-                  <td>{person.fonction}</td>
+                  <td>{person.Service}</td>
+
                 </tr>
                 <tr>
                   <th>Localisation:</th>
-                  <td>{person.localisation}</td>
+                  <td>{person.fonction}</td>
+
+
                 </tr>
                 <tr>
                   <th>Numero:</th>

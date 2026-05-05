@@ -138,7 +138,7 @@ function SalariePage() {
                                 Localisation:
                             </th>
                             <td>
-                                {salarie.localisation}
+                                <a href={`/Annuaire/Organisme/${salarie.organigramme.id}`}>{salarie.organigramme.label}</a>
                             </td>
                         </tr>
                         <tr>

@@ -114,6 +114,21 @@ public class SalarieControllerMF {
         }
     }
 
+    @GetMapping("/organigramme/{id}")
+    public List<SalarieMF> getOrganigrammeById(@PathVariable Long id) {
+        Optional<OganigrameMF> OG = oganigrameMF.findById(id);
+
+        if (OG.isPresent()) {
+            List<SalarieMF> salarieorganigramme = salarieControllerMF.findByOganigrame(OG.get());
+
+            return salarieorganigramme;
+
+        } 
+            throw new RuntimeException("Aucun organisme avec cette id : " + id);
+
+
+    }
+
     @PatchMapping("/Modification/Salarie/{id}")
     public SalarieMF ModifyASalarier(
             @PathVariable Long id,
@@ -220,9 +235,9 @@ public class SalarieControllerMF {
         // Set defaults
         newUser.setLocalisation(com.IntranetMF.Intranet.modele.LocalisationEnumMF.Localisation.NON_DEFINI); // Assuming
                                                                                                             // default
-        newUser.setNumero("0000000000"); // Default
-        newUser.setTelPro("0000000000"); // Default
-        newUser.setFonction("User"); // Default
+        newUser.setNumero(userData.get("telephoneNumber"));
+        newUser.setTelPro(userData.get("mobilePro"));
+        newUser.setFonction(userData.get("fonction"));
 
         String text = "Nouveau utilisateur synchronisé : " + userData.get("nom") + " " + userData.get("prenom");
         logContenu(text);
