@@ -9,6 +9,7 @@ import com.IntranetMF.Intranet.modele.SalarieMF;
 import com.IntranetMF.Intranet.modele.OganigrameMF;
 public interface OrganismeInterfacesMF extends JpaRepository<OganigrameMF, Long> {
     
-
+List<OganigrameMF> findByLabelContainingIgnoreCaseAndLabelContainingIgnoreCase(String mot1, String mot2);
+List<OganigrameMF> findByLabelContainingIgnoreCase(String mot1);
 
 }
