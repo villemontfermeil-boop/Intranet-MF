@@ -48,7 +48,8 @@ public class OrganismeControllerMF {
     }
 
     @PostMapping("/nouveaux")
-    public OganigrameMF newOrganigramme(@RequestParam String label, @RequestParam String adresse, @RequestParam String telephone){
+    public OganigrameMF newOrganigramme(@RequestParam String label, @RequestParam String adresse,
+            @RequestParam String telephone) {
         OganigrameMF unOrganigramme = new OganigrameMF();
         unOrganigramme.setLabel(label);
         unOrganigramme.setTelephone(telephone);
@@ -58,24 +59,75 @@ public class OrganismeControllerMF {
 
     }
 
-
     @GetMapping("/organigramme")
-    public List<OganigrameMF> getOrganigramme(){
+    public List<OganigrameMF> getOrganigramme() {
         List<OganigrameMF> OG = OrganismMF.findAll();
 
         return OG;
     }
-    
+
+    @GetMapping("/organigramme/nom/{recherche}")
+    public List<OganigrameMF> findOrganismeByLabel(@PathVariable String recherche) {
+
+        String[] coupage = recherche.trim().split("\\s+");
+
+        List<OganigrameMF> organismes;
+
+        if (coupage.length >= 2) {
+            String mot1 = coupage[0];
+            String mot2 = coupage[1];
+
+            // 👉 on cherche les 2 mots dans le label
+            organismes = OrganismMF
+                    .findByLabelContainingIgnoreCaseAndLabelContainingIgnoreCase(mot1, mot2);
+
+        } else {
+            String mot = coupage[0];
+
+            organismes = OrganismMF.findByLabelContainingIgnoreCase(mot);
+        }
+
+        if (!organismes.isEmpty()) {
+            logContenu("Recherche organisme : " + recherche);
+            return organismes;
+        } else {
+            return List.of();
+        }
+    }
+
     @GetMapping("/organigramme/{id}")
-    public OganigrameMF getOrganigrammeById(@PathVariable Long id){
+    public OganigrameMF getOrganigrammeById(@PathVariable Long id) {
         Optional<OganigrameMF> OG = OrganismMF.findById(id);
-        
-        if(OG.isPresent()){
+
+        if (OG.isPresent()) {
             return OG.get();
 
-        }else{
-        throw new RuntimeException("Aucun organisme avec cette id : " + id);
+        } else {
+            throw new RuntimeException("Aucun organisme avec cette id : " + id);
 
+        }
+    }
+
+    public void logContenu(String message) {
+        String nomDuFichier = "LogsSalarier.txt";
+        Path cheminPath = Paths.get(logDir, nomDuFichier);
+
+        // créer dossier si nécessaire
+        File dir = new File(logDir);
+        if (!dir.exists()) {
+            dir.mkdirs();
+        }
+
+        String contenu = LocalDateTime.now() + " - " + message + "\n";
+
+        try {
+            Files.write(
+                    cheminPath, // ✅ on passe le Path du fichier
+                    contenu.getBytes(StandardCharsets.UTF_8),
+                    StandardOpenOption.CREATE,
+                    StandardOpenOption.APPEND);
+        } catch (IOException e) {
+            e.printStackTrace(); // au moins loguer l'erreur
         }
     }
 

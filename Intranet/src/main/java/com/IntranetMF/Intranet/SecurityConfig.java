@@ -44,6 +44,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         // ROUTES PUBLIQUES
+                        .requestMatchers("/salaries/**").permitAll()
                         .requestMatchers("/Oublie/modifier/motdepasse").permitAll()
                         .requestMatchers("/uploads/**").permitAll()
                         .requestMatchers("/Article/getArticle").permitAll()
@@ -54,6 +55,8 @@ public class SecurityConfig {
                         .requestMatchers("/Article/upload").authenticated()
                         .requestMatchers("/media/**").permitAll()
                         .requestMatchers("/organigramme/{id}").permitAll()
+                        .requestMatchers("/organigramme/nom/{recherche}").permitAll()
+                        
 
                         // à verifier
                         .requestMatchers("/uploads/Photos/**").permitAll()

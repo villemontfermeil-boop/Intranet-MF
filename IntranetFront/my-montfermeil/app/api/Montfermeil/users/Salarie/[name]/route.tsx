@@ -5,10 +5,10 @@ export async function GET(
   request: Request,
   context: { params: Promise<{ name: string }> }
 ) {
-  const { name } = await context.params;   
-  const cookieStore = await cookies();     
+  const { name } = await context.params;
+  const cookieStore = await cookies();
   const credential = cookieStore.get("credential")?.value;
- const authHeader = request.headers.get('authorization');
+  const authHeader = request.headers.get('authorization');
   console.log("Fetching data for name =", name);
   console.log("credential =", authHeader);
 
@@ -22,13 +22,16 @@ export async function GET(
       }
     );
 
+    if (!response.ok) {
+      console.error("Erreur API :", response.status);
+      return NextResponse.json([], { status: response.status });
+    }
+
     const json = await response.json();
-    return NextResponse.json(json, { status: response.status });
+    return NextResponse.json(json);
+
   } catch (error) {
     console.error(error);
-    return NextResponse.json(
-      { error: "Error fetching user data" },
-      { status: 500 }
-    );
+    return NextResponse.json([], { status: 500 });
   }
 }
