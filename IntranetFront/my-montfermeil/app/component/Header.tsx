@@ -25,7 +25,9 @@ function Header({ nom }: { nom: string | null }) {
             });
 
             keycloak.init({
-                onLoad: 'login-required'
+                onLoad: 'login-required',
+                checkLoginIframe: false,
+                pkceMethod: 'S256'
             }).then(async (authenticated) => {
                 if (!authenticated) {
                     keycloak.login();
@@ -50,6 +52,7 @@ function Header({ nom }: { nom: string | null }) {
                         mobilePro: user?.mobile || '',
                         telephoneNumber: user?.telephoneNumber || '',
                         organisation : user?.company || '',
+                        fonction : user?.title || '',
                     };
 
                     console.log("SENDING SYNC DATA:", syncData);
@@ -69,6 +72,7 @@ function Header({ nom }: { nom: string | null }) {
                     console.log("SYNC RESPONSE TEXT:", syncResponseText);
                     setdata(syncResponseText);
                     sessionStorage.setItem('id', syncResponseText.id);
+                    sessionStorage.setItem('fonction', syncResponseText.organigramme.label || '')
 
 
                  
@@ -100,13 +104,12 @@ function Header({ nom }: { nom: string | null }) {
                 sessionStorage.setItem('mail', user?.email || '');
                 sessionStorage.setItem('nom', user?.family_name || '');
                 sessionStorage.setItem('prenom', user?.given_name || '')
-                sessionStorage.setItem('fonction', user?.department || '')
+                sessionStorage.setItem('localisation', user?.title || '')
                 sessionStorage.setItem('token', keycloak.token || '')
                 // sessionStorage.setItem('localisation', user?.department || '');
                 sessionStorage.setItem('telephonepro', user?.mobile || '');
                 sessionStorage.setItem('numero', user?.telephoneNumber || '');
-                sessionStorage.setItem('localisation', user?.title)
-                console.log(keycloak.token)
+                
                 // Assuming admin role from Keycloak
                 setAdmin(user?.realm_access?.roles?.includes('admin') || false);
 
