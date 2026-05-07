@@ -31,7 +31,7 @@ export async function GET() {
         return new NextResponse(
             JSON.stringify({ 
                 error: message,
-                details: "Vérifiez que le backend est démarré sur http://localhost:8080"
+                details: "Vérifiez que le backend est démarré"
             }), 
             { 
                 status: 500,
