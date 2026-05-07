@@ -9,6 +9,9 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -77,6 +80,12 @@ public class SalarieControllerMF {
         }
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/test-role")
+    public Object test(Authentication auth) {
+        return auth.getAuthorities();
+    }
+
     @GetMapping("/")
     public Iterable<SalarieMF> getAllSalaries() {
 
@@ -123,12 +132,11 @@ public class SalarieControllerMF {
 
             return salarieorganigramme;
 
-        } 
-            throw new RuntimeException("Aucun organisme avec cette id : " + id);
-
+        }
+        throw new RuntimeException("Aucun organisme avec cette id : " + id);
 
     }
-
+    @PreAuthorize("hasRole('ADMIN')")
     @PatchMapping("/Modification/Salarie/{id}")
     public SalarieMF ModifyASalarier(
             @PathVariable Long id,
@@ -169,6 +177,7 @@ public class SalarieControllerMF {
     }
 
     @Transactional
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/NewSalarie")
     public SalarieMF createSalarie(
             @RequestParam String nom,

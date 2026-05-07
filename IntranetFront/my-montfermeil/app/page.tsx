@@ -33,7 +33,11 @@ function HomePage() {
             setLoading(true); // Début du chargement
             setError(null); // Réinitialise l'erreur
 
-            const response = await fetch("/api/Montfermeil/articles/");
+            const response = await fetch("/api/Montfermeil/articles/", {
+                headers:{
+                    'Authorization' : `Bearer ${sessionStorage.getItem('token')}`
+                }
+            });
 
             if (!response.ok) {
                 throw new Error(`Erreur HTTP: ${response.status}`);

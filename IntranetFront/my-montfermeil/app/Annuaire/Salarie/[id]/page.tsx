@@ -29,13 +29,14 @@ function SalariePage() {
         try {
             const response = await fetch(`/api/Montfermeil/users/${id}`, {
                 headers: {
-                    Authorization: `Bearer ${token}`
+                    'Authorization': `Bearer ${token}`
                 }
             });
             const data = await response.json();
+            console.log( data);
             setSalarie(data);
         } catch (error) {
-            console.log(error);
+            console.log("L ERRRRRRRRRRREURRRRRRRRRRRRR",error);
         }
     }
 

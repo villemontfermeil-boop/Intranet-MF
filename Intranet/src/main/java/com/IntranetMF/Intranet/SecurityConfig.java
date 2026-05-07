@@ -1,5 +1,11 @@
 package com.IntranetMF.Intranet;
 
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import java.util.stream.Collectors;
+import java.util.Collection;
+import java.util.Map;
+import java.util.List;
+
 import com.IntranetMF.Intranet.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -44,19 +50,17 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         // ROUTES PUBLIQUES
-                        .requestMatchers("/salaries/**").permitAll()
-                        .requestMatchers("/Oublie/modifier/motdepasse").permitAll()
+                        .requestMatchers("/Oublie/modifier/motdepasse").hasRole("ADMIN")
                         .requestMatchers("/uploads/**").permitAll()
                         .requestMatchers("/Article/getArticle").permitAll()
-                        .requestMatchers("/salaries/login").permitAll()
-                        .requestMatchers("/salaries/logout").permitAll()
+                        .requestMatchers("/salaries/login").authenticated()
+                        .requestMatchers("/salaries/logout").authenticated()
                         .requestMatchers("/auth/sync").permitAll()
-                        .requestMatchers("/Oublie/motDePasse").permitAll()
+                        .requestMatchers("/Oublie/motDePasse").hasRole("ADMIN")
                         .requestMatchers("/Article/upload").authenticated()
                         .requestMatchers("/media/**").permitAll()
-                        .requestMatchers("/organigramme/{id}").permitAll()
-                        .requestMatchers("/organigramme/nom/{recherche}").permitAll()
-                        
+                        .requestMatchers("/organigramme/{id}").authenticated()
+                        .requestMatchers("/organigramme/nom/{recherche}").authenticated()
 
                         // à verifier
                         .requestMatchers("/uploads/Photos/**").permitAll()
@@ -65,21 +69,22 @@ public class SecurityConfig {
                         .requestMatchers("/salaries/NewSalarie").hasRole("ADMIN")
 
                         // USER & ADMIN
-                        .requestMatchers("/salaries/{id}").permitAll()
+                        .requestMatchers("/salaries/{id}").authenticated()
                         .requestMatchers("/Salarie/{email}").authenticated()
+                        .requestMatchers("/test-role").hasRole("ADMIN")
                         .requestMatchers("/Photo/Nouveaux").authenticated()
                         .requestMatchers("/Photo/Modifier").authenticated()
                         .requestMatchers("/Photo/Profile/**").permitAll()
-                        .requestMatchers("/Organisme/**").permitAll()
+                        .requestMatchers("/Organisme/**").authenticated()
                         .requestMatchers("/Article/newArticle").authenticated()
                         .requestMatchers("/Modification/Salarie/{id}").hasRole("ADMIN")
                         .requestMatchers("/salaries/PasswordReset").hasRole("ADMIN")
 
-                        .anyRequest().permitAll() // tout le reste nécessite auth
+                        .anyRequest().authenticated() // tout le reste nécessite auth
                 )
-                .oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> {
-                    jwt.jwtAuthenticationConverter(new JwtAuthenticationConverter());
-                }));
+               .oauth2ResourceServer(oauth2 ->
+    oauth2.jwt(Customizer.withDefaults())
+);
 
         return http.build();
     }
@@ -93,6 +98,29 @@ public class SecurityConfig {
                 .passwordEncoder(passwordEncoder());
 
         return auth.build();
+    }
+
+    @Bean
+    public JwtAuthenticationConverter jwtAuthenticationConverter() {
+
+        JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
+
+        converter.setJwtGrantedAuthoritiesConverter(jwt -> {
+
+            Map<String, Object> realmAccess = jwt.getClaim("realm_access");
+
+            if (realmAccess == null || realmAccess.isEmpty()) {
+                return List.of();
+            }
+
+            List<String> roles = (List<String>) realmAccess.get("roles");
+
+            return roles.stream()
+                    .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
+                    .collect(Collectors.toList());
+        });
+
+        return converter;
     }
 
     @Bean

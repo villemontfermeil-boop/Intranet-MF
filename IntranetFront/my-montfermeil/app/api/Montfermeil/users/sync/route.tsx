@@ -7,7 +7,7 @@ export async function POST(request: Request) {
         console.log("SYNC REQUEST BODY:", body);
         
         const authHeader = request.headers.get('Authorization');
-        
+        console.log(authHeader)
         if (!body.email) {
             return new NextResponse(
                 JSON.stringify({ error: "Missing email in body" }), 
