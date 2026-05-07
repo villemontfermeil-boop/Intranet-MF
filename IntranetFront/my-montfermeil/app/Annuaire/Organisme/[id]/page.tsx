@@ -13,7 +13,7 @@ function getOrganisme() {
     const [chargement1, setChargement1] = useState<boolean>(false);
     const [chargement2, setChargement2] = useState<boolean>(false);
     const [chargement3, setChargement3] = useState<boolean>(false);
-
+    const [api, setApi] = useState<any>({});
     const [loading, setLoading] = useState(true); // État de chargement
 
     const id = params.id
@@ -77,14 +77,44 @@ function getOrganisme() {
             console.log(err);
         }
     }
+
+
+    async function getBackend() {
+
+        const token = sessionStorage.getItem('token') || ''
+        console.log(token);
+        try {
+
+            const res = await fetch(`/api/Montfermeil/connexion`,
+                {
+                    headers: {
+                        'authorization': token
+                    },
+                }
+            );
+            const data = await res.json();
+
+            console.log("DATA api :", data);
+
+
+            setApi(data);
+            setChargement3(true);
+
+        } catch (err) {
+            console.log(err);
+        }
+    }
     useEffect(() => {
         if (salaries.length > 0) {
             fetchPhotos();
         }
     }, [salaries]);
     useEffect(() => {
+        getBackend();
+
         findOrganismeById();
         findOrganismeByIdAndSalarie();
+
     }, [])
 
     useEffect(() => {
@@ -129,12 +159,8 @@ function getOrganisme() {
         );
     }
 
-    console.log(Object.entries(photos))
-    console.log(photos[1])
-    console.log(photos[2])
-    console.log(photos[8])
 
-
+    console.log("API ACTUELEMEEEEEEEE: "+ Object.entries(api))
     return (
         <div className="Main">
             <h1><u>{organisme?.label}</u></h1>
@@ -169,7 +195,7 @@ function getOrganisme() {
                                 <td>
                                     {photos[value.id] ? (
                                         <img
-                                            src={`http://localhost:8080/${photos[value.id]}`}
+                                            src={`${api.api}/${photos[value.id]}`}
                                             alt="photo"
                                             width="50"
                                         />
