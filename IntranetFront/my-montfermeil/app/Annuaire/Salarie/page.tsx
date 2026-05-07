@@ -72,7 +72,7 @@ function ModifierSalarie() {
             const results = await searchAll(search);
             setPeople(results);
             setLoading(false);
-        }, 400);
+        }, 1300);
 
         return () => clearTimeout(timer);
 

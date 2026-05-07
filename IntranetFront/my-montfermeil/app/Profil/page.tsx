@@ -19,6 +19,7 @@ function Moi() {
   // États pour l'image et le chargement
   const [image, setImage] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [loading2, setLoading2] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   // États pour l'édition
@@ -26,13 +27,42 @@ function Moi() {
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [backend,setBackend] = useState<any>({});
 
   const router = useRouter();
 
   // Image de profil (avec fallback)
   const profileImage = image?.photo
-    ? `http://localhost:8080/uploads/Photos/${image.photo}`
+    ? `${backend.api}/uploads/Photos/${image.photo}`
     : "/cerclePhoto.png";
+
+
+
+   async function getBackend() {
+
+        const token = sessionStorage.getItem('token') || ''
+        console.log(token);
+        try {
+
+            const res = await fetch(`/api/Montfermeil/connexion`,
+                {
+                    headers: {
+                        'authorization': token
+                    },
+                }
+            );
+            const data = await res.json();
+
+            console.log("DATA api :", data);
+
+
+            setBackend(data);
+            setLoading2(false);
+
+        } catch (err) {
+            console.log(err);
+        }
+    }
 
   // 🔹 Récupération photo utilisateur
   async function getProfile(oneId: string) {
@@ -69,6 +99,7 @@ function Moi() {
   }, [])
   // Chargement initial
   useEffect(() => {
+    getBackend();
     getProfile(person.id);
   }, [person.id]);
 
@@ -128,7 +159,7 @@ console.log("EMAIL ENVOYÉ =", email)
   }, [preview]);
 
   // Afficher un loader pendant le chargement initial
-  if (loading) {
+  if (loading && loading2) {
     return (
       <div style={{
         display: "flex",
