@@ -8,7 +8,7 @@ export async function POST(parm: Request) {
     const cookieStore = await cookies();
     const credential = cookieStore.get("credential")?.value || ""
     try{ 
-        const reponse = await fetch(`http://localhost:8080/Article/upload`, {
+        const reponse = await fetch(`${process.env.BACKEND_API}/Article/upload`, {
                 method: "POST",
                 headers: {
                     'Authorization': `Basic ${credential}`

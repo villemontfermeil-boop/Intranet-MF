@@ -10,10 +10,12 @@ function SalariePage() {
 
     // États pour les données
     const [salarie, setSalarie] = useState<any>({});
+    const [backend, setBackend] = useState<any>({});
+
     const [image, setImage] = useState<any>({});
     const [loading, setLoading] = useState(true); // État de chargement
 
-    const profileImage = `http://localhost:8080/uploads/Photos/${image.photo}`;
+    const profileImage = `${backend.api}/uploads/Photos/${image.photo}`;
 
     console.log("Il contient :", image);
 
@@ -34,6 +36,31 @@ function SalariePage() {
             setSalarie(data);
         } catch (error) {
             console.log(error);
+        }
+    }
+
+    async function getBackend() {
+
+        const token = sessionStorage.getItem('token') || ''
+        console.log(token);
+        try {
+
+            const res = await fetch(`/api/Montfermeil/connexion`,
+                {
+                    headers: {
+                        'authorization': token
+                    },
+                }
+            );
+            const data = await res.json();
+
+            console.log("DATA api :", data);
+
+
+            setBackend(data);
+
+        } catch (err) {
+            console.log(err);
         }
     }
 
@@ -61,7 +88,8 @@ function SalariePage() {
             setLoading(true);
             await Promise.all([
                 LookingForid(id),
-                getProfile(id)
+                getProfile(id),
+                getBackend()
             ]);
             setLoading(false);
         };
