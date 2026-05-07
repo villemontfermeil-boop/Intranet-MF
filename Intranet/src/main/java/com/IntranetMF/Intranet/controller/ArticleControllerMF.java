@@ -48,6 +48,7 @@ public class ArticleControllerMF {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('USER')")
     public Optional<ArticleMF> GetArticleWithId(@PathVariable Long id) {
         Optional<ArticleMF> article = articleControllerMF.findById(id);
         if (article.isPresent()) {
@@ -62,6 +63,7 @@ public class ArticleControllerMF {
     }
 
     @GetMapping("/getArticle")
+    @PreAuthorize("hasRole('USER')")
     public List<ArticleMF> getArticle() {
         return articleControllerMF.findAllByOrderByDateDesc();
 
@@ -108,7 +110,14 @@ public class ArticleControllerMF {
             article.setDescription(description);
             article.setCreation(); // Date actuelle
             article.setTitre(titre);
+            if (type == null || type.isEmpty()) {
+                System.out.println("Le type est vide");
+            article.setType(com.IntranetMF.Intranet.modele.ArticleEnumMF.TypeArticle.Non_défini );
+
+            }else{
             article.setType(com.IntranetMF.Intranet.modele.ArticleEnumMF.TypeArticle.valueOf(type));
+
+            }
             article.setSalarie(salarie);
 
             // 4. Si fichier présent, enregistrer le nom et chemin
@@ -130,6 +139,7 @@ public class ArticleControllerMF {
         }
     }
 
+    @PreAuthorize("hasRole('USER')")
     @DeleteMapping("/deleteArticle/{id}")
     public ResponseEntity<String> deleteArticle(
             @PathVariable Long id,

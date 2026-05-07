@@ -1,8 +1,10 @@
 package com.IntranetMF.Intranet.controller;
+
 import java.util.Optional;
 
 import java.time.LocalDateTime;
 import java.util.Map;
+import java.util.List;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -52,6 +54,16 @@ public class KeycloakAuthController {
             throw new RuntimeException("Email is required for sync");
         }
 
+        Object rolesObj = userData.get("roles");
+
+        boolean isAdmin = false;
+
+        if (rolesObj instanceof List<?> rolesList) {
+            isAdmin = rolesList.contains("ADMIN");
+        } else if (rolesObj instanceof String rolesStr) {
+            isAdmin = rolesStr.contains("ADMIN");
+        }
+
         var salarieOpt = salarieRepository.findByMail(email);
 
         if (salarieOpt.isPresent()) {
@@ -63,7 +75,7 @@ public class KeycloakAuthController {
             existing.setBeginLogin(LocalDateTime.now());
             existing.setNom(userData.getOrDefault("nom", existing.getNom()));
             existing.setPrenom(userData.getOrDefault("prenom", existing.getPrenom()));
-
+            existing.setIsAdmin(isAdmin);
             System.out.println("   Set isConnected = true");
             System.out.println("   Set beginLogin = " + existing.getBeginLogin());
 
@@ -75,18 +87,18 @@ public class KeycloakAuthController {
             return saved;
         }
         SalarieMF newUser = new SalarieMF();
-       
-       Long organigrammeId = Long.parseLong(userData.getOrDefault("organisation", "0"));
+
+        Long organigrammeId = Long.parseLong(userData.getOrDefault("organisation", "0"));
         Optional<OganigrameMF> uneOrganisation = oganigrameMF.findById(organigrammeId);
-        if(!uneOrganisation.isPresent()){
+        if (!uneOrganisation.isPresent()) {
             String defaultValue = "3";
-                organigrammeId = Long.parseLong(defaultValue);
-        Optional<OganigrameMF> uneOrganisation2 = oganigrameMF.findById(organigrammeId);
+            organigrammeId = Long.parseLong(defaultValue);
+            Optional<OganigrameMF> uneOrganisation2 = oganigrameMF.findById(organigrammeId);
 
-        newUser.setOrganigramme(uneOrganisation2.get());
+            newUser.setOrganigramme(uneOrganisation2.get());
 
-        }else{
-        newUser.setOrganigramme(uneOrganisation.get());
+        } else {
+            newUser.setOrganigramme(uneOrganisation.get());
 
         }
         // Create new user
@@ -96,19 +108,24 @@ public class KeycloakAuthController {
         newUser.setPrenom(userData.getOrDefault("prenom", ""));
         newUser.setIsConnected(true);
         newUser.setBeginLogin(LocalDateTime.now());
-        newUser.setIsAdmin(false);
 
-        
+        newUser.setIsAdmin(isAdmin);
 
-        if (userData.get("localisation").equals("VILLE_╔DUCA")) {
-            newUser.setLocalisation(Localisation.VILLE_ÉDUCATIVE);
-        }else{
-             newUser.setLocalisation(Localisation.valueOf(userData.getOrDefault("localisation", "NON_DEFINI")));
+        if (userData.get("localisation") == null || userData.get("localisation").isEmpty()) {
+            newUser.setLocalisation(Localisation.NON_DEFINI);
+        } else {
+            if (userData.get("localisation").equals("VILLE_╔DUCA")) {
+                newUser.setLocalisation(Localisation.VILLE_ÉDUCATIVE);
+            } else {
+                newUser.setLocalisation(Localisation.valueOf(userData.getOrDefault("localisation", "NON_DEFINI")));
+            }
         }
-        System.out.print(Localisation.valueOf(userData.getOrDefault("localisation", "NON_DEFINI").toString()));
+
+        // System.out.print(Localisation.valueOf(userData.getOrDefault("localisation", "NON_DEFINI").toString()));
         // Set defaults for required fields
-        newUser.setNumero(userData.getOrDefault("telephoneNumber",""));
-        newUser.setTelPro(userData.getOrDefault("mobilePro",""));
+        System.out.println("Localisation = " + newUser.getLocalisation());
+        newUser.setNumero(userData.getOrDefault("telephoneNumber", ""));
+        newUser.setTelPro(userData.getOrDefault("mobilePro", ""));
         newUser.setFonction(userData.getOrDefault("fonction", "NON_DEFINI"));
 
         SalarieMF saved = salarieRepository.save(newUser);

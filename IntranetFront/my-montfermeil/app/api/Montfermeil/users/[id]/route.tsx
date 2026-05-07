@@ -20,7 +20,7 @@ export async function GET(request: Request, context: any) {
         
         const resp = await fetch(`${process.env.BACKEND_API}/salaries/${id}`, { 
           headers:{
-            Autorization : auth || ''
+            Authorization : auth || ''
           }
          });
 

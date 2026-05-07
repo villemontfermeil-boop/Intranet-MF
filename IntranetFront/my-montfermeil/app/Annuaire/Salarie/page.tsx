@@ -10,33 +10,46 @@ function ModifierSalarie() {
     const [people, setPeople] = useState<any[]>([]);
     const [loading, setLoading] = useState(false);
     const router = useRouter();
+    const token = sessionStorage.getItem("token");
 
     // 🔥 fetch sécurisé
-    async function fetchData(url: string) {
+    async function fetchData(url: string, options: RequestInit = {}) {
         const token = sessionStorage.getItem("token");
 
-        try {
-            const res = await fetch(url, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+        const res = await fetch(url, {
+            ...options,
+            headers: {
+                Authorization: `Bearer ${token}`,
+                ...(options.headers || {})
+            }
+        });
 
-            if (!res.ok) return [];
+        if (!res.ok) return [];
 
-            const text = await res.text();
-            if (!text) return [];
-
-            return JSON.parse(text);
-
-        } catch (err) {
-            console.log(err);
-            return [];
-        }
+        const text = await res.text();
+        return text ? JSON.parse(text) : [];
     }
 
     async function searchAll(name: string) {
+        const token = sessionStorage.getItem("token");
+
         const [salaries, organismes] = await Promise.all([
-            fetchData(`/api/Montfermeil/users/Salarie/${encodeURIComponent(name)}`),
-            fetchData(`/api/Montfermeil/organisation/label/${encodeURIComponent(name)}`)
+            fetchData(
+                `/api/Montfermeil/users/Salarie/${encodeURIComponent(name)}`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                }
+            ),
+            fetchData(
+                `/api/Montfermeil/organisation/label/${encodeURIComponent(name)}`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                }
+            )
         ]);
 
         const formattedSalaries = salaries.map((s: any) => ({
@@ -176,21 +189,21 @@ function ModifierSalarie() {
                                         <>
                                             {/* 🔥 ORGANISME ALIGNÉ SUR MÊME STRUCTURE */}
 
-                                            <td style={{textAlign: "center"}}><b>{p.label ?? "N/A"}</b></td>
+                                            <td style={{ textAlign: "center" }}><b>{p.label ?? "N/A"}</b></td>
 
-                                            <td style={{textAlign: "center"}}>
+                                            <td style={{ textAlign: "center" }}>
                                                 {p.telephone
                                                     ? <a href={`tel:${p.telephone}`}>{p.telephone}</a>
                                                     : "Aucun"}
                                             </td>
 
                                             {/* tel pro (vide pour organisme mais colonne conservée) */}
-                                            <td style={{textAlign: "center"}}>-</td>
-                                            <td style={{textAlign: "center"}}>-</td>
-                                            <td style={{textAlign: "center"}}>-</td>
+                                            <td style={{ textAlign: "center" }}>-</td>
+                                            <td style={{ textAlign: "center" }}>-</td>
+                                            <td style={{ textAlign: "center" }}>-</td>
 
 
-                                            <td style={{textAlign: "center"}}>
+                                            <td style={{ textAlign: "center" }}>
                                                 <a
                                                     href={`https://www.google.com/search?q=${encodeURIComponent(p.adresse)}`}
                                                     target="_blank"

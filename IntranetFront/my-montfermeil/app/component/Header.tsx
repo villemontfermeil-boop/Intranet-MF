@@ -48,6 +48,7 @@ function Header({ nom }: { nom: string | null }) {
                         email: user?.email || '',
                         nom: user?.family_name || '',
                         prenom: user?.given_name || '',
+                        roles: user?.realm_access?.roles.toString(),
                         localisation: user?.department || '',
                         mobilePro: user?.mobile || '',
                         telephoneNumber: user?.telephoneNumber || '',
@@ -163,7 +164,7 @@ function Header({ nom }: { nom: string | null }) {
             router.push('/');
         }
     };
-
+console.log(sessionStorage.getItem("fonction"))
     return (
         <div className="Thebody">
             <img src="/logo.png" onClick={() => router.push('/')} className='styleLogo' />
@@ -201,7 +202,7 @@ function Header({ nom }: { nom: string | null }) {
                                     Transport
                                 </button>
 
-                                {sessionStorage.length > 0 && sessionStorage.getItem('fonction') == "Communication" && <button type="button" className='MenuButton' onClick={() => router.push("/Nouveau/Article")}>
+                                {sessionStorage.length > 0 && sessionStorage.getItem('fonction') == "COMMUNICATION" && <button type="button" className='MenuButton' onClick={() => router.push("/Nouveau/Article")}>
                                     Nouvel article
                                 </button>}
 

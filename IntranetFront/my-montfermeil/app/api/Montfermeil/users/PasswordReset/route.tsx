@@ -8,7 +8,7 @@ export async function PATCH(req: Request) {
     const body = await req.formData();
     console.log(body);
     try {
-        const response = await fetch("http://localhost:8080/salaries/PasswordReset", {
+        const response = await fetch(`${process.env.BACKEND_API}/salaries/PasswordReset`, {
             method: "PATCH",
             headers: {
                 "Authorization": `Basic ${credential}`,

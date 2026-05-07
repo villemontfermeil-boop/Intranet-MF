@@ -27,7 +27,7 @@ function Moi() {
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
-  const [backend,setBackend] = useState<any>({});
+  const [backend, setBackend] = useState<any>({});
 
   const router = useRouter();
 
@@ -36,33 +36,33 @@ function Moi() {
     ? `${backend.api}/uploads/Photos/${image.photo}`
     : "/cerclePhoto.png";
 
+  const token = sessionStorage.getItem('token') || ''
 
 
-   async function getBackend() {
+  async function getBackend() {
 
-        const token = sessionStorage.getItem('token') || ''
-        console.log(token);
-        try {
+    console.log(token);
+    try {
 
-            const res = await fetch(`/api/Montfermeil/connexion`,
-                {
-                    headers: {
-                        'authorization': token
-                    },
-                }
-            );
-            const data = await res.json();
-
-            console.log("DATA api :", data);
-
-
-            setBackend(data);
-            setLoading2(false);
-
-        } catch (err) {
-            console.log(err);
+      const res = await fetch(`/api/Montfermeil/connexion`,
+        {
+          headers: {
+            'authorization': token
+          },
         }
+      );
+      const data = await res.json();
+
+      console.log("DATA api :", data);
+
+
+      setBackend(data);
+      setLoading2(false);
+
+    } catch (err) {
+      console.log(err);
     }
+  }
 
   // 🔹 Récupération photo utilisateur
   async function getProfile(oneId: string) {
@@ -75,7 +75,11 @@ function Moi() {
       setLoading(true);
       setError(null);
 
-      const response = await fetch(`/api/Montfermeil/users/Photo/${oneId}`);
+      const response = await fetch(`/api/Montfermeil/users/Photo/${oneId}`, {
+        headers: {
+          'authorization': token
+        },
+      });
 
       if (!response.ok) {
         throw new Error(`Erreur HTTP: ${response.status}`);
@@ -118,7 +122,7 @@ function Moi() {
       alert("Email introuvable, reconnecte-toi")
       return
     }
-console.log("EMAIL ENVOYÉ =", email)
+    console.log("EMAIL ENVOYÉ =", email)
     FD.append("email", email)
 
     try {

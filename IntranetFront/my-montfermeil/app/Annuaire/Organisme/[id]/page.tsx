@@ -15,16 +15,17 @@ function getOrganisme() {
     const [chargement3, setChargement3] = useState<boolean>(false);
     const [api, setApi] = useState<any>({});
     const [loading, setLoading] = useState(true); // État de chargement
+    const token = sessionStorage.getItem('token')
 
     const id = params.id
-    const idValue = id ?
-        (Array.isArray(id) ? id[0] : id) :
-        '';
 
     async function findOrganismeById() {
-
         try {
-            const api = await fetch(`/api/Montfermeil/organisation/${id}`);
+            const api = await fetch(`/api/Montfermeil/organisation/${id}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
 
             const json = await api.json();
             console.log(json);
@@ -39,7 +40,13 @@ function getOrganisme() {
     async function findOrganismeByIdAndSalarie() {
 
         try {
-            const api = await fetch(`/api/Montfermeil/organisation/users/${id}`);
+            const api = await fetch(`/api/Montfermeil/organisation/users/${id}`,
+                {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                }
+            );
 
             const json = await api.json();
             console.log(json);
@@ -57,7 +64,11 @@ function getOrganisme() {
 
             await Promise.all(
                 salaries.map(async (user) => {
-                    const res = await fetch(`/api/Montfermeil/users/Photo/${user.id}`);
+                    const res = await fetch(`/api/Montfermeil/users/Photo/${user.id}`, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
                     const data = await res.json();
 
                     console.log("DATA PHOTO :", data);
@@ -160,7 +171,7 @@ function getOrganisme() {
     }
 
 
-    console.log("API ACTUELEMEEEEEEEE: "+ Object.entries(api))
+    console.log("API ACTUELEMEEEEEEEE: " + Object.entries(api))
     return (
         <div className="Main">
             <h1><u>{organisme?.label}</u></h1>
