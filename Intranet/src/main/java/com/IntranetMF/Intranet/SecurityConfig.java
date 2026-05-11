@@ -52,6 +52,7 @@ public class SecurityConfig {
                         // ROUTES PUBLIQUES
                         .requestMatchers("/Oublie/modifier/motdepasse").hasRole("ADMIN")
                         .requestMatchers("/uploads/**").permitAll()
+                        .requestMatchers("/recommander/**").authenticated()
                         .requestMatchers("/Article/getArticle").permitAll()
                         .requestMatchers("/salaries/login").authenticated()
                         .requestMatchers("/salaries/logout").authenticated()
