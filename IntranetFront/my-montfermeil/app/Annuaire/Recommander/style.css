@@ -1,0 +1,32 @@
+.Main{
+    text-align: center;
+}
+
+.table-container {
+    max-height: 300px; /* hauteur du scroll */
+    overflow-y: auto;
+    margin-top: 20px;
+    border: 1px solid #ccc;
+}
+.theTable{
+    width: 100%;
+
+}
+/* optionnel mais propre */
+.table-salaries {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.table-salaries th,
+.table-salaries td {
+    padding: 8px;
+    border: 1px solid #ddd;
+}
+
+/* header fixe (bonus 🔥) */
+.table-salaries thead th {
+    position: sticky;
+    top: 0;
+    background: white;
+}

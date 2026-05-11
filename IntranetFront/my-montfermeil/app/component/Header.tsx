@@ -205,6 +205,9 @@ console.log(sessionStorage.getItem("fonction"))
                                 {sessionStorage.length > 0 && sessionStorage.getItem('fonction') == "COMMUNICATION" && <button type="button" className='MenuButton' onClick={() => router.push("/Nouveau/Article")}>
                                     Nouvel article
                                 </button>}
+                                {sessionStorage.length > 0 && sessionStorage.getItem('fonction') == "COURRIER" && <button type="button" className='MenuButton' onClick={() => router.push("/Annuaire/Recommander")}>
+                                    Recommander
+                                </button>}
 
                                 <button type='button' className='MenuButton' onClick={() => router.push('/Profil')}> Mon profil </button>
 
