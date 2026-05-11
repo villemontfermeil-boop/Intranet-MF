@@ -33,6 +33,7 @@ import com.IntranetMF.Intranet.repository.RecommanderInterfacesMF;
 import com.IntranetMF.Intranet.repository.SalarieInterfacesMF;
 
 import com.IntranetMF.Intranet.modele.SalarieMF;
+import com.IntranetMF.Intranet.modele.OganigrameMF;
 import com.IntranetMF.Intranet.modele.RecommandeMF;
 
 @RestController
@@ -42,6 +43,10 @@ public class RecommanderControllerMF {
     private final RecommanderInterfacesMF recommanderInterfacesMF;
 
     private final SalarieInterfacesMF salarieInterfacesMF;
+
+    private String logDir = "log/Recommander/" + LocalDate.now().getYear() + "/"
+            + LocalDate.now().getMonthValue() + "/"
+            + LocalDate.now().getDayOfMonth();
 
     private RecommanderControllerMF(RecommanderInterfacesMF r, SalarieInterfacesMF s) {
         this.recommanderInterfacesMF = r;
@@ -70,6 +75,7 @@ public class RecommanderControllerMF {
                     recommander.setRecommande(Recommander);
                     recommander.setService(services);
                     recommander.setDate(date);
+                    logContenu(salarie.getNom() +" "+ salarie.getPrenom() + " à ajouter un recommander" );
 
                     return recommanderInterfacesMF.save(recommander);
 
@@ -90,7 +96,8 @@ public class RecommanderControllerMF {
         if (personne.isPresent()) {
             if (personne.get().getIsConnected()) {
                 if ("COURRIER".equals(personne.get().getOrganigramme().getLabel())) {
-                    List<RecommandeMF> recommander = recommanderInterfacesMF.findAll();
+                    List<RecommandeMF> recommander = recommanderInterfacesMF.findAllByOrderByDateDesc();
+                    logContenu(personne.get().getNom() +" "+ personne.get().getPrenom() + " à chercher tout les recommander" );
 
                     return recommander;
                 }
@@ -103,4 +110,60 @@ public class RecommanderControllerMF {
         throw new RuntimeException("Aucun salarié trouver");
 
     }
+
+    @GetMapping("/numero/{recherche}")
+    public List<RecommandeMF> findRecommander(@AuthenticationPrincipal Jwt jwt, @PathVariable String recherche) {
+
+        String email = jwt.getClaim("email");
+        Optional<SalarieMF> personne = salarieInterfacesMF.findByMail(email);
+
+        if (!personne.isPresent()) {
+            throw new RuntimeException("Aucun salarié trouver");
+
+        }
+
+        if (!personne.get().getIsConnected()) {
+            throw new RuntimeException("Vous devez etre connecter");
+
+        }
+        if (!"COURRIER".equals(personne.get().getOrganigramme().getLabel())) {
+            throw new RuntimeException("Vous devez etre du service courrier");
+
+        }
+
+        List<RecommandeMF> recommanders;
+
+        recommanders = recommanderInterfacesMF.findByRecommanderContainingIgnoreCaseOrderByDateDesc(recherche);
+
+        if (!recommanders.isEmpty()) {
+            logContenu(personne.get().getNom() +" "+ personne.get().getPrenom() +" à  chercher:  " + recherche);
+            return recommanders;
+        } else {
+            return List.of();
+        }
+    }
+
+    public void logContenu(String message) {
+        String nomDuFichier = "LogsSalarier.txt";
+        Path cheminPath = Paths.get(logDir, nomDuFichier);
+
+        // créer dossier si nécessaire
+        File dir = new File(logDir);
+        if (!dir.exists()) {
+            dir.mkdirs();
+        }
+
+        String contenu = LocalDateTime.now() + " - " + message + "\n";
+
+        try {
+            Files.write(
+                    cheminPath, // ✅ on passe le Path du fichier
+                    contenu.getBytes(StandardCharsets.UTF_8),
+                    StandardOpenOption.CREATE,
+                    StandardOpenOption.APPEND);
+        } catch (IOException e) {
+            e.printStackTrace(); // au moins loguer l'erreur
+        }
+    }
+
 }
