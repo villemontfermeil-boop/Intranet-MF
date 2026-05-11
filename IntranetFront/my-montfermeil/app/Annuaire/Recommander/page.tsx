@@ -27,7 +27,12 @@ function pageRecommander() {
 
 
 
-
+    useEffect(()=>{
+        if(sessionStorage.length == 0|| sessionStorage.length == null || sessionStorage.getItem("fonction") != "COURRIER"){
+            alert("Vous devez etre de ce service pour pouvoir y accéder")
+            routeur.push('/')
+        }
+    }, [])
     async function getRecommander() {
         const token = sessionStorage.getItem("token") || "";
 
@@ -107,6 +112,7 @@ function pageRecommander() {
     }
 
     useEffect(() => {
+
         const timer = setTimeout(() => {
 
             const loadData = async () => {
@@ -124,6 +130,8 @@ function pageRecommander() {
 
         return () => clearTimeout(timer);
     }, [text]);
+
+
 
     if (loading) {
         return (
