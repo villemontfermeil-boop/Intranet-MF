@@ -14,111 +14,191 @@ function Header({ nom }: { nom: string | null }) {
     const [kc, setKc] = useState<Keycloak.KeycloakInstance | null>(null);
     // const [connexion , setConnexion ] = useState<boolean>(false)
 
-   
-    useEffect(() => {
-        // if(connexion == true){return}
-        if (typeof window !== "undefined") {
-            const keycloak = new Keycloak({
-                url: "http://localhost:8081",
-                realm: "intranet-montfermeil",
-                clientId: "intranet-app",
-            });
 
-            keycloak.init({
-                onLoad: 'login-required',
-                checkLoginIframe: false,
-                pkceMethod: 'S256'
-            }).then(async (authenticated) => {
-                if (!authenticated) {
-                    keycloak.login();
-                    return;
+
+
+
+    // Use sessionStorage so the user stays logged on refresh but is cleared on tab close.
+    useEffect(() => {
+        // Initialize connection state from sessionStorage on mount
+        try {
+            const isConnected = sessionStorage.getItem('isConnected') === 'true';
+            setClientConnected(isConnected);
+            setAdmin(sessionStorage.getItem('isAdmin') === 'true');
+        } catch (e) {
+            setClientConnected(false);
+            setAdmin(false);
+        }
+
+        // Send a logout request to server when the page is being unloaded because of a close.
+        // We try to skip sending on a reload by checking the navigation type.
+        const handleBeforeUnload = () => {
+            try {
+                // Detect reload where possible
+                let isReload = false;
+                try {
+                    const navEntries = performance.getEntriesByType && performance.getEntriesByType('navigation');
+                    if (navEntries && navEntries.length) {
+                        isReload = (navEntries[0] as PerformanceNavigationTiming).type === 'reload';
+                    } else if ((performance as any).navigation) {
+                        isReload = (performance as any).navigation.type === 1; // TYPE_RELOAD
+                    }
+                } catch (e) {
+                    // ignore and assume not a reload
                 }
 
-                // ✅ utilisateur connecté via Keycloak
-                setClientConnected(true);
+                if (isReload) return; // don't logout on refresh
 
-                const user = keycloak.tokenParsed;
-                console.log("Téléphone", user?.telephoneNumber);
-                console.log("USER KEYCLOAK:", user);
+                const mail = sessionStorage.getItem('mail');
+                if (!mail) return;
 
-                // 🔥 ENVOI AU BACKEND (IMPORTANT)
+                const body = new Blob(
+                    [new URLSearchParams({ mail }).toString()],
+                    { type: "application/x-www-form-urlencoded" }
+                );
+
+                navigator.sendBeacon('/api/Montfermeil/users/logout', body);
+            } catch (e) {
+                // best-effort; ignore errors during unload
+                console.log(e)
+            }
+        };
+
+        window.addEventListener('beforeunload', handleBeforeUnload);
+
+        return () => {
+            window.removeEventListener('beforeunload', handleBeforeUnload);
+        };
+
+    }
+    )
+    
+    useEffect(() => {
+        if (typeof window === "undefined") return;
+
+        const keycloak = new Keycloak({
+            url: "http://localhost:8081",
+            realm: "intranet-montfermeil",
+            clientId: "intranet-app",
+        });
+
+        let refreshInterval: NodeJS.Timeout;
+
+        keycloak.init({
+            onLoad: "login-required",
+            checkLoginIframe: false,
+            pkceMethod: "S256",
+        }).then(async (authenticated) => {
+
+            if (!authenticated) {
+                keycloak.login();
+                return;
+            }
+
+            setClientConnected(true);
+
+            const user = keycloak.tokenParsed;
+
+            // =========================
+            // 🔄 AUTO REFRESH TOKEN
+            // =========================
+            refreshInterval = setInterval(() => {
+                keycloak.updateToken(30)
+                    .then((refreshed) => {
+                        if (refreshed) {
+                            sessionStorage.setItem("token", keycloak.token || "");
+                            console.log("🔄 Token refreshed");
+                        }
+                    })
+                    .catch(() => {
+                        console.log("❌ Refresh failed → logout");
+
+                        keycloak.logout({
+                            redirectUri: window.location.origin,
+                        });
+                    });
+            }, 10000);
+
+            keycloak.onTokenExpired = () => {
+                keycloak.updateToken(5).catch(() => {
+                    keycloak.logout({
+                        redirectUri: window.location.origin,
+                    });
+                });
+            };
+
+            // =========================
+            // 🧠 SYNC BDD (UNE SEULE FOIS)
+            // =========================
+            const alreadySynced = sessionStorage.getItem("synced");
+
+            if (!alreadySynced) {
                 try {
                     const syncData = {
-                        username: user?.preferred_username || '',
-                        email: user?.email || '',
-                        nom: user?.family_name || '',
-                        prenom: user?.given_name || '',
-                        roles: user?.realm_access?.roles.toString(),
-                        localisation: user?.department || '',
-                        mobilePro: user?.mobile || '',
-                        telephoneNumber: user?.telephoneNumber || '',
-                        organisation : user?.company || '',
-                        fonction : user?.title || '',
+                        username: user?.preferred_username || "",
+                        email: user?.email || "",
+                        nom: user?.family_name || "",
+                        prenom: user?.given_name || "",
+                        roles: user?.realm_access?.roles?.toString() || "",
+                        localisation: user?.department || "",
+                        mobilePro: user?.mobile || "",
+                        telephoneNumber: user?.telephoneNumber || "",
+                        organisation: user?.company || "",
+                        fonction: user?.title || "",
                     };
 
-                    console.log("SENDING SYNC DATA:", syncData);
-
-                    const syncResponse = await fetch('/api/Montfermeil/users/sync', {
-                        method: 'POST',
+                    const res = await fetch("/api/Montfermeil/users/sync", {
+                        method: "POST",
                         headers: {
-                            'Content-Type': 'application/json; charset=utf-8',
-                            Authorization: `Bearer ${keycloak.token}`
+                            "Content-Type": "application/json",
+                            Authorization: `Bearer ${keycloak.token}`,
                         },
-                        body: JSON.stringify(syncData)
+                        body: JSON.stringify(syncData),
                     });
 
-                    console.log("SYNC RESPONSE STATUS:", syncResponse.status);
+                    const data = await res.json();
 
-                    const syncResponseText = await syncResponse.json();
-                    console.log("SYNC RESPONSE TEXT:", syncResponseText);
-                    setdata(syncResponseText);
-                    sessionStorage.setItem('id', syncResponseText.id);
-                    sessionStorage.setItem('fonction', syncResponseText.organigramme.label || '')
+                    setdata(data);
 
+                    sessionStorage.setItem("id", data.id);
+                    sessionStorage.setItem("fonction", data?.organigramme?.label || "");
+                    sessionStorage.setItem("synced", "true");
 
-                 
-
-
-                    if (!syncResponse.ok) {
-                        try {
-                            const syncError = JSON.parse(syncResponseText);
-                            console.error("SYNC FAILED:", {
-                                status: syncResponse.status,
-                                error: syncError.error,
-                                details: syncError.details
-                            });
-                        } catch {
-                            console.error("SYNC FAILED:", syncResponse.status, syncResponseText);
-                        }
-                    } else {
-
-                        console.log("SYNC SUCCESS");
-                    }
-                } catch (syncError) {
-                    console.error("SYNC EXCEPTION:", syncError);
+                    console.log("✅ SYNC OK");
+                } catch (err) {
+                    console.error("❌ SYNC ERROR", err);
                 }
-         
+            }
 
-                // sessionStorage.setItem('id', data.id);
-                console.log("id", sessionStorage.getItem("id"))
-                sessionStorage.setItem('isConnected', 'true');
-                sessionStorage.setItem('mail', user?.email || '');
-                sessionStorage.setItem('nom', user?.family_name || '');
-                sessionStorage.setItem('prenom', user?.given_name || '')
-                sessionStorage.setItem('localisation', user?.title || '')
-                sessionStorage.setItem('token', keycloak.token || '')
-                // sessionStorage.setItem('localisation', user?.department || '');
-                sessionStorage.setItem('telephonepro', user?.mobile || '');
-                sessionStorage.setItem('numero', user?.telephoneNumber || '');
-                
-                // Assuming admin role from Keycloak
-                setAdmin(user?.realm_access?.roles?.includes('admin') || false);
+            // =========================
+            // 💾 SESSION STORAGE
+            // =========================
+            sessionStorage.setItem("isConnected", "true");
+            sessionStorage.setItem("mail", user?.email || "");
+            sessionStorage.setItem("nom", user?.family_name || "");
+            sessionStorage.setItem("prenom", user?.given_name || "");
+            sessionStorage.setItem("token", keycloak.token || "");
+            sessionStorage.setItem("telephonepro", user?.mobile || "");
+            sessionStorage.setItem("numero", user?.telephoneNumber || "");
 
-            });
+            setAdmin(user?.realm_access?.roles?.includes("admin") || false);
 
-            setKc(keycloak);
-        }
+        });
+
+        setKc(keycloak);
+
+        // =========================
+        // 🧹 CLEANUP PROPRE
+        // =========================
+        return () => {
+            if (refreshInterval) {
+                clearInterval(refreshInterval);
+            }
+        };
+
     }, []);
+
+
 
     /* =========================
        LOGOUT BOUTON
@@ -134,7 +214,7 @@ function Header({ nom }: { nom: string | null }) {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                         body: new URLSearchParams({
-                            email: userEmail 
+                            email: userEmail
                         })
                     });
                 } catch (e) {
@@ -146,7 +226,7 @@ function Header({ nom }: { nom: string | null }) {
             sessionStorage.clear();
             setClientConnected(false);
             setAdmin(false);
-            
+
 
             // Then logout from Keycloak (redirects to home)
             if (kc) {

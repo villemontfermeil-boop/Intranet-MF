@@ -34,8 +34,8 @@ function HomePage() {
             setError(null); // Réinitialise l'erreur
 
             const response = await fetch("/api/Montfermeil/articles/", {
-                headers:{
-                    'Authorization' : `Bearer ${sessionStorage.getItem('token')}`
+                headers: {
+                    'Authorization': `Bearer ${sessionStorage.getItem('token')}`
                 }
             });
 
@@ -81,19 +81,22 @@ function HomePage() {
         const nom = sessionStorage.getItem("nom") || '';
         const prenom = sessionStorage.getItem("prenom") || '';
         const body = new URLSearchParams({ nom, Prenom: prenom });
+        const token = sessionStorage.getItem("token")
         console.log("nom", nom)
         console.log("id", Articleid)
         try {
             const reponse = await fetch(`/api/Montfermeil/articles/delete/${Articleid}`, {
                 method: "DELETE",
                 headers: {
-                    "Content-Type": "application/x-www-form-urlencoded"
+                    "Content-Type": "application/x-www-form-urlencoded",
+                    Authorization :  `Bearer ${token}`,
+
                 },
 
                 body: body.toString()
             })
             if (reponse.ok) {
-        setLoading(false)
+                setLoading(false)
 
                 alert("suprression éffectuer: " + reponse);
                 console.log(reponse)
@@ -101,12 +104,12 @@ function HomePage() {
             }
         } catch (ex) {
             console.log(ex)
-        setLoading(false)
+            setLoading(false)
 
         }
     }
 
-   
+
     useEffect(() => {
         getArticle();
     }, []);
@@ -292,7 +295,7 @@ function HomePage() {
 
                                             }
                     }>
-                        {sessionStorage.getItem("isConnected") == "true" && sessionStorage.getItem("fonction") == "Communication" ? <button onClick={() => deleteArticle(value.id.toString())} style={{ width: "50px", height: "40px" }}>
+                        {sessionStorage.getItem("isConnected") == "true" && sessionStorage.getItem("fonction") == "COMMUNICATION" ? <button onClick={() => deleteArticle(value.id.toString())} style={{ width: "50px", height: "40px" }}>
                             <img src="/cross.png" alt="" style={{ width: "30px", height: "30px" }} />
 
                         </button> : ""
