@@ -30,6 +30,9 @@ import com.IntranetMF.Intranet.modele.OganigrameMF;
 import com.IntranetMF.Intranet.repository.SalarieInterfacesMF;
 import com.IntranetMF.Intranet.repository.OrganismeInterfacesMF;
 
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+
 import jakarta.transaction.Transactional;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -55,11 +58,20 @@ public class SalarieControllerMF {
     }
 
     @GetMapping("/{id}")
-    public SalarieMF getMethodName(@PathVariable Long id) {
+    public SalarieMF getMethodName(@AuthenticationPrincipal Jwt jwt, @PathVariable Long id) {
+
+        String email = jwt.getClaim("email");
+        Optional<SalarieMF> personne = salarieControllerMF.findByMail(email);
+
+        if (!personne.isPresent()) {
+            throw new RuntimeException("Compte innexistant");
+        }
+
         var salarieOpt = salarieControllerMF.findById(id);
         if (salarieOpt.isPresent()) {
             SalarieMF salarie = salarieOpt.get();
-            String text = salarie.getNom() + " " + salarie.getPrenom() + " . A été rechercher.";
+            String text = salarie.getNom() + " " + salarie.getPrenom() + " . A été rechercher. Par "
+                    + personne.get().getPrenom() + " " + salarie.getNom();
             logContenu(text);
             return salarie;
         } else {
@@ -69,10 +81,21 @@ public class SalarieControllerMF {
     }
 
     @GetMapping("/email/{email}")
-    public SalarieMF getEmail(@PathVariable String email) {
+    public SalarieMF getEmail(@AuthenticationPrincipal Jwt jwt, @PathVariable String email) {
         Optional<SalarieMF> unSalarie = salarieControllerMF.findByMail(email);
 
+        String emailV = jwt.getClaim("email");
+        Optional<SalarieMF> personne = salarieControllerMF.findByMail(email);
+
+        if (!personne.isPresent()) {
+            throw new RuntimeException("Compte innexistant");
+        }
+
         if (unSalarie.isPresent()) {
+
+            String text = email + "  A été rechercher. Par "
+                    + personne.get().getPrenom() + " " + personne.get().getNom();
+            logContenu(text);
             return unSalarie.get();
         } else {
             throw new RuntimeException("Salarie not found with email: " + email);
@@ -87,20 +110,34 @@ public class SalarieControllerMF {
     }
 
     @GetMapping("/")
-    public Iterable<SalarieMF> getAllSalaries() {
+    public Iterable<SalarieMF> getAllSalaries(@AuthenticationPrincipal Jwt jwt) {
 
-        String text = "Un admin à recherecher tout les utilisateur";
+        String email = jwt.getClaim("email");
+        Optional<SalarieMF> personne = salarieControllerMF.findByMail(email);
+
+        if (!personne.isPresent()) {
+            throw new RuntimeException("Compte innexistant");
+        }
+
+        String text = personne.get().getPrenom() + " " + personne.get().getNom() + " A chercher tout les utilisateur";
         logContenu(text);
 
         return salarieControllerMF.findAll();
     }
 
     @GetMapping("/Salarie/{nom}")
-    public List<SalarieMF> findSalarierbymail(@PathVariable String nom) {
+    public List<SalarieMF> findSalarierbymail(@AuthenticationPrincipal Jwt jwt, @PathVariable String nom) {
 
         String[] coupage = nom.trim().split("\\s+"); // Séparer en mots
 
         List<SalarieMF> salarie;
+
+        String email = jwt.getClaim("email");
+        Optional<SalarieMF> personne = salarieControllerMF.findByMail(email);
+
+        if (!personne.isPresent()) {
+            throw new RuntimeException("Compte innexistant");
+        }
 
         if (coupage.length >= 2) {
             String prenom = coupage[0];
@@ -115,7 +152,7 @@ public class SalarieControllerMF {
         }
 
         if (!salarie.isEmpty()) {
-            String text = "Un salarié a rechercher: " + nom;
+            String text = personne.get().getPrenom() + " " + personne.get().getNom() + " A chercher " + nom;
             logContenu(text);
             return salarie;
         } else {
@@ -124,21 +161,32 @@ public class SalarieControllerMF {
     }
 
     @GetMapping("/organigramme/{id}")
-    public List<SalarieMF> getOrganigrammeById(@PathVariable Long id) {
+    public List<SalarieMF> getOrganigrammeById(@AuthenticationPrincipal Jwt jwt, @PathVariable Long id) {
         Optional<OganigrameMF> OG = oganigrameMF.findById(id);
+
+        String email = jwt.getClaim("email");
+        Optional<SalarieMF> personne = salarieControllerMF.findByMail(email);
+
+        if (!personne.isPresent()) {
+            throw new RuntimeException("Compte innexistant");
+        }
 
         if (OG.isPresent()) {
             List<SalarieMF> salarieorganigramme = salarieControllerMF.findByOganigrame(OG.get());
-
+            String text = personne.get().getPrenom() + " " + personne.get().getNom()
+                    + " A chercher l'orgnigramme numéro  " + id;
+            logContenu(text);
             return salarieorganigramme;
 
         }
         throw new RuntimeException("Aucun organisme avec cette id : " + id);
 
     }
+
     @PreAuthorize("hasRole('ADMIN')")
     @PatchMapping("/Modification/Salarie/{id}")
     public SalarieMF ModifyASalarier(
+            @AuthenticationPrincipal Jwt jwt,
             @PathVariable Long id,
             @RequestParam String nom,
             @RequestParam String prenom,
@@ -155,6 +203,13 @@ public class SalarieControllerMF {
             throw new IllegalArgumentException("Numéro invalide : uniquement des chiffres autorisés");
         }
 
+        String email = jwt.getClaim("email");
+        Optional<SalarieMF> personne = salarieControllerMF.findByMail(email);
+
+        if (!personne.isPresent()) {
+            throw new RuntimeException("Compte innexistant");
+        }
+
         var salarierOpt = salarieControllerMF.findById(id);
         if (salarierOpt.isPresent()) {
             SalarieMF salarier = salarierOpt.get(); // on prend l'objet existant
@@ -168,7 +223,8 @@ public class SalarieControllerMF {
                     com.IntranetMF.Intranet.modele.LocalisationEnumMF.Localisation.valueOf(localisation));
             System.out.print(salarier);
 
-            String text = "Un admin a modifier : " + salarier.getNom() + " " + salarier.getPrenom();
+            String text = personne.get().getPrenom() + " " + personne.get().getNom() + " a modifier : "
+                    + salarier.getNom() + " " + salarier.getPrenom();
             logContenu(text);
             return salarieControllerMF.save(salarier); // sauvegarde de l'objet existant modifié
         } else {
@@ -180,7 +236,7 @@ public class SalarieControllerMF {
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/NewSalarie")
     public SalarieMF createSalarie(
-            @RequestParam String nom,
+            @AuthenticationPrincipal Jwt jwt, @RequestParam String nom,
             @RequestParam String prenom,
             @RequestParam String mail,
             @RequestParam String numero,
@@ -193,6 +249,13 @@ public class SalarieControllerMF {
         }
         if (!numeroPro.matches("\\d+")) {
             throw new IllegalArgumentException("Numéro invalide : uniquement des chiffres autorisés");
+        }
+
+        String email = jwt.getClaim("email");
+        Optional<SalarieMF> personne = salarieControllerMF.findByMail(email);
+
+        if (!personne.isPresent()) {
+            throw new RuntimeException("Compte innexistant");
         }
         SalarieMF newSalarie = new SalarieMF();
         newSalarie.setNom(nom);
@@ -214,7 +277,7 @@ public class SalarieControllerMF {
         newSalarie.setOrganigramme(og.get());
 
         System.out.print(newSalarie);
-        String text = "Un admin a ajouter : " + nom + " " + prenom;
+        String text = personne.get().getPrenom() + " " + personne.get().getNom() +" a ajouter : " + nom + " " + prenom;
         logContenu(text);
         return salarieControllerMF.save(newSalarie);
     }
