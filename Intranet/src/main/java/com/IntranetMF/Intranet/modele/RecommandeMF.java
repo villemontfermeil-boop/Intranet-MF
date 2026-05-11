@@ -28,25 +28,22 @@ public class RecommandeMF {
     private String service;
 
     // getter
-    public Long getId(){
+    public Long getId() {
         return this.id;
     }
-    public String getDate() {
 
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-        return this.date.format(formatter);
+    public LocalDate getDate() {
+        return this.date;
 
     }
 
-    public String getRecommande(){
+    public String getRecommande() {
         return this.recommander;
     }
 
-    public String getService(){
+    public String getService() {
         return this.service;
     }
-
-
 
     // setter
 
@@ -54,15 +51,13 @@ public class RecommandeMF {
 
         this.date = d;
 
-       
-
     }
 
-    public void setRecommande(String e){
-         this.recommander = e;
+    public void setRecommande(String e) {
+        this.recommander = e;
     }
 
-    public void setService(String e){
+    public void setService(String e) {
         this.service = e;
     }
 

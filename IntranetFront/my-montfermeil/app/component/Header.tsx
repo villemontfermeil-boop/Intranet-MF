@@ -164,7 +164,6 @@ function Header({ nom }: { nom: string | null }) {
             router.push('/');
         }
     };
-console.log(sessionStorage.getItem("fonction"))
     return (
         <div className="Thebody">
             <img src="/logo.png" onClick={() => router.push('/')} className='styleLogo' />
