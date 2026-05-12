@@ -26,10 +26,10 @@ export async function GET(
             })
             const json = await reponse.json();
             console.log("Lejson", json);
-            return NextResponse.json(json, {status: 200});
+            return NextResponse.json(json, {status: reponse.status});
             
         }catch(e){
-            console.log(e)
+            console.log("GROS PROBLEME",e)
             return NextResponse.json("Une Érreur c'est produits", {status: 500});
 
         }

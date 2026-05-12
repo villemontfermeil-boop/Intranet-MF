@@ -16,11 +16,12 @@ function Moi() {
     telpro: sessionStorage.getItem("telephonepro"),
     id: sessionStorage.getItem("id") || "",
   });
+
+  console.log(person)
   // États pour l'image et le chargement
   const [image, setImage] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [loading2, setLoading2] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
   // États pour l'édition
   const [editing, setEditing] = useState(false);
@@ -38,7 +39,7 @@ function Moi() {
 
   const token = sessionStorage.getItem('token') || ''
 
-
+  console.log(sessionStorage.getItem("localisation"))
   async function getBackend() {
 
     console.log(token);
@@ -73,13 +74,19 @@ function Moi() {
 
     try {
       setLoading(true);
-      setError(null);
-
+      const token = sessionStorage.getItem("token") || ''
       const response = await fetch(`/api/Montfermeil/users/Photo/${oneId}`, {
         headers: {
-          'authorization': token
+          Authorization: `Bearer ${token}`
         },
       });
+
+      // 🔹 Pas de photo => image par défaut
+      if (response.status === 404) {
+        console.log("Pas de photo utilisateur");
+        setImage(null);
+        return;
+      }
 
       if (!response.ok) {
         throw new Error(`Erreur HTTP: ${response.status}`);
@@ -87,10 +94,14 @@ function Moi() {
 
       const data = await response.json();
       setImage(data);
+
     } catch (e) {
+
       console.error("Erreur chargement photo:", e);
-      setError("Impossible de charger la photo");
+
+      // 🔹 fallback image par défaut
       setImage(null);
+
     } finally {
       setLoading(false);
     }
@@ -195,31 +206,7 @@ function Moi() {
     );
   }
 
-  // Afficher une erreur si le chargement a échoué
-  if (error) {
-    return (
-      <div style={{
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        height: "100vh",
-        flexDirection: "column",
-        color: "red"
-      }}>
-        <p>❌ {error}</p>
-        <button
-          onClick={() => getProfile(person.id)}
-          style={{
-            marginTop: "20px",
-            padding: "10px 20px",
-            cursor: "pointer"
-          }}
-        >
-          Réessayer
-        </button>
-      </div>
-    );
-  }
+ 
 
   return (
     <div>

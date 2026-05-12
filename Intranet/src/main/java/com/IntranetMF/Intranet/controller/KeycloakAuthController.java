@@ -67,6 +67,9 @@ public class KeycloakAuthController {
         var salarieOpt = salarieRepository.findByMail(email);
 
         if (salarieOpt.isPresent()) {
+            String organismeSalarie = userData.get("organisation");
+            long num = Long.parseLong(organismeSalarie);
+            Optional<OganigrameMF> organigramme = oganigrameMF.findById(num);
             System.out.println("✅ User already exists - updating...");
             SalarieMF existing = salarieOpt.get();
             System.out.println("   Name: " + existing.getNom() + " " + existing.getPrenom());
@@ -76,6 +79,8 @@ public class KeycloakAuthController {
             existing.setNom(userData.getOrDefault("nom", existing.getNom()));
             existing.setPrenom(userData.getOrDefault("prenom", existing.getPrenom()));
             existing.setIsAdmin(isAdmin);
+            existing.setOrganigramme(organigramme.get());
+
             System.out.println("   Set isConnected = true");
             System.out.println("   Set beginLogin = " + existing.getBeginLogin());
 
@@ -121,7 +126,8 @@ public class KeycloakAuthController {
             }
         }
 
-        // System.out.print(Localisation.valueOf(userData.getOrDefault("localisation", "NON_DEFINI").toString()));
+        // System.out.print(Localisation.valueOf(userData.getOrDefault("localisation",
+        // "NON_DEFINI").toString()));
         // Set defaults for required fields
         System.out.println("Localisation = " + newUser.getLocalisation());
         newUser.setNumero(userData.getOrDefault("telephoneNumber", ""));
