@@ -162,6 +162,7 @@ function Header({ nom }: { nom: string | null }) {
 
                     sessionStorage.setItem("id", data.id);
                     sessionStorage.setItem("fonction", data?.organigramme?.label || "");
+                    sessionStorage.setItem("organisme", data?.organigramme?.id || "");
                     sessionStorage.setItem("synced", "true");
 
                     console.log("✅ SYNC OK");

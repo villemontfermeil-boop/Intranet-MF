@@ -29,6 +29,8 @@ function Moi() {
   const [preview, setPreview] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const [backend, setBackend] = useState<any>({});
+  const organisme = sessionStorage.getItem("organisme")
+
 
   const router = useRouter();
 
@@ -116,6 +118,8 @@ function Moi() {
   useEffect(() => {
     getBackend();
     getProfile(person.id);
+
+
   }, [person.id]);
 
   // 🔹 Envoi de la nouvelle photo
@@ -205,8 +209,9 @@ function Moi() {
       </div>
     );
   }
+  console.log(organisme)
 
- 
+
 
   return (
     <div>
@@ -253,17 +258,22 @@ function Moi() {
                 </tr>
                 <tr>
                   <th>Localisation:</th>
-                  <td>{person.fonction}</td>
+                  <td
+                    onClick={() => router.push(`/Annuaire/Organisme/${organisme}`)}
+                    style={{ cursor: "pointer", color: "blue" }}
+                  > <u>
+                    {person.fonction}
+                  </u></td>
 
 
                 </tr>
                 <tr>
                   <th>Numero:</th>
-                  <td>{person.numero}</td>
+                  <td><a href={`tel:${person.numero}`}>{person.numero || "NON_DÉFINI"}</a></td>
                 </tr>
                 <tr>
                   <th>Téléphone pro:</th>
-                  <td>{person.telpro || "NON_DÉFINI"}</td>
+                  <td><a href={`tel:${person.telpro}`}>{person.telpro || "NON_DÉFINI"}</a></td>
                 </tr>
                 <tr>
                   <th>Email:</th>
