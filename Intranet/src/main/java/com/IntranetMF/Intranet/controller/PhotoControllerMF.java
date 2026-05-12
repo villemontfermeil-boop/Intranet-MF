@@ -102,7 +102,7 @@ public class PhotoControllerMF {
     }
 
     @GetMapping("/Profile/{id}")
-    // @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('USER')")
     public Optional<PhotoMF> getProfileImage(@PathVariable Long id) {
         Optional<SalarieMF> salarie = salarieMF.findById(id);
 
@@ -115,11 +115,11 @@ public class PhotoControllerMF {
                 logContenu(text);
                 return profil;
             } else {
-                throw new RuntimeException("Salarie not found with id: " + id);
+                throw new RuntimeException("2: Salarie not found with id: " + id);
 
             }
         }
-        throw new RuntimeException("Salarie not found with id: " + id);
+        throw new RuntimeException("1: Salarie not found with id: " + id);
 
     }
 

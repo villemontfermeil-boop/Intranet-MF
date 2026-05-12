@@ -144,7 +144,7 @@ function Header({ nom }: { nom: string | null }) {
                         mobilePro: user?.mobile || "",
                         telephoneNumber: user?.telephoneNumber || "",
                         organisation: user?.company || "",
-                        fonction: user?.title || "",
+                        fonction: user?.title || "7",
                     };
 
                     const res = await fetch("/api/Montfermeil/users/sync", {
@@ -178,6 +178,7 @@ function Header({ nom }: { nom: string | null }) {
             sessionStorage.setItem("nom", user?.family_name || "");
             sessionStorage.setItem("prenom", user?.given_name || "");
             sessionStorage.setItem("token", keycloak.token || "");
+            sessionStorage.setItem('localisation', user?.title || '')
             sessionStorage.setItem("telephonepro", user?.mobile || "");
             sessionStorage.setItem("numero", user?.telephoneNumber || "");
 
