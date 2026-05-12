@@ -70,7 +70,7 @@ function HomePage() {
             setData(articles);
         } catch (error) {
             console.error("Erreur lors du chargement des articles:", error);
-            setError("Impossible de charger les articles. Veuillez réessayer plus tard.");
+            setError("Impossible de charger les articles. Veuillez réessayer et pensez à rafraichir la page.");
         } finally {
             setLoading(false); // Fin du chargement (succès ou erreur)
         }
