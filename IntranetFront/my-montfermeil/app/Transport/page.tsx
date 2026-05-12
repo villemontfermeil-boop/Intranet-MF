@@ -1,58 +1,30 @@
 'use client';
 import { useEffect, useState } from "react";
-interface MessageText {
-    value: string;
-    lang: string;
-}
-
+import "./style.css";
 interface Message {
-    MessageType: string;
-    MessageText: MessageText;
+    text: string;
 }
 
-interface Content {
-    LineRef: { value: string }[];
-    Message: Message[];
+interface Severity {
+    name: string;
+    effect: string;
 }
 
-interface InfoMessage {
-    FormatRef: string;
-    RecordedAtTime: string;
-    ItemIdentifier: string;
-    InfoMessageIdentifier: { value: string };
-    InfoChannelRef: { value: string };
-    ValidUntilTime: string;
-    Content: Content;
-}
-
-interface GeneralMessageDelivery {
-    ResponseTimestamp: string;
-    Version: string;
-    Status: string;
-    InfoMessage: InfoMessage[];
-}
-
-interface ServiceDelivery {
-    ResponseTimestamp: string;
-    ProducerRef: string;
-    ResponseMessageIdentifier: string;
-    GeneralMessageDelivery: GeneralMessageDelivery[];
-}
-
-interface Siri {
-    ServiceDelivery: ServiceDelivery;
+interface Disruption {
+    id: string;
+    severity: Severity;
+    messages: Message[];
 }
 
 interface ApiResponse {
-    Siri: Siri;
+    disruptions: Disruption[];
 }
-
 
 function PageTransport() {
     const [messages, setMessages] = useState<any[]>([]);
     const Transport = {
         "T4": "C01843",
-        "146" : "C01171",
+        "146": "C01171",
         "602": "C01574",
         "603": "C01575",
         "604": "C01576",
@@ -61,18 +33,19 @@ function PageTransport() {
         "1": "C01423",
         "5": "C01427",
         "T1": "C01389",
-        "E" : "C01853",
-        "B" : "C01831",
-        "605" : "C01577"
+        "E": "C01853",
+        "B": "C01831",
+        "605": "C01577"
     }
 
     const [choix, setChoix] = useState<string>('');
 
-
     async function GetInfo(ligne: string) {
+        const url = `https://prim.iledefrance-mobilites.fr/marketplace/v2/navitia/line_reports/lines/line%3AIDFM%3A${ligne}/line_reports`
+
         try {
             const reponse = await fetch(
-                `https://prim.iledefrance-mobilites.fr/marketplace/general-message?LineRef=STIF:Line::${ligne}:`,
+                url,
                 {
                     headers: {
                         apikey: "fSByGMLkoTqTW1l6a7Jr0XkA4684icTg"
@@ -82,17 +55,15 @@ function PageTransport() {
 
             const data: ApiResponse = await reponse.json();
 
-            const importantMessages = data.Siri.ServiceDelivery.GeneralMessageDelivery.flatMap(gmd =>
-                gmd.InfoMessage.flatMap(info =>
-                    info.Content.Message.map(msg => ({
-                        type: msg.MessageType,
-                        text: msg.MessageText.value,
-                        line: info.Content.LineRef[0]?.value
-                    }))
-                )
-            );
+            console.log(data);
 
-            setMessages(importantMessages);
+            const formattedMessages = data.disruptions.map((d) => ({
+                type: d.severity?.name,
+                effect: d.severity?.effect,
+                text: d.messages?.[0]?.text
+            }));
+
+            setMessages(formattedMessages);
 
         } catch (e) {
             console.log(e);
@@ -108,10 +79,10 @@ function PageTransport() {
 
     return (
         <div>
-            <h3 style={{textAlign: "center"}}><u >Choisissez le transport qui vous intéresse</u></h3>
-            <div style={{alignItems: "center", display: "flex", justifyContent: "center", gap: "20px", fontFamily: '"Brown Pro", sans-serif'}}>
-                <button onClick={() => setChoix(Transport.T4)}><img style={{width: '50px', height: "50px"}} src={"/t4.png"}/></button>
-                <button onClick={() => setChoix(Transport[1])}><img style={{width: '50px', height: "50px"}} src={"/bus-1.png"}/></button>
+            <h3 style={{ textAlign: "center" }}><u >Choisissez le transport qui vous intéresse</u></h3>
+            <div style={{ alignItems: "center", display: "flex", justifyContent: "center", gap: "20px", fontFamily: '"Brown Pro", sans-serif' }}>
+                <button onClick={() => setChoix(Transport.T4)}><img style={{ width: '50px', height: "50px" }} src={"/t4.png"} /></button>
+                <button onClick={() => setChoix(Transport[1])}><img style={{ width: '50px', height: "50px" }} src={"/bus-1.png"} /></button>
                 <button onClick={() => setChoix(Transport[5])}>5</button>
                 <button onClick={() => setChoix(Transport[146])}>146</button>
                 <button onClick={() => setChoix(Transport[602])}>602</button>
@@ -126,14 +97,23 @@ function PageTransport() {
 
             </div>
             {messages.length === 0 ? (
-                <h1 style={{textAlign: "center"}}>Aucune information pour le moment</h1>
+                <h1 style={{textAlign: "center"}}>Aucune perturbation</h1>
             ) : (
                 <ul>
-                    {messages.map((msg, index) => (
-                        <li key={index}>
-                            <strong>{msg.type}</strong> : {msg.text}
-                        </li>
-                    ))}
+                    {messages
+                        .filter(
+                            (msg) =>
+                                msg.type !== "SIGNIFICANT_DELAYS" &&
+                                msg.type !== "OTHER_EFFECT"
+                        )
+                        .map((msg, index) => (
+                            <li key={index}>
+                                <div
+                                    className="messageHTML"
+                                    dangerouslySetInnerHTML={{ __html: msg.text }}
+                                />
+                            </li>
+                        ))}
                 </ul>
             )}
         </div>
