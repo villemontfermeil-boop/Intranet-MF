@@ -39,16 +39,44 @@ function PageTransport() {
     }
 
     const [choix, setChoix] = useState<string>('');
+    const [cle, setCle] = useState<any>({});
+    const [loading, setLoading] = useState<boolean>(false)
+
+    async function getKey() {
+
+        try {
+            setLoading(true)
+
+            const token = sessionStorage.getItem("token") || ''
+            const data = await fetch("/api/IFM", {
+                method: "GET",
+                headers: {
+                    Authorization: token
+
+                }
+            })
+            setCle(await data.json());
+            setLoading(false)
+
+        } catch (ex) {
+            console.log(ex)
+            alert("Probleme lors de la récuperation de la clé")
+            setLoading(false)
+        }
+
+    }
 
     async function GetInfo(ligne: string) {
         const url = `https://prim.iledefrance-mobilites.fr/marketplace/v2/navitia/line_reports/lines/line%3AIDFM%3A${ligne}/line_reports`
 
         try {
+            setLoading(true)
+
             const reponse = await fetch(
                 url,
                 {
                     headers: {
-                        apikey: "fSByGMLkoTqTW1l6a7Jr0XkA4684icTg"
+                        apikey: cle.clef
                     }
                 }
             );
@@ -64,9 +92,13 @@ function PageTransport() {
             }));
 
             setMessages(formattedMessages);
+            setLoading(false)
+
 
         } catch (e) {
             console.log(e);
+            setLoading(false)
+
         }
     }
 
@@ -74,8 +106,46 @@ function PageTransport() {
         if (choix) {
             GetInfo(choix)
             console.log(choix)
+            if (messages) {
+                getKey()
+            }
         }
     }, [choix])
+
+
+    if (loading) {
+        return (
+            <div style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                height: "100vh",
+                flexDirection: "column"
+            }}>
+                <div className="spinner"></div>
+                <p style={{ marginTop: "20px", fontSize: "18px" }}>
+                    Chargement du profil...
+                </p>
+
+                <style jsx>{`
+                    .spinner {
+                        border: 4px solid rgba(0, 0, 0, 0.1);
+                        width: 50px;
+                        height: 50px;
+                        border-radius: 50%;
+                        border-left-color: #09f;
+                        animation: spin 1s linear infinite;
+                    }
+                    
+                    @keyframes spin {
+                        0% { transform: rotate(0deg); }
+                        100% { transform: rotate(360deg); }
+                    }
+                `}</style>
+            </div>
+        );
+    }
+
 
     return (
         <div>
@@ -97,7 +167,7 @@ function PageTransport() {
 
             </div>
             {messages.length === 0 ? (
-                <h1 style={{textAlign: "center"}}>Aucune perturbation</h1>
+                <h1 style={{ textAlign: "center" }}>Aucune perturbation</h1>
             ) : (
                 <ul>
                     {messages
