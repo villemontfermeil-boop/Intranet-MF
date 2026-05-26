@@ -60,7 +60,7 @@ function infoDesServices() {
 
         // nom du fichier (texte)
         formData.append("nom", fileName || file.name);
-        formData.append("organisme", String(sessionStorage.getItem("organisme"))|| '');
+        formData.append("organisme", String(sessionStorage.getItem("organisme")) || '');
 
         try {
             const token = sessionStorage.getItem("token");
@@ -80,7 +80,7 @@ function infoDesServices() {
             console.log(json)
             alert("Ajout éfectuer avec succès")
             routeur.push("/")
-setHider(false)
+            setHider(false)
             setLoading(false)
 
         } catch (ex) {
@@ -148,6 +148,7 @@ setHider(false)
 
             }}
         >
+
             <table
                 className="table-salaries"
                 style={{
@@ -156,13 +157,7 @@ setHider(false)
                     borderCollapse: "collapse",
                 }}
             >
-                <thead>
-                    <tr>
-                        <td>
-                            <button onClick={() => hider == false ? setHider(true) : setHider(false)}>Ajouter un document</button>
-                        </td>
-                    </tr>
-                </thead>
+
 
                 <tbody hidden={hider == false ? false : true}>
                     {Array.isArray(organisme) &&
@@ -195,7 +190,7 @@ setHider(false)
                 <tbody hidden={!hider ? true : false}>
                     <tr>
                         <td>
-                            <input type="file" onChange={(e) => { const file = e.target.files; if (file && file.length > 0) {setFileName(file[0].name), setFile(file[0]) } else { setFile(null)} }} />
+                            <input type="file" onChange={(e) => { const file = e.target.files; if (file && file.length > 0) { setFileName(file[0].name), setFile(file[0]) } else { setFile(null) } }} />
                         </td>
                     </tr>
                     <tr>
@@ -206,6 +201,8 @@ setHider(false)
                 </tbody>
 
             </table>
+            <button style={{width: "100%"}} onClick={() => hider == false ? setHider(true) : setHider(false)}>Ajouter un document</button>
+
         </div>
     );
 

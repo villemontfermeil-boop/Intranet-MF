@@ -20,6 +20,11 @@ import com.IntranetMF.Intranet.modele.SalarieMF;
 import com.IntranetMF.Intranet.repository.SalarieInterfacesMF;
 import com.IntranetMF.Intranet.repository.OrganismeInterfacesMF;
 
+/**
+ * Controller public pour la synchronisation des utilisateurs Keycloak.
+ *
+ * Reçoit les données de Keycloak et met à jour ou crée des salariés locaux.
+ */
 @RestController
 @RequestMapping("/auth")
 public class KeycloakAuthController {
@@ -36,8 +41,11 @@ public class KeycloakAuthController {
     }
 
     /**
-     * Endpoint public pour synchroniser les utilisateurs Keycloak
-     * Accessible SANS authentification
+     * Synchronise un utilisateur Keycloak avec la base interne.
+     *
+     * @param userData Les données utilisateur Keycloak reçues en JSON.
+     * @return le salarié créé ou mis à jour.
+     * @throws RuntimeException si l'email est manquant ou si l'organi- gramme par défaut est introuvable.
      */
     @PostMapping("/sync")
     @Transactional

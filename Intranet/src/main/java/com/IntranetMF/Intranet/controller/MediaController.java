@@ -18,6 +18,11 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 
+/**
+ * Controller REST pour diffuser des contenus médias (fichiers uploadés).
+ *
+ * Permet de récupérer une ressource média par son nom de fichier.
+ */
 @RestController
 @RequestMapping("/media")
 public class MediaController {
@@ -27,6 +32,12 @@ public class MediaController {
             + LocalDate.now().getMonthValue() + "/"
             + LocalDate.now().getDayOfMonth();
 
+    /**
+     * Récupère un fichier média uploadé par son nom de fichier.
+     *
+     * @param filename Le nom du fichier média.
+     * @return la ressource média si elle existe, sinon une réponse 404 ou 500.
+     */
     @GetMapping("/{filename:.+}")
     public ResponseEntity<Resource> getMedia(@PathVariable String filename) {
         try {

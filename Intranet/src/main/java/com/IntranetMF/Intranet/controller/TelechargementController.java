@@ -48,6 +48,12 @@ import com.IntranetMF.Intranet.modele.ArticleMF;
 import com.IntranetMF.Intranet.modele.OganigrameMF;
 import com.IntranetMF.Intranet.repository.OrganismeInterfacesMF;
 
+/**
+ * Controller REST pour les fichiers de téléchargement.
+ *
+ * Permet d'uploader, lister, récupérer et supprimer des fichiers liés
+ * aux organigrammes.
+ */
 @RestController
 @RequestMapping("/telechargement")
 public class TelechargementController {
@@ -63,6 +69,15 @@ public class TelechargementController {
         this.organismeInterfacesMF = o;
     }
 
+    /**
+     * Enregistre un nouveau téléchargement de fichier.
+     *
+     * @param jwt       Le jeton JWT de l'utilisateur authentifié.
+     * @param file      Le fichier téléchargé.
+     * @param nom       Le nom donné au fichier.
+     * @param organisme L'identifiant de l'organisme associé.
+     * @return l'objet TelechargementMF créé.
+     */
     @PostMapping(value = "/nouveaux/fichier", consumes = org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE)
     public TelechargementMF nouveauxTelechargement(@AuthenticationPrincipal Jwt jwt,
             @RequestParam("file") MultipartFile file, String nom, Long organisme) {
@@ -114,6 +129,12 @@ public class TelechargementController {
         }
     }
 
+    /**
+     * Récupère la liste de tous les téléchargements.
+     *
+     * @param jwt Le jeton JWT de l'utilisateur authentifié.
+     * @return la liste des téléchargements disponibles.
+     */
     @GetMapping("/telechargement")
     public List<TelechargementMF> getTelechargement(@AuthenticationPrincipal Jwt jwt) {
         String email = jwt.getClaim("email");
@@ -128,6 +149,13 @@ public class TelechargementController {
         }
     }
 
+    /**
+     * Récupère un téléchargement par son identifiant.
+     *
+     * @param jwt Le jeton JWT de l'utilisateur authentifié.
+     * @param id  L'identifiant du téléchargement.
+     * @return l'objet TelechargementMF correspondant.
+     */
     @GetMapping("/telechargement/{id}")
     public TelechargementMF getTelechargementById(@AuthenticationPrincipal Jwt jwt,
             @PathVariable Long id) {
@@ -149,6 +177,13 @@ public class TelechargementController {
         }
     }
 
+    /**
+     * Supprime un téléchargement et le fichier associé.
+     *
+     * @param id  L'identifiant du téléchargement à supprimer.
+     * @param jwt Le jeton JWT de l'utilisateur authentifié.
+     * @return un message de confirmation.
+     */
     @DeleteMapping("/organisme/supprimer/{id}")
     public String deleteTelechargement(@PathVariable Long id, @AuthenticationPrincipal Jwt jwt) {
         String email = jwt.getClaim("email");
@@ -186,6 +221,13 @@ public class TelechargementController {
 
     }
 
+    /**
+     * Récupère les téléchargements associés à un organisme.
+     *
+     * @param jwt       Le jeton JWT de l'utilisateur authentifié.
+     * @param organisme L'identifiant de l'organisme.
+     * @return la liste des téléchargements pour l'organisme.
+     */
     @GetMapping("/organisme/{organisme}")
     public List<TelechargementMF> getTelechargementByOrganisation(@AuthenticationPrincipal Jwt jwt,
             @PathVariable Long organisme) {

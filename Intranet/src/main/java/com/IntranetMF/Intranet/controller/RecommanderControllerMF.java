@@ -36,6 +36,11 @@ import com.IntranetMF.Intranet.modele.SalarieMF;
 import com.IntranetMF.Intranet.modele.OganigrameMF;
 import com.IntranetMF.Intranet.modele.RecommandeMF;
 
+/**
+ * Controller REST pour gérer les recommandations.
+ *
+ * Permet de créer, lister et rechercher des recommandations de courrier.
+ */
 @RestController
 @RequestMapping("/recommander")
 public class RecommanderControllerMF {
@@ -53,6 +58,15 @@ public class RecommanderControllerMF {
         this.salarieInterfacesMF = s;
     }
 
+    /**
+     * Crée une nouvelle recommandation de courrier.
+     *
+     * @param jwt          Le jeton JWT de l'utilisateur authentifié.
+     * @param Recommander  Le texte de la recommandation.
+     * @param date         La date souhaitée.
+     * @param services     Le service destinataire.
+     * @return la recommandation enregistrée.
+     */
     @PostMapping("/nouveaux")
     public RecommandeMF newRecommander(@AuthenticationPrincipal Jwt jwt, @RequestParam String Recommander,
             @RequestParam @DateTimeFormat(pattern = "dd/MM/yyyy") LocalDate date, @RequestParam String services) {
@@ -88,6 +102,12 @@ public class RecommanderControllerMF {
 
     }
 
+    /**
+     * Récupère toutes les recommandations triées par date décroissante.
+     *
+     * @param jwt Le jeton JWT de l'utilisateur authentifié.
+     * @return la liste des recommandations.
+     */
     @GetMapping("/recommander")
     public List<RecommandeMF> getAllRecommander(@AuthenticationPrincipal Jwt jwt) {
         String email = jwt.getClaim("email");
@@ -111,6 +131,13 @@ public class RecommanderControllerMF {
 
     }
 
+    /**
+     * Recherche des recommandations par numéro ou mot-clé.
+     *
+     * @param jwt       Le jeton JWT de l'utilisateur authentifié.
+     * @param recherche Le terme de recherche.
+     * @return la liste des recommandations correspondantes.
+     */
     @GetMapping("/numero/{recherche}")
     public List<RecommandeMF> findRecommander(@AuthenticationPrincipal Jwt jwt, @PathVariable String recherche) {
 

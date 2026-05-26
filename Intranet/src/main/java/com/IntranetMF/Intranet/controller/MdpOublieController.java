@@ -37,6 +37,12 @@ import com.IntranetMF.Intranet.repository.MdpOublieInterfaces;
 import com.IntranetMF.Intranet.repository.SalarieInterfacesMF;
 import org.springframework.web.bind.annotation.RequestBody;
 
+/**
+ * Controller REST pour le workflow de mot de passe oublié.
+ *
+ * Permet de créer une demande de réinitialisation, de consulter le statut
+ * et de modifier le mot de passe.
+ */
 @RestController
 @RequestMapping("/Oublie")
 public class MdpOublieController {
@@ -56,6 +62,13 @@ public class MdpOublieController {
         this.mdpOublieInterfaces = mdpOublieInterfaces;
     }
 
+    /**
+     * Crée une demande de réinitialisation de mot de passe.
+     *
+     * @param email    L'adresse e-mail du salarié.
+     * @param password Le nouveau mot de passe à enregistrer.
+     * @return l'enregistrement de réinitialisation créé.
+     */
     @PostMapping("/motDePasse")
     public MdpOublieMF nouveauMdpOublie(@RequestParam("email") String email,
             @RequestParam("password") String password) {
@@ -97,6 +110,14 @@ public class MdpOublieController {
 
     }
 
+    /**
+     * Obtient le statut d'une demande de mot de passe oublié.
+     *
+     * @param id     L'identifiant de la demande.
+     * @param nom    Le nom du salarié.
+     * @param prenom Le prénom du salarié.
+     * @return l'objet de mot de passe oublié correspondant.
+     */
     @GetMapping("/Change/{id}")
     public MdpOublieMF getStatus(@PathVariable Long id, @RequestParam("Nom") String nom,
             @RequestParam("Prenom") String prenom) {
@@ -115,6 +136,13 @@ public class MdpOublieController {
 
     }
 
+    /**
+     * Met à jour le mot de passe d'un salarié après une demande oubli.
+     *
+     * @param email    L'adresse e-mail du salarié.
+     * @param password Le nouveau mot de passe.
+     * @return l'objet MdpOublieMF mis à jour.
+     */
     @PatchMapping("/modifier/motdepasse")
     public MdpOublieMF modifierMdpOublie(@RequestParam("email") String email,
             @RequestParam("password") String password) {
