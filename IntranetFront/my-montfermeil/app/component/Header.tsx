@@ -69,9 +69,7 @@ function Header({ nom }: { nom: string | null }) {
         return () => {
             window.removeEventListener('beforeunload', handleBeforeUnload);
         };
-
-    }
-    )
+    }, []);
 
     useEffect(() => {
         if (typeof window === "undefined") return;
@@ -85,11 +83,10 @@ function Header({ nom }: { nom: string | null }) {
         let refreshInterval: NodeJS.Timeout;
 
         keycloak.init({
-            onLoad: "login-required",
+            onLoad: "check-sso",
             checkLoginIframe: false,
             pkceMethod: "S256",
         }).then(async (authenticated) => {
-
             if (!authenticated) {
                 keycloak.login();
                 return;
@@ -117,7 +114,7 @@ function Header({ nom }: { nom: string | null }) {
                             redirectUri: window.location.origin,
                         });
                     });
-            }, 10000);
+            }, 60000);
 
             keycloak.onTokenExpired = () => {
                 keycloak.updateToken(5).catch(() => {
