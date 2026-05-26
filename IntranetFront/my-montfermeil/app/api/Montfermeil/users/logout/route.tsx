@@ -18,8 +18,17 @@ export async function POST(request: Request) {
             body: new URLSearchParams(Object.fromEntries(body as any))
         })
         console.log(response)
-        const JSON =await response.json();
-        return new NextResponse(JSON, { status: 200 });
+        const text = await response.text();
+        if (!text) {
+            return new NextResponse(null, { status: response.status });
+        }
+        try {
+            const parsed = JSON.parse(text);
+            return NextResponse.json(parsed, { status: response.status });
+        } catch (e) {
+            // Not JSON, return raw text
+            return new NextResponse(text, { status: response.status });
+        }
     }catch(Error){
         console.log(Error)
         console.log('credential:', credential)
