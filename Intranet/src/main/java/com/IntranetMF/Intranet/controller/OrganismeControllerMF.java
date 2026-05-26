@@ -30,6 +30,11 @@ import com.IntranetMF.Intranet.modele.PhotoMF;
 import com.IntranetMF.Intranet.modele.SalarieMF;
 import com.IntranetMF.Intranet.repository.SalarieInterfacesMF;
 
+/**
+ * Controller REST pour gérer les organigrammes.
+ *
+ * Fournit des endpoints pour créer, rechercher et récupérer des organigrammes.
+ */
 @RestController
 @RequestMapping("/Organisme")
 public class OrganismeControllerMF {
@@ -47,6 +52,14 @@ public class OrganismeControllerMF {
         this.salarieMF = salarieMF;
     }
 
+/**
+     * Crée un nouvel organigramme.
+     *
+     * @param label     Le label du service.
+     * @param adresse   L'adresse du service.
+     * @param telephone Le téléphone du service.
+     * @return l'organigramme créé.
+     */
     @PostMapping("/nouveaux")
     public OganigrameMF newOrganigramme(@RequestParam String label, @RequestParam String adresse,
             @RequestParam String telephone) {
@@ -59,6 +72,11 @@ public class OrganismeControllerMF {
 
     }
 
+/**
+     * Liste tous les organigrammes.
+     *
+     * @return la liste des organigrammes.
+     */
     @GetMapping("/organigramme")
     public List<OganigrameMF> getOrganigramme() {
         List<OganigrameMF> OG = OrganismMF.findAll();
@@ -66,6 +84,12 @@ public class OrganismeControllerMF {
         return OG;
     }
 
+/**
+     * Recherche des organigrammes par label.
+     *
+     * @param recherche Le terme de recherche.
+     * @return la liste des organigrammes trouvés.
+     */
     @GetMapping("/organigramme/nom/{recherche}")
     public List<OganigrameMF> findOrganismeByLabel(@PathVariable String recherche) {
 
@@ -95,6 +119,12 @@ public class OrganismeControllerMF {
         }
     }
 
+/**
+     * Récupère un organigramme par son identifiant.
+     *
+     * @param id L'identifiant de l'organigramme.
+     * @return l'organigramme si trouvé.
+     */
     @GetMapping("/organigramme/{id}")
     public OganigrameMF getOrganigrammeById(@PathVariable Long id) {
         Optional<OganigrameMF> OG = OrganismMF.findById(id);

@@ -33,6 +33,11 @@ import com.IntranetMF.Intranet.modele.SalarieMF;
 import com.IntranetMF.Intranet.repository.ArticleInterfacesMF;
 import com.IntranetMF.Intranet.repository.SalarieInterfacesMF;
 
+/**
+ * Controller REST pour gérer les articles.
+ *
+ * Permet de récupérer, créer et supprimer des articles.
+ */
 @RestController
 @RequestMapping("/Article")
 public class ArticleControllerMF {
@@ -47,6 +52,12 @@ public class ArticleControllerMF {
         this.salarieInterfacesMF = salarieInterfacesMF;
     }
 
+    /**
+     * Récupère un article par son identifiant.
+     *
+     * @param id L'identifiant de l'article.
+     * @return un Optional contenant l'article si trouvé.
+     */
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('USER')")
     public Optional<ArticleMF> GetArticleWithId(@PathVariable Long id) {
@@ -62,6 +73,11 @@ public class ArticleControllerMF {
         }
     }
 
+    /**
+     * Récupère la liste de tous les articles triés par date décroissante.
+     *
+     * @return la liste des articles.
+     */
     @GetMapping("/getArticle")
     @PreAuthorize("hasRole('USER')")
     public List<ArticleMF> getArticle() {
@@ -69,6 +85,16 @@ public class ArticleControllerMF {
 
     }
 
+    /**
+     * Crée un nouvel article et enregistre éventuellement un fichier associé.
+     *
+     * @param description Description de l'article.
+     * @param salarieId   Identifiant du salarié auteur.
+     * @param type        Type de l'article.
+     * @param titre       Titre de l'article.
+     * @param file        Fichier optionnel attaché à l'article.
+     * @return l'article enregistré.
+     */
     @PostMapping(value = "/upload", consumes = org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('USER')")
     public ArticleMF uploadFile(
@@ -139,6 +165,14 @@ public class ArticleControllerMF {
         }
     }
 
+    /**
+     * Supprime un article et son fichier associé si présent.
+     *
+     * @param id     L'identifiant de l'article à supprimer.
+     * @param nom    Le nom du salarié effectuant la suppression.
+     * @param prenom Le prénom du salarié effectuant la suppression.
+     * @return une réponse HTTP indiquant le résultat de l'opération.
+     */
     @PreAuthorize("hasRole('USER')")
     @DeleteMapping("/deleteArticle/{id}")
     public ResponseEntity<String> deleteArticle(

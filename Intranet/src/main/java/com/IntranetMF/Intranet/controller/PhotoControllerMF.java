@@ -27,6 +27,11 @@ import com.IntranetMF.Intranet.modele.PhotoMF;
 import com.IntranetMF.Intranet.modele.SalarieMF;
 import com.IntranetMF.Intranet.repository.SalarieInterfacesMF;
 
+/**
+ * Controller REST pour gérer les photos de profil des salariés.
+ *
+ * Permet d'ajouter, récupérer et modifier l'image de profil d'un salarié.
+ */
 @RestController
 @RequestMapping("/Photo")
 public class PhotoControllerMF {
@@ -44,6 +49,13 @@ public class PhotoControllerMF {
         this.salarieMF = salarieMF;
     }
 
+/**
+     * Enregistre une nouvelle photo de profil pour un salarié.
+     *
+     * @param file Le fichier image téléchargé.
+     * @param mail L'adresse e-mail du salarié.
+     * @return une réponse HTTP contenant un message de succès ou d'erreur.
+     */
     @PostMapping("/Nouveaux")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<String> newPhoto(@RequestParam("file") MultipartFile file, @RequestParam String mail) {
@@ -101,6 +113,12 @@ public class PhotoControllerMF {
         }
     }
 
+/**
+     * Récupère la photo de profil d'un salarié.
+     *
+     * @param id L'identifiant du salarié.
+     * @return un Optional contenant la photo si trouvée.
+     */
     @GetMapping("/Profile/{id}")
     @PreAuthorize("hasRole('USER')")
     public Optional<PhotoMF> getProfileImage(@PathVariable Long id) {
@@ -123,6 +141,13 @@ public class PhotoControllerMF {
 
     }
 
+/**
+     * Modifie la photo de profil existante d'un salarié.
+     *
+     * @param file  Le nouveau fichier image.
+     * @param email L'adresse e-mail du salarié.
+     * @return une réponse HTTP indiquant le résultat de la modification.
+     */
     @PutMapping("/Modifier")
     public ResponseEntity<String> modifyProfileImage(
             @RequestParam("file") MultipartFile file,

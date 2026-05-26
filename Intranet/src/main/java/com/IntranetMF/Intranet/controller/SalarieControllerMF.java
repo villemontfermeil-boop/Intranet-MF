@@ -37,6 +37,12 @@ import jakarta.transaction.Transactional;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 
+/**
+ * Controller REST pour gérer les salariés.
+ *
+ * Fournit les endpoints pour récupérer, rechercher, modifier,
+ * créer, synchroniser et déconnecter des salariés.
+ */
 @RestController
 @RequestMapping("/salaries")
 public class SalarieControllerMF {
@@ -57,6 +63,14 @@ public class SalarieControllerMF {
         this.oganigrameMF = oganigrameMF;
     }
 
+    /**
+     * Renvoie le salarié correspondant à l'identifiant fourni.
+     *
+     * @param jwt Le jeton JWT de l'utilisateur authentifié.
+     * @param id  L'identifiant du salarié recherché.
+     * @return le salarié trouvé.
+     * @throws RuntimeException si le compte JWT n'existe pas ou si le salarié n'est pas trouvé.
+     */
     @GetMapping("/{id}")
     public SalarieMF getMethodName(@AuthenticationPrincipal Jwt jwt, @PathVariable Long id) {
 
@@ -80,6 +94,14 @@ public class SalarieControllerMF {
 
     }
 
+    /**
+     * Renvoie un salarié à partir de son adresse e-mail.
+     *
+     * @param jwt   Le jeton JWT de l'utilisateur authentifié.
+     * @param email L'adresse e-mail du salarié à récupérer.
+     * @return le salarié trouvé.
+     * @throws RuntimeException si le compte JWT n'existe pas ou si le salarié n'est pas trouvé.
+     */
     @GetMapping("/email/{email}")
     public SalarieMF getEmail(@AuthenticationPrincipal Jwt jwt, @PathVariable String email) {
         Optional<SalarieMF> unSalarie = salarieControllerMF.findByMail(email);
@@ -103,12 +125,25 @@ public class SalarieControllerMF {
         }
     }
 
+    /**
+     * Vérifie les rôles de l'utilisateur authentifié.
+     *
+     * @param auth Le contexte d'authentification Spring Security.
+     * @return les autorités du principal.
+     */
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/test-role")
     public Object test(Authentication auth) {
         return auth.getAuthorities();
     }
 
+    /**
+     * Renvoie la liste de tous les salariés.
+     *
+     * @param jwt Le jeton JWT de l'utilisateur authentifié.
+     * @return tous les salariés enregistrés dans la base de données.
+     * @throws RuntimeException si le compte JWT n'existe pas.
+     */
     @GetMapping("/")
     public Iterable<SalarieMF> getAllSalaries(@AuthenticationPrincipal Jwt jwt) {
 
@@ -125,6 +160,14 @@ public class SalarieControllerMF {
         return salarieControllerMF.findAll();
     }
 
+    /**
+     * Recherche des salariés par nom ou prénom.
+     *
+     * @param jwt Le jeton JWT de l'utilisateur authentifié.
+     * @param nom Le terme de recherche (nom, prénom ou combinaison).
+     * @return la liste des salariés correspondant à la recherche.
+     * @throws RuntimeException si le compte JWT n'existe pas.
+     */
     @GetMapping("/Salarie/{nom}")
     public List<SalarieMF> findSalarierbymail(@AuthenticationPrincipal Jwt jwt, @PathVariable String nom) {
 
@@ -160,6 +203,14 @@ public class SalarieControllerMF {
         }
     }
 
+    /**
+     * Renvoie les salariés d'un organigramme donné.
+     *
+     * @param jwt Le jeton JWT de l'utilisateur authentifié.
+     * @param id  L'identifiant de l'organigramme.
+     * @return la liste des salariés appartenant à cet organigramme.
+     * @throws RuntimeException si le compte JWT n'existe pas ou si l'organigramme n'est pas trouvé.
+     */
     @GetMapping("/organigramme/{id}")
     public List<SalarieMF> getOrganigrammeById(@AuthenticationPrincipal Jwt jwt, @PathVariable Long id) {
         Optional<OganigrameMF> OG = oganigrameMF.findById(id);
@@ -183,6 +234,21 @@ public class SalarieControllerMF {
 
     }
 
+    /**
+     * Modifie un salarié existant.
+     *
+     * @param jwt          Le jeton JWT de l'utilisateur authentifié.
+     * @param id           L'identifiant du salarié à modifier.
+     * @param nom          Le nouveau nom.
+     * @param prenom       Le nouveau prénom.
+     * @param mail         La nouvelle adresse e-mail.
+     * @param numero       Le nouveau numéro de téléphone personnel.
+     * @param numeroPro    Le nouveau numéro de téléphone professionnel.
+     * @param fonction     La nouvelle fonction du salarié.
+     * @param localisation La nouvelle localisation.
+     * @return le salarié mis à jour.
+     * @throws RuntimeException si le compte JWT n'existe pas ou si le salarié n'est pas trouvé.
+     */
     @PreAuthorize("hasRole('ADMIN')")
     @PatchMapping("/Modification/Salarie/{id}")
     public SalarieMF ModifyASalarier(
@@ -232,6 +298,20 @@ public class SalarieControllerMF {
         }
     }
 
+    /**
+     * Crée un nouveau salarié.
+     *
+     * @param jwt          Le jeton JWT de l'utilisateur authentifié.
+     * @param nom          Le nom du salarié.
+     * @param prenom       Le prénom du salarié.
+     * @param mail         L'adresse e-mail du salarié.
+     * @param numero       Le numéro de téléphone personnel du salarié.
+     * @param numeroPro    Le numéro de téléphone professionnel du salarié.
+     * @param fonction     La fonction du salarié.
+     * @param localisation La localisation du salarié.
+     * @return le salarié nouvellement créé.
+     * @throws RuntimeException si le compte JWT n'existe pas.
+     */
     @Transactional
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/NewSalarie")
@@ -282,6 +362,12 @@ public class SalarieControllerMF {
         return salarieControllerMF.save(newSalarie);
     }
 
+    /**
+     * Synchronise un utilisateur externe avec la base de données interne.
+     *
+     * @param userData Les données utilisateur reçues (email, nom, prénom, etc.).
+     * @return le salarié synchronisé (créé ou mis à jour).
+     */
     @PostMapping("/sync")
     public SalarieMF syncUser(@RequestBody Map<String, String> userData) {
         String email = userData.get("email");
@@ -316,6 +402,13 @@ public class SalarieControllerMF {
         return salarieControllerMF.save(newUser);
     }
 
+    /**
+     * Déconnecte un salarié en passant son statut isConnected à false.
+     *
+     * @param email L'email du salarié à déconnecter.
+     * @return le salarié mis à jour après déconnexion.
+     * @throws RuntimeException si l'email est manquant ou si le salarié n'est pas trouvé.
+     */
     @PostMapping("/logout")
     @Transactional
     public SalarieMF logoutSalarie(@RequestParam String email) {

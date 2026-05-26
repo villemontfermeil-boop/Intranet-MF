@@ -283,7 +283,7 @@ function Header({ nom }: { nom: string | null }) {
                                     Transport
                                 </button>
                                 <button type="button" className='MenuButton' onClick={() => router.push('/Annuaire/Organisme/info-des-services')}>
-                                    Info des services
+                                    information des services
                                 </button>
 
                                 {sessionStorage.length > 0 && sessionStorage.getItem('fonction') == "COMMUNICATION" && <button type="button" className='MenuButton' onClick={() => router.push("/Nouveau/Article")}>
