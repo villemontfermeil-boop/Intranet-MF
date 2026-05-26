@@ -45,7 +45,7 @@ public class PhotoControllerMF {
     }
 
     @PostMapping("/Nouveaux")
-    // @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<String> newPhoto(@RequestParam("file") MultipartFile file, @RequestParam String mail) {
         if (!file.getContentType().startsWith("image/")) {
             return ResponseEntity.badRequest().body("Fichier invalide");

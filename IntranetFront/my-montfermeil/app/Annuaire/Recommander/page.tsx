@@ -167,7 +167,7 @@ function pageRecommander() {
 
     return (
         <div >
-            <h1 style={{ textAlign: "center", left: "20px" }}><u>Recommander</u></h1>
+            <h1 style={{ textAlign: "center", left: "20px" }}><u>Recommandé</u></h1>
             <button style={{ width: "100%" }} onClick={() => cacher == false ? setCacher(true) : setCacher(false)}>Ajouter un recommander</button>
 
             <div className="table-container" hidden={cacher}>
@@ -191,7 +191,7 @@ function pageRecommander() {
                                 Date
                             </th>
                             <th>
-                                n° de recommander
+                                n° de recommandé
                             </th>
                             <th>
                                 Services
@@ -229,7 +229,7 @@ function pageRecommander() {
                                 Date
                             </th>
                             <th>
-                                n° de recommander
+                                n° de recommandé
                             </th>
                             <th>
                                 Services
