@@ -127,7 +127,7 @@ function Moi() {
     try {
       setUploading(true);
       const tokenValue = getSessionItemOrEmpty("token");
-      const response = await fetch("api/Montfermeil/users/Photo/NewPhoto", {
+      const response = await fetch("/api/Montfermeil/users/Photo/NewPhoto", {
         method: "PUT",
         headers: {
           Authorization: `Bearer ${tokenValue}`,

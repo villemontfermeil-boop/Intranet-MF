@@ -136,20 +136,20 @@ function ModifierSalarie() {
 
                                             <td data-label="Téléphone">
                                                 {p.numero
-                                                    ? <a href={`tel:${p.numero}`}>{p.numero}</a>
+                                                    ? <a style={{color: "blue"}} href={`tel:${p.numero}`}><u>{p.numero}</u></a>
                                                     : "Aucun"}
                                             </td>
 
                                             {/* 🔥 téléphone pro remis */}
                                             <td data-label="Tél. Pro">
                                                 {p.telephonepro
-                                                    ? <a href={`tel:${p.telephonepro}`}>{p.telephonepro}</a>
+                                                    ? <a style={{color: "blue"}} href={`tel:${p.telephonepro}`}><u>{p.telephonepro} </u></a>
                                                     : "Aucun"}
                                             </td>
 
                                             <td data-label="Email">
                                                 {p.mail
-                                                    ? <a href={`mailto:${p.mail}`}>{p.mail}</a>
+                                                    ? <a style={{color: "blue"}} href={`mailto:${p.mail}`}><u>{p.mail} </u></a>
                                                     : "Aucun"}
                                             </td>
 
@@ -159,9 +159,9 @@ function ModifierSalarie() {
 
                                             <td data-label="Localisation">
                                                 {p.organigramme ? (
-                                                    <a href={`/Annuaire/Organisme/${p.organigramme.id}`}>
+                                                    <u><a style={{color:"blue"}} href={`/Annuaire/Organisme/${p.organigramme.id}`}>
                                                         {p.organigramme.label}
-                                                    </a>
+                                                    </a></u>
                                                 ) : "N/A"}
                                             </td>
 

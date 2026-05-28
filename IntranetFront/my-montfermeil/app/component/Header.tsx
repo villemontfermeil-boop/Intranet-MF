@@ -3,7 +3,6 @@ import { useState, useEffect } from 'react';
 import './stylheader.css';
 import { useRouter } from 'next/navigation';
 import Keycloak from 'keycloak-js';
-import { getSessionBoolean, getSessionItemOrEmpty, isBrowser } from '@/app/utils/sessionStorage';
 
 function Header({ nom }: { nom: string | null }) {
     const [clientConnected, setClientConnected] = useState(false);
@@ -14,8 +13,6 @@ function Header({ nom }: { nom: string | null }) {
     const [data, setdata] = useState<any>();
     const [kc, setKc] = useState<Keycloak.KeycloakInstance | null>(null);
     // const [connexion , setConnexion ] = useState<boolean>(false)
-
-
 
 
 
@@ -76,7 +73,7 @@ function Header({ nom }: { nom: string | null }) {
         if (typeof window === "undefined") return;
 
         const keycloak = new Keycloak({
-            url: "http://localhost:8081",
+            url: "https://192.168.56.11:8081",
             realm: "intranet-montfermeil",
             clientId: "intranet-app",
         });
@@ -284,10 +281,10 @@ function Header({ nom }: { nom: string | null }) {
                                     information des services
                                 </button>
 
-                                                {getSessionBoolean('isConnected') && getSessionItemOrEmpty('fonction') === "COMMUNICATION" && <button type="button" className='MenuButton' onClick={() => router.push("/Nouveau/Article")}>
+                                {sessionStorage.length > 0 && sessionStorage.getItem('fonction') == "COMMUNICATION" && <button type="button" className='MenuButton' onClick={() => router.push("/Nouveau/Article")}>
                                     Nouvel article
                                 </button>}
-                                {getSessionBoolean('isConnected') && getSessionItemOrEmpty('fonction') === "COURRIER" && <button type="button" className='MenuButton' onClick={() => router.push("/Annuaire/Recommander")}>
+                                {sessionStorage.length > 0 && sessionStorage.getItem('fonction') == "COURRIER" && <button type="button" className='MenuButton' onClick={() => router.push("/Annuaire/Recommander")}>
                                     Recommander
                                 </button>}
 
