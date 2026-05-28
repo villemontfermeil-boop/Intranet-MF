@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import "./style.css";
 import { getSessionItemOrEmpty } from "@/app/utils/sessionStorage";
 
 
@@ -137,73 +138,71 @@ function infoDesServices() {
 
 
     return (
-        <div
-            style={{
-                maxHeight: "400px",
-                overflowY: "auto",
-                border: "1px solid #ccc",
-                borderRadius: "10px",
-                width: "300px",
-                margin: "auto",
-                marginTop: "5%"
+        <div className="organisme-page">
+            <section className="organisme-panel">
+                <div className="organisme-header">
+                    <div>
+                        <h2>Organismes & services</h2>
+                        <p>Consultez les organismes disponibles et importez un document.</p>
+                    </div>
+                    <button
+                        className="toggle-btn"
+                        onClick={() => setHider(!hider)}
+                    >
+                        {hider ? "Masquer le formulaire" : "Ajouter un document"}
+                    </button>
+                </div>
 
-            }}
-        >
-
-            <table
-                className="table-salaries"
-                style={{
-                    textAlign: "center",
-                    width: "100%",
-                    borderCollapse: "collapse",
-                }}
-            >
-
-
-                <tbody hidden={hider == false ? false : true}>
-                    {Array.isArray(organisme) &&
-                        organisme.map((value, index) => (
-                            <tr key={index}>
-                                <td
-                                    style={{
-                                        padding: "8px",
-                                        borderBottom: "1px solid #eee"
-                                    }}
-                                >
-                                    <p
-                                        style={{
-                                            cursor: "pointer",
-                                            color: "blue",
-                                            margin: 0
+                <div className="table-wrapper">
+                    <table className="table-salaries">
+                        <tbody hidden={!hider}>
+                            <tr>
+                                <td>
+                                    <input
+                                        type="file"
+                                        className="file-input"
+                                        onChange={(e) => {
+                                            const file = e.target.files;
+                                            if (file && file.length > 0) {
+                                                setFileName(file[0].name);
+                                                setFile(file[0]);
+                                            } else {
+                                                setFile(null);
+                                            }
                                         }}
-                                        onClick={() =>
-                                            routeur.push(`/Annuaire/Organisme/info-des-services/${value.id}`)
-                                        }
-                                    >
-                                        {value.label}
-                                    </p>
+                                    />
                                 </td>
                             </tr>
+                            <tr>
+                                <td>
+                                    <button
+                                        className="submit-btn"
+                                        type="submit"
+                                        onClick={() => setOrganisme()}
+                                    >
+                                        Envoyer
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
 
-                        ))}
-                </tbody>
-
-                <tbody hidden={!hider ? true : false}>
-                    <tr>
-                        <td>
-                            <input type="file" onChange={(e) => { const file = e.target.files; if (file && file.length > 0) { setFileName(file[0].name), setFile(file[0]) } else { setFile(null) } }} />
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <button type="submit" onClick={() => setOrganisme()}>Emvoyer</button>
-                        </td>
-                    </tr>
-                </tbody>
-
-            </table>
-            <button style={{width: "100%"}} onClick={() => hider == false ? setHider(true) : setHider(false)}>Ajouter un document</button>
-
+                        <tbody hidden={hider}>
+                            {Array.isArray(organisme) && organisme.map((value, index) => (
+                                <tr key={index}>
+                                    <td>
+                                        <button
+                                            className="organisme-link"
+                                            onClick={() => routeur.push(`/Annuaire/Organisme/info-des-services/${value.id}`)}
+                                        >
+                                            {value.label}
+                                        </button>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
         </div>
     );
 
