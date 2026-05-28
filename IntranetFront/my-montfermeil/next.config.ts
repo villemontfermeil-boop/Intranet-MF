@@ -11,7 +11,7 @@ const nextConfig = {
       "default-src 'self'",
 
       // 🔥 IMPORTANT Keycloak + API + WebSocket
-      "connect-src 'self' http: https: ws: wss: http://localhost:* ws://localhost:* http://192.168.56.11:8080 http://keycloak.montfermeil.local:8081 https://prim.iledefrance-mobilites.fr",
+      "connect-src 'self' http: https: ws: wss: http://localhost:* ws://localhost:* https://prim.iledefrance-mobilites.fr",
 
       // ⚠️ Next.js nécessite unsafe-inline
       "script-src 'self' 'unsafe-inline' 'unsafe-eval'",

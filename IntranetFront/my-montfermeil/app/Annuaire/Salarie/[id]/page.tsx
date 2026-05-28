@@ -133,82 +133,79 @@ function SalariePage() {
     }
 
     return (
-        <div>
-            <div style={{ placeItems: "center" }}>
+        <main className="profile-page">
+            <section className="profile-header">
                 <h1>
                     <u>
-                        {salarie.nom}
-                        {"   "}
-                        {salarie.prenom}
+                        {salarie.nom} {salarie.prenom}
                     </u>
                 </h1>
+            </section>
 
-                <div className="PhotoCLass">
-                    <img src="/cadre.png" className="Conteneur" alt="cadre" />
+            <div className="profile-layout">
+                <aside className="photo-card">
+                    <img src="/cadre.png" className="profile-frame" alt="cadre" />
+                    {image.status !== 500 ? (
+                        <img src={profileImage} className="profile-avatar" alt="photo profil" />
+                    ) : (
+                        <img className="profile-avatar" src="/cerclePhoto.png" alt="photo par défaut" />
+                    )}
+                </aside>
 
-                    {image.status !== 500
-                        ? <img src={profileImage} className="PP" alt="photo profil" />
-                        : <img className="PP" src="/cerclePhoto.png" alt="photo par défaut" />
-                    }
-                </div>
-
-                <table border={1} className="tableau" style={{ textAlign: "center", marginRight: "50px" }}>
-                    <thead>
-                        <tr>
-                            <th style={{ paddingRight: "50%" }}>
-                                Service:
-                            </th>
-                            <td>
-                                {salarie.fonction}
-                            </td>
-                        </tr>
-                        <tr>
-                            <th style={{ paddingRight: "50%" }}>
-                                Localisation:
-                            </th>
-                            <td>
-                                <a href={`/Annuaire/Organisme/${salarie.organigramme.id}`}>{salarie.organigramme.label}</a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th style={{ paddingRight: "50%" }}>
-                                Numero:
-                            </th>
-                            <td>
-                                <a href={"tel:" + salarie.numero}>{salarie.numero} </a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th style={{ paddingRight: "50%" }}>
-                                Téléphone pro:
-                            </th>
-                            <td>
-                                <a href={"tel:" + salarie.telephonepro || 'NON_DÉFINI'}>{salarie.telephonepro || 'NON_DÉFINI'}</a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th style={{ paddingRight: "50%" }}>
-                                Email:
-                            </th>
-                            <td>
-                                <a href={`mailto:${salarie.mail}`}> {salarie.mail}</a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th style={{ paddingRight: "0%" }}>
-                                Statut sur le site :
-                            </th>
-                            <td>
-                                {salarie.isConnected ?
-                                    <img src="/checkbox.png" style={{ width: "10%" }} alt="connecté" /> :
-                                    <img src="/cross.png" style={{ width: "10%" }} alt="déconnecté" />
-                                }
-                            </td>
-                        </tr>
-                    </thead>
-                </table>
+                <section className="profile-card">
+                    <table className="profile-table">
+                        <tbody>
+                            <tr>
+                                <th>Service :</th>
+                                <td>{salarie.fonction}</td>
+                            </tr>
+                            <tr>
+                                <th>Localisation :</th>
+                                <td>
+                                    <a className="profile-link" href={`/Annuaire/Organisme/${salarie.organigramme?.id}`}>
+                                        {salarie.organigramme?.label || 'Non défini'}
+                                    </a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Numéro :</th>
+                                <td>
+                                    <a className="profile-link" href={`tel:${salarie.numero}`}>
+                                        {salarie.numero || 'NON_DÉFINI'}
+                                    </a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Téléphone pro :</th>
+                                <td>
+                                    <a className="profile-link" href={`tel:${salarie.telephonepro || ''}`}>
+                                        {salarie.telephonepro || 'NON_DÉFINI'}
+                                    </a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Email :</th>
+                                <td>
+                                    <a className="profile-link" href={`mailto:${salarie.mail}`}>
+                                        {salarie.mail || 'Non défini'}
+                                    </a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Statut :</th>
+                                <td>
+                                    {salarie.isConnected ? (
+                                        <img src="/checkbox.png" className="profile-status-icon" alt="connecté" />
+                                    ) : (
+                                        <img src="/cross.png" className="profile-status-icon" alt="déconnecté" />
+                                    )}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </section>
             </div>
-        </div>
+        </main>
     );
 }
 
