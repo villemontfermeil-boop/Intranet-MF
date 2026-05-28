@@ -26,7 +26,7 @@ const routeur = useRouter();
 
     return (
         <div>
-            {data.oublie && <button onClick={() => routeur.push("/Nouveau/MotsDePasse")}> Changer le mots de passe</button> }
+            {data.oublie && <button onClick={() => routeur.push("/Nouveau/MotsDePasse")}> Changer le mot de passe</button> }
         </div>  
 
     );

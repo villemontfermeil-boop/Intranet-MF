@@ -205,7 +205,7 @@ function SalarieModification() {
         <div style={{ placeItems: "center" }}>
             <h1>Voici l'id : {id} </h1>
             <div style={{ placeItems: "center" }}>
-                <button hidden={isInPasswordMode} onClick={() => SetPasswordMode(true)}>Modifier le mots de passe</button>
+                <button hidden={isInPasswordMode} onClick={() => SetPasswordMode(true)}>Modifier le mot de passe</button>
                 <button hidden={show} onClick={() => SetPasswordMode(false)}>Modifier le salarié</button>
 
             </div>
@@ -440,7 +440,7 @@ function SalarieModification() {
                     <thead>
                         <tr>
                             <th>
-                                Nouveaux mots de passe:
+                                Nouveau mot de passe:
                             </th>
                             <td>
                                 <input style={{ width: "95%" }} onChange={handlechangePassword} type="password" name="mdp" id="" />
@@ -453,7 +453,7 @@ function SalarieModification() {
                         </tr>
                     </thead>
                 </table>
-                <div hidden={echouay}><h4 style={{ color: "red", textAlign: "center" }}><u>Faites en sorte que le mots de passe soit avec : 1 Majuscule, 1 Minuscule, 1 Charactère spéciale, 1 Nombre/Chiffre et que le mot de passe soit superieur à 8 </u></h4></div>
+                <div hidden={echouay}><h4 style={{ color: "red", textAlign: "center" }}><u>Veillez à ce que le mot de passe contienne : 1 lettre majuscule, 1 lettre minuscule, 1 caractère spécial, 1 chiffre, et qu'il comporte plus de 8 caractères.</u></h4></div>
 
             </div>
 

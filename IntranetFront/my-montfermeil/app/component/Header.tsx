@@ -257,7 +257,7 @@ function Header({ nom }: { nom: string | null }) {
                     </button>
 
                     <div className={`menu-container ${menu ? "open" : ""}`}>
-                        {/* <a href='/Nouveau/MotsDePasse' onMouseEnter={() => SetEntrer(true)} onMouseLeave={() => SetEntrer(false)} style={Entrer ? { color: "lightblue" } : {}}> Mots de passe oublié ? </a> */}
+                        {/* <a href='/Nouveau/MotsDePasse' onMouseEnter={() => SetEntrer(true)} onMouseLeave={() => SetEntrer(false)} style={Entrer ? { color: "lightblue" } : {}}> Mot de passe oublié ? </a> */}
 
                         <button type="button" className='MenuButton' onClick={() => router.push('/Application')}>
                             Application
@@ -278,7 +278,7 @@ function Header({ nom }: { nom: string | null }) {
                                     Transport
                                 </button>
                                 <button type="button" className='MenuButton' onClick={() => router.push('/Annuaire/Organisme/info-des-services')}>
-                                    information des services
+                                    Informations des services
                                 </button>
 
                                 {sessionStorage.length > 0 && sessionStorage.getItem('fonction') == "COMMUNICATION" && <button type="button" className='MenuButton' onClick={() => router.push("/Nouveau/Article")}>
