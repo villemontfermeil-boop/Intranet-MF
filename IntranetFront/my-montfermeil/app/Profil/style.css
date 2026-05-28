@@ -20,6 +20,7 @@
     grid-template-columns: minmax(260px, 340px) 1fr;
     gap: 2rem;
     align-items: start;
+    
 }
 
 .photo-card {
@@ -29,7 +30,6 @@
     border-radius: 28px;
     padding: 1.5rem;
     box-shadow: 0 18px 44px rgba(15, 23, 42, 0.08);
-    height: 435px;
 }
 
 .profile-frame {
