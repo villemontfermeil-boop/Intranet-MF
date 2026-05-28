@@ -152,16 +152,15 @@ function infoDesServices() {
                             fichier.map((value, index) => (
                                 <tr key={index}>
                                     <td >
-                                        <p
+                                        <a
                                             style={{
                                                 cursor: "pointer",
                                                 color: "blue",
                                                 margin: 0
                                             }}
-                                            onClick={() =>
-                                                routeur.push(`${api.api}/${value.path}`)
-                                            }
-                                        >{value.nom}</p>
+                                            href={`${api.api}/${value.path}`}
+                                            target="blank"
+                                        >{value.nom}</a>
                                     </td>
                                     {id == sessionStorage.getItem("organisme") && 
                                     <td><button onClick={()=> deleteFichier(value.id)}><img width={30} src="/delete.png" alt="supprimer" /></button></td>}

@@ -9,7 +9,7 @@ const nextConfig = {
     const csp = isDev
       ? [
         "default-src 'self'",
-        "connect-src 'self' http://localhost:* ws://localhost:*",
+        "connect-src 'self' http://localhost:* ws://localhost:* https://prim.iledefrance-mobilites.fr",
         "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
         "style-src 'self' 'unsafe-inline'",
 
@@ -25,7 +25,7 @@ const nextConfig = {
       ].join("; ")
       : [
         "default-src 'self'",
-        `connect-src 'self' ${backendUrl}`,
+        `connect-src 'self' ${backendUrl} https://prim.iledefrance-mobilites.fr`,
         "script-src 'self'",
         "style-src 'self'",
 

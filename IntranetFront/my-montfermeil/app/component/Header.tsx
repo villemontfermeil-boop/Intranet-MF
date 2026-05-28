@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import './stylheader.css';
 import { useRouter } from 'next/navigation';
 import Keycloak from 'keycloak-js';
+import { getSessionBoolean, getSessionItemOrEmpty, isBrowser } from '@/app/utils/sessionStorage';
 
 function Header({ nom }: { nom: string | null }) {
     const [clientConnected, setClientConnected] = useState(false);
@@ -283,10 +284,10 @@ function Header({ nom }: { nom: string | null }) {
                                     information des services
                                 </button>
 
-                                {sessionStorage.length > 0 && sessionStorage.getItem('fonction') == "COMMUNICATION" && <button type="button" className='MenuButton' onClick={() => router.push("/Nouveau/Article")}>
+                                                {getSessionBoolean('isConnected') && getSessionItemOrEmpty('fonction') === "COMMUNICATION" && <button type="button" className='MenuButton' onClick={() => router.push("/Nouveau/Article")}>
                                     Nouvel article
                                 </button>}
-                                {sessionStorage.length > 0 && sessionStorage.getItem('fonction') == "COURRIER" && <button type="button" className='MenuButton' onClick={() => router.push("/Annuaire/Recommander")}>
+                                {getSessionBoolean('isConnected') && getSessionItemOrEmpty('fonction') === "COURRIER" && <button type="button" className='MenuButton' onClick={() => router.push("/Annuaire/Recommander")}>
                                     Recommander
                                 </button>}
 
