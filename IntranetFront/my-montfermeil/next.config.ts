@@ -1,45 +1,36 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   poweredByHeader: false,
+  allowedDevOrigins: ['192.168.56.11'],
 
   async headers() {
     const isDev = process.env.NODE_ENV === "development";
-    const backendUrl = "http://localhost:8080";
+    const backendUrl = "http://192.168.56.11:8080";
 
-    const csp = isDev
-      ? [
-        "default-src 'self'",
-        "connect-src 'self' http://localhost:* ws://localhost:* https://prim.iledefrance-mobilites.fr",
-        "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
-        "style-src 'self' 'unsafe-inline'",
+    const csp = [
+      "default-src 'self'",
 
-        "img-src 'self' data: blob: http://localhost:8080 https:",
-        "media-src 'self' blob: http://localhost:8080 https:",
+      // 🔥 IMPORTANT Keycloak + API + WebSocket
+      "connect-src 'self' http: https: ws: wss: http://localhost:* ws://localhost:* http://192.168.56.11:8080 http://keycloak.montfermeil.local:8081 https://prim.iledefrance-mobilites.fr",
 
-        "font-src 'self'",
-        "object-src 'none'",
-        "base-uri 'self'",
-        "form-action 'self'",
-        "frame-ancestors 'self'",
-        "block-all-mixed-content"
-      ].join("; ")
-      : [
-        "default-src 'self'",
-        `connect-src 'self' ${backendUrl} https://prim.iledefrance-mobilites.fr`,
-        "script-src 'self'",
-        "style-src 'self'",
+      // ⚠️ Next.js nécessite unsafe-inline
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
 
-        "img-src 'self' data: blob: https:",
-        "media-src 'self' blob: https:",
+      "style-src 'self' 'unsafe-inline'",
 
-        "font-src 'self'",
-        "object-src 'none'",
-        "base-uri 'self'",
-        "form-action 'self'",
-        "frame-ancestors 'self'",
-        "block-all-mixed-content",
-        "upgrade-insecure-requests"
-      ].join("; ");
+      // 🔥 images backend + blob upload + keycloak
+      "img-src 'self' data: blob: http: https:",
+
+      // 🔥 vidéos / fichiers upload
+      "media-src 'self' blob: http: https:",
+
+      "font-src 'self' data:",
+
+      "object-src 'none'",
+      "base-uri 'self'",
+      "form-action 'self'",
+      "frame-ancestors 'self'"
+    ].join("; ");
 
     return [
       {
@@ -48,15 +39,7 @@ const nextConfig = {
           { key: "Content-Security-Policy", value: csp },
           { key: "X-Frame-Options", value: "SAMEORIGIN" },
           { key: "X-Content-Type-Options", value: "nosniff" },
-          { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
-          ...(isDev
-            ? []
-            : [
-              {
-                key: "Strict-Transport-Security",
-                value: "max-age=31536000; includeSubDomains"
-              }
-            ])
+          { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" }
         ]
       }
     ];
@@ -64,4 +47,5 @@ const nextConfig = {
 };
 
 module.exports = nextConfig;
+
 

@@ -42,6 +42,22 @@ function PageTransport() {
     const [cle, setCle] = useState<any>({});
     const [loading, setLoading] = useState<boolean>(false)
 
+    const buttonClasses: Record<string, string> = {
+        T4: 'btn-t4',
+        1: 'btn-bus1',
+        5: 'btn-bus5',
+        146: 'btn-bus146',
+        602: 'btn-bus602',
+        603: 'btn-bus603',
+        604: 'btn-bus604',
+        605: 'btn-bus605',
+        613: 'btn-bus613',
+        643: 'btn-bus643',
+        T1: 'btn-t1',
+        E: 'btn-rer-e',
+        B: 'btn-rer-b',
+    };
+
     async function getKey() {
 
         try {
@@ -150,21 +166,24 @@ function PageTransport() {
     return (
         <div>
             <h3 style={{ textAlign: "center" }}><u >Choisissez le transport qui vous intéresse</u></h3>
-            <div style={{ alignItems: "center", display: "flex", justifyContent: "center", gap: "20px", fontFamily: '"Brown Pro", sans-serif' }}>
-                <button onClick={() => setChoix(Transport.T4)}><img style={{ width: '50px', height: "50px" }} src={"/t4.png"} /></button>
-                <button onClick={() => setChoix(Transport[1])}><img style={{ width: '50px', height: "50px" }} src={"/bus-1.png"} /></button>
-                <button onClick={() => setChoix(Transport[5])}>5</button>
-                <button onClick={() => setChoix(Transport[146])}>146</button>
-                <button onClick={() => setChoix(Transport[602])}>602</button>
-                <button onClick={() => setChoix(Transport[603])}>603</button>
-                <button onClick={() => setChoix(Transport[604])}>604</button>
-                <button onClick={() => setChoix(Transport[605])}>605</button>
-                <button onClick={() => setChoix(Transport[613])}>613</button>
-                <button onClick={() => setChoix(Transport[643])}>643</button>
-                <button onClick={() => setChoix(Transport.T1)}>T1</button>
-                <button onClick={() => setChoix(Transport.E)}>RER E</button>
-                <button onClick={() => setChoix(Transport.B)}>RER B</button>
-
+            <div className="transport-grid">
+                <button className={`transport-btn ${buttonClasses.T4}`} onClick={() => setChoix(Transport.T4)}>
+                    <img className="transport-icon" style={{ width: '50px', height: '50px' }} src="/t4.png" alt="T4" />
+                </button>
+                <button className={`transport-btn ${buttonClasses[1]}`} onClick={() => setChoix(Transport[1])}>
+                    <img className="transport-icon" style={{ width: '50px', height: '50px' }} src="/bus-1.png" alt="Bus 1" />
+                </button>
+                <button className={`transport-btn ${buttonClasses[5]}`} onClick={() => setChoix(Transport[5])}>5</button>
+                <button className={`transport-btn ${buttonClasses[146]}`} onClick={() => setChoix(Transport[146])}>146</button>
+                <button className={`transport-btn ${buttonClasses[602]}`} onClick={() => setChoix(Transport[602])}>602</button>
+                <button className={`transport-btn ${buttonClasses[603]}`} onClick={() => setChoix(Transport[603])}>603</button>
+                <button className={`transport-btn ${buttonClasses[604]}`} onClick={() => setChoix(Transport[604])}>604</button>
+                <button className={`transport-btn ${buttonClasses[605]}`} onClick={() => setChoix(Transport[605])}>605</button>
+                <button className={`transport-btn ${buttonClasses[613]}`} onClick={() => setChoix(Transport[613])}>613</button>
+                <button className={`transport-btn ${buttonClasses[643]}`} onClick={() => setChoix(Transport[643])}>643</button>
+                <button className={`transport-btn ${buttonClasses.T1}`} onClick={() => setChoix(Transport.T1)}>T1</button>
+                <button className={`transport-btn ${buttonClasses.E}`} onClick={() => setChoix(Transport.E)}>RER E</button>
+                <button className={`transport-btn ${buttonClasses.B}`} onClick={() => setChoix(Transport.B)}>RER B</button>
             </div>
             {messages.length === 0 ? (
                 <h1 style={{ textAlign: "center" }}>Aucune perturbation</h1>

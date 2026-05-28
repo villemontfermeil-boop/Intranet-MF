@@ -10,13 +10,12 @@ export async function GET(request: Request) {
 
   }
   try {
-    console.log(process.env.BACKEND_API)
+    const backendApi = process.env.BACKEND_NEW_API;
+    console.log('BACKEND_API ->', backendApi);
 
-    return NextResponse.json({ "api": process.env.BACKEND_API }, { status: 201 })
-
+    return NextResponse.json({ api: backendApi }, { status: 200 });
   } catch (ex) {
-    return NextResponse.json({ "érreur": ex }, { status: 201 })
-
+    return NextResponse.json({ erreur: ex }, { status: 500 });
   }
 
 

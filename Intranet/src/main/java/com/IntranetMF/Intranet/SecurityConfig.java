@@ -133,7 +133,7 @@ public class SecurityConfig {
         config.setAllowedOrigins(List.of("http://localhost:3000", "http://127.0.0.1:3000",
                 "http://localhost:3001",
                 "http://localhost",
-                "https://keycloak.montfermeil.local:3000"));
+                "https://keycloak.montfermeil.local:3000", "https://192.168.56.11:3000"));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);

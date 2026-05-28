@@ -21,10 +21,11 @@ const backendUrl = process.env.BACKEND_API;
         const credential = btoa(`${login}:${password}`);
 
         try{
-            const reponse = await fetch(`${backendUrl}uploads/Photos/${image}`, {
+            const backendApi = backendUrl?.endsWith('/') ? backendUrl : `${backendUrl}/`;
+            const reponse = await fetch(`${backendApi}uploads/Photos/${image}`, {
                 headers:{
-                    "Authorization" : `Basic ${credential}` 
-                } 
+                    Authorization: `Basic ${credential}`
+                }
             })
             const json = await reponse.json();
             console.log(json);
