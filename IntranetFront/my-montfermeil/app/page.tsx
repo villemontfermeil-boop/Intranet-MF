@@ -252,7 +252,7 @@ function HomePage() {
                   )}
                 </span>
               </div>
-              <p className="article-text">{value.description}</p>
+              <p className="article-text" style={{textAlign: "center"}}>{value.description}</p>
 
               {value.mediaName && isVideo(value.mediaName) && (
                 <video controls className="media">

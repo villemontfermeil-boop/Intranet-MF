@@ -175,19 +175,19 @@ function getOrganisme() {
                                 </td>
 
                                 <td>
-                                    <a href={`/Annuaire/Salarie/${user.id}`}>
+                                    <a style={{color: "blue"}} href={`/Annuaire/Salarie/${user.id}`}>
                                         {user.prenom} {user.nom}
                                     </a>
                                 </td>
 
                                 <td>
-                                    <a href={`mailto:${user.mail}`}>
+                                    <a style={{color: "blue"}} href={`mailto:${user.mail}`}>
                                         {user.mail}
                                     </a>
                                 </td>
 
                                 <td>
-                                    <a href={`tel:${user.telephonepro}`}>
+                                    <a style={{color: "blue"}} href={`tel:${user.telephonepro}`}>
                                         {user.telephonepro}
                                     </a>
                                 </td>
