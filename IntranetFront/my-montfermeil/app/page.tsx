@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import "@/app/home.css";
+import { getSessionBoolean, getSessionItemOrEmpty } from "@/app/utils/sessionStorage";
 
 function HomePage() {
     const [data, setData] = useState<any[]>([]);
@@ -35,7 +36,7 @@ function HomePage() {
 
             const response = await fetch("/api/Montfermeil/articles/", {
                 headers: {
-                    'Authorization': `Bearer ${sessionStorage.getItem('token')}`
+                    'Authorization': `Bearer ${getSessionItemOrEmpty('token')}`
                 }
             });
 
@@ -78,10 +79,10 @@ function HomePage() {
 
     async function deleteArticle(Articleid: string) {
         setLoading(true)
-        const nom = sessionStorage.getItem("nom") || '';
-        const prenom = sessionStorage.getItem("prenom") || '';
+        const nom = getSessionItemOrEmpty("nom");
+        const prenom = getSessionItemOrEmpty("prenom");
         const body = new URLSearchParams({ nom, Prenom: prenom });
-        const token = sessionStorage.getItem("token")
+        const token = getSessionItemOrEmpty("token");
         console.log("nom", nom)
         console.log("id", Articleid)
         try {
@@ -295,7 +296,7 @@ function HomePage() {
 
                                             }
                     }>
-                        {sessionStorage.getItem("isConnected") == "true" && sessionStorage.getItem("fonction") == "COMMUNICATION" ? <button onClick={() => deleteArticle(value.id.toString())} style={{ width: "50px", height: "40px" }}>
+                        {getSessionBoolean("isConnected") && getSessionItemOrEmpty("fonction") === "COMMUNICATION" ? <button onClick={() => deleteArticle(value.id.toString())} style={{ width: "50px", height: "40px" }}>
                             <img src="/cross.png" alt="" style={{ width: "30px", height: "30px" }} />
 
                         </button> : ""
@@ -304,7 +305,7 @@ function HomePage() {
                         <h4><u>{value.titre}</u></h4>
                         <p>Créé le : {value.creation}</p>
 
-                        {sessionStorage.getItem("isConnected") == "true" ? (
+                        {getSessionBoolean("isConnected") ? (
                             <div>
 
                                 <p>

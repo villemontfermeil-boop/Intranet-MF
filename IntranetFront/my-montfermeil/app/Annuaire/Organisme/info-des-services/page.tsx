@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { getSessionItemOrEmpty } from "@/app/utils/sessionStorage";
 
 
 
@@ -20,7 +21,7 @@ function infoDesServices() {
     async function getOrganisme() {
         setLoading(true)
         try {
-            const token = sessionStorage.getItem("token");
+            const token = getSessionItemOrEmpty("token");
 
             const data = await fetch("/api/Montfermeil/organisation/label/all", {
                 headers: {
@@ -60,10 +61,10 @@ function infoDesServices() {
 
         // nom du fichier (texte)
         formData.append("nom", fileName || file.name);
-        formData.append("organisme", String(sessionStorage.getItem("organisme")) || '');
+        formData.append("organisme", String(getSessionItemOrEmpty("organisme")) || '');
 
         try {
-            const token = sessionStorage.getItem("token");
+            const token = getSessionItemOrEmpty("token");
 
             const data = await fetch("/api/Montfermeil/download/new", {
                 method: "POST",

@@ -9,7 +9,7 @@ function CreationArticle() {
 
     const [file, SetFile] = useState<File | null>();
     const [submit, SetisSubmit] = useState(false);
-    const [result, SetResult] = useState([])
+    const [fonction, setFonction] = useState<string | null>(null);
     const router = useRouter();
 
     const [article, SetArticle] = useState({
@@ -22,10 +22,13 @@ function CreationArticle() {
 
     useEffect(() => {
 
-        if (sessionStorage.length == 0 || sessionStorage.getItem('fonction') != "COMMUNICATION") {
+        const f = sessionStorage.getItem('fonction');
+        setFonction(f);
+
+        if (!f || f !== "COMMUNICATION") {
             router.push('/');
         }
-    })
+    },[])
 
     async function HandleSubmit() {
         try {
@@ -38,7 +41,7 @@ function CreationArticle() {
             formData.append('titre', article.Titre);
             formData.append('type', article.Types);
 
-            const salarieId = sessionStorage.getItem('id');
+            const salarieId = sessionStorage.getItem('id') || '';
             if (salarieId) {
                 formData.append('salarieId', salarieId);
             } else {
@@ -109,7 +112,6 @@ function CreationArticle() {
 
         <div style={{ placeItems: "center" }}>
             {
-                sessionStorage.length == 0 || sessionStorage.getItem('fonction') == "COMMUNICATION" ?
                     <div>
                         <h1><u>Bienvenue dans la création d'un article</u></h1>
                         <p style={{ textAlign: "center" }}>Notes: il est préférable pour les media que vous allez ajouter, <br />qu'il soit en extension (Images :"jpg", "jpeg", "png", "gif","webp"; Video : "mp4", "webm", "ogg";)</p>
@@ -163,9 +165,7 @@ function CreationArticle() {
                                 </tr>
                             </thead>
                         </table>
-                    </div>
-                    : <div>
-                        <h1>Interdit</h1>
+                    
                     </div>}
         </div>
     )

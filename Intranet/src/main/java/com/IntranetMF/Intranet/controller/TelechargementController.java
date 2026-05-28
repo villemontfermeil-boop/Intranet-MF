@@ -63,6 +63,11 @@ public class TelechargementController {
     private final OrganismeInterfacesMF organismeInterfacesMF;
     private final String uploadDir = "uploads/Documents";
 
+    private String logDir = "log/Telechargement/"
+            + LocalDate.now().getYear() + "/"
+            + LocalDate.now().getMonthValue() + "/"
+            + LocalDate.now().getDayOfMonth();
+
     public TelechargementController(TelechargementInterface t, SalarieInterfacesMF s, OrganismeInterfacesMF o) {
         this.telechargementInterface = t;
         this.salarieControllerMF = s;
@@ -107,6 +112,8 @@ public class TelechargementController {
 
                         fichierNouveaux.setDate(date);
                         fichierNouveaux.setOrganisme(organismme.get());
+                    logContenu(salarie.get().getNom()+ " "+ salarie.get().getPrenom() + "A ajouter le documents :  "+nom );
+
                         return telechargementInterface.save(fichierNouveaux);
                     } else {
                         throw new RuntimeException("4 organisme invalide " + organisme);
@@ -141,6 +148,7 @@ public class TelechargementController {
         Optional<SalarieMF> salarie = salarieControllerMF.findByMail(email);
         List<TelechargementMF> fichiers = telechargementInterface.findAll();
         if (salarie.isPresent()) {
+            logContenu(salarie.get().getNom() + " " + salarie.get().getPrenom() + "A chercher tout les  documents ");
 
             return fichiers;
         } else {
@@ -166,6 +174,9 @@ public class TelechargementController {
         if (salarie.isPresent()) {
 
             if (fichiers.isPresent()) {
+                logContenu(salarie.get().getNom() + " " + salarie.get().getPrenom() + "A chercher le documents :  "
+                        + fichiers.get().getNom() + ". Id: " + fichiers.get().getId());
+
                 return fichiers.get();
             } else {
                 throw new RuntimeException("2: fichier non trouver ");
@@ -206,6 +217,9 @@ public class TelechargementController {
                         throw new RuntimeException("5: érreur pour supprimer le fichier ");
 
                     }
+                    logContenu(salarie.get().getNom() + " " + salarie.get().getPrenom()
+                            + "A supprimer le documents liée à l'organisme " + telechargement.get().getOrganisme()
+                            + ". le fichier etait: " + telechargement.get().getNom());
 
                     telechargementInterface.deleteById(id);
 
@@ -217,7 +231,7 @@ public class TelechargementController {
             throw new RuntimeException("3: fichier non trouver ");
 
         }
-            throw new RuntimeException("3: salarié non trouver ");
+        throw new RuntimeException("3: salarié non trouver ");
 
     }
 
@@ -241,6 +255,9 @@ public class TelechargementController {
                 List<TelechargementMF> fichiers = telechargementInterface.findByOganigrame(OG.get());
 
                 if (!fichiers.isEmpty()) {
+
+                    logContenu(salarie.get().getNom() + " " + salarie.get().getPrenom()
+                            + "A rechercher les documents liée à l'organisme " + organisme);
                     return fichiers;
                 } else {
                     throw new RuntimeException("3: Aucun fichier trouver de ce group ");
@@ -255,4 +272,28 @@ public class TelechargementController {
 
         }
     }
+
+    public void logContenu(String message) {
+        String nomDuFichier = "LogsSalarier.txt";
+        Path cheminPath = Paths.get(logDir, nomDuFichier);
+
+        // créer dossier si nécessaire
+        File dir = new File(logDir);
+        if (!dir.exists()) {
+            dir.mkdirs();
+        }
+
+        String contenu = LocalDateTime.now() + " - " + message + "\n";
+
+        try {
+            Files.write(
+                    cheminPath, // ✅ on passe le Path du fichier
+                    contenu.getBytes(StandardCharsets.UTF_8),
+                    StandardOpenOption.CREATE,
+                    StandardOpenOption.APPEND);
+        } catch (IOException e) {
+            e.printStackTrace(); // au moins loguer l'erreur
+        }
+    }
+
 }

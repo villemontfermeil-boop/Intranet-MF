@@ -3,21 +3,24 @@
 import { useEffect, useState } from "react";
 import "./style.css";
 import { useRouter } from "next/navigation";
+import { getSessionBoolean, getSessionItemOrEmpty, isBrowser } from "@/app/utils/sessionStorage";
 
 function Moi() {
   // États pour les données
-  const [person] = useState({
-    nom: sessionStorage.getItem("nom") || "",
-    prenom: sessionStorage.getItem("prenom") || "",
-    mail: sessionStorage.getItem("mail") || "",
-    numero: sessionStorage.getItem("numero") || "",
-    Service: sessionStorage.getItem("localisation"),
-    fonction: sessionStorage.getItem("fonction"),
-    telpro: sessionStorage.getItem("telephonepro"),
-    id: sessionStorage.getItem("id") || "",
+  const [person, setPerson] = useState({
+    nom: "",
+    prenom: "",
+    mail: "",
+    numero: "",
+    Service: "",
+    fonction: "",
+    telpro: "",
+    id: "",
   });
+  const [organisme, setOrganisme] = useState("");
+  const [token, setToken] = useState("");
 
-  console.log(person)
+  console.log(person);
   // États pour l'image et le chargement
   const [image, setImage] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -29,8 +32,6 @@ function Moi() {
   const [preview, setPreview] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const [backend, setBackend] = useState<any>({});
-  const organisme = sessionStorage.getItem("organisme")
-
 
   const router = useRouter();
 
@@ -39,29 +40,21 @@ function Moi() {
     ? `${backend.api}/uploads/Photos/${image.photo}`
     : "/cerclePhoto.png";
 
-  const token = sessionStorage.getItem('token') || ''
-
-  console.log(sessionStorage.getItem("localisation"))
   async function getBackend() {
-
-    console.log(token);
     try {
+      const tokenValue = getSessionItemOrEmpty('token');
 
-      const res = await fetch(`/api/Montfermeil/connexion`,
-        {
-          headers: {
-            'authorization': token
-          },
-        }
-      );
+      const res = await fetch(`/api/Montfermeil/connexion`, {
+        headers: {
+          authorization: tokenValue,
+        },
+      });
       const data = await res.json();
 
       console.log("DATA api :", data);
 
-
       setBackend(data);
       setLoading2(false);
-
     } catch (err) {
       console.log(err);
     }
@@ -76,10 +69,10 @@ function Moi() {
 
     try {
       setLoading(true);
-      const token = sessionStorage.getItem("token") || ''
+      const tokenValue = getSessionItemOrEmpty('token');
       const response = await fetch(`/api/Montfermeil/users/Photo/${oneId}`, {
         headers: {
-          Authorization: `Bearer ${token}`
+          Authorization: `Bearer ${tokenValue}`,
         },
       });
 
@@ -109,17 +102,31 @@ function Moi() {
     }
   }
   useEffect(() => {
-    if (sessionStorage.length == 0 || !sessionStorage.getItem("isConnected")) {
-      location.href = "/";
+    if (!isBrowser || !getSessionBoolean("isConnected")) {
+      return;
     }
 
-  }, [])
+    setPerson({
+      nom: getSessionItemOrEmpty("nom"),
+      prenom: getSessionItemOrEmpty("prenom"),
+      mail: getSessionItemOrEmpty("mail"),
+      numero: getSessionItemOrEmpty("numero"),
+      Service: getSessionItemOrEmpty("localisation"),
+      fonction: getSessionItemOrEmpty("fonction"),
+      telpro: getSessionItemOrEmpty("telephonepro"),
+      id: getSessionItemOrEmpty("id"),
+    });
+
+    setOrganisme(getSessionItemOrEmpty("organisme"));
+    setToken(getSessionItemOrEmpty("token"));
+  }, []);
+
   // Chargement initial
   useEffect(() => {
+    if (!person.id) return;
+
     getBackend();
     getProfile(person.id);
-
-
   }, [person.id]);
 
   // 🔹 Envoi de la nouvelle photo
@@ -131,7 +138,7 @@ function Moi() {
 
     const FD = new FormData();
     FD.append("file", file as File);
-    const email = sessionStorage.getItem("mail")
+    const email = getSessionItemOrEmpty("mail");
 
     if (!email) {
       alert("Email introuvable, reconnecte-toi")
@@ -142,11 +149,11 @@ function Moi() {
 
     try {
       setUploading(true);
-
+      const tokenValue = getSessionItemOrEmpty('token');
       const response = await fetch("api/Montfermeil/users/Photo/NewPhoto", {
         method: "PUT",
         headers: {
-          Authorization: `Bearer ${sessionStorage.getItem('token')}`
+          Authorization: `Bearer ${tokenValue}`
         },
         body: FD
       });

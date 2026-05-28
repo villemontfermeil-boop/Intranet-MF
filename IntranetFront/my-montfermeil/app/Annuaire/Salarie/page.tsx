@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import "@/app/Annuaire/Salarie/style.css";
+import { getSessionBoolean, getSessionItemOrEmpty } from "@/app/utils/sessionStorage";
 
 function ModifierSalarie() {
 
@@ -10,11 +11,10 @@ function ModifierSalarie() {
     const [people, setPeople] = useState<any[]>([]);
     const [loading, setLoading] = useState(false);
     const router = useRouter();
-    const token = sessionStorage.getItem("token");
 
     // 🔥 fetch sécurisé
     async function fetchData(url: string, options: RequestInit = {}) {
-        const token = sessionStorage.getItem("token");
+        const token = getSessionItemOrEmpty("token");
 
         const res = await fetch(url, {
             ...options,
@@ -31,7 +31,7 @@ function ModifierSalarie() {
     }
 
     async function searchAll(name: string) {
-        const token = sessionStorage.getItem("token");
+        const token = getSessionItemOrEmpty("token");
 
         const [salaries, organismes] = await Promise.all([
             fetchData(
@@ -67,7 +67,7 @@ function ModifierSalarie() {
 
     // 🔥 protection accès
     useEffect(() => {
-        if (!sessionStorage.getItem("token")) {
+        if (!getSessionItemOrEmpty("token")) {
             router.push("/");
         }
     }, []);
@@ -122,7 +122,7 @@ function ModifierSalarie() {
                                 <th>Service</th>
                                 <th>Localisation</th>
                                 <th>Découvrir</th>
-                                {sessionStorage.getItem("isAdmin") === 'true' && <th>Modifier</th>}
+                                {getSessionBoolean("isAdmin") && <th>Modifier</th>}
                             </tr>
                         </thead>
 
@@ -174,7 +174,7 @@ function ModifierSalarie() {
                                                 </button>
                                             </td>
 
-                                            {sessionStorage.getItem("isAdmin") === 'true' && (
+                                            {getSessionBoolean("isAdmin") && (
                                                 <td>
                                                     <button
                                                         className="modifier-btn"
@@ -223,7 +223,7 @@ function ModifierSalarie() {
                                                 </button>
                                             </td>
 
-                                            {sessionStorage.getItem("isAdmin") === 'true' && (
+                                            {getSessionBoolean("isAdmin") && (
                                                 <td>-</td>
                                             )}
                                         </>
