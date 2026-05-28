@@ -9,3 +9,119 @@
 .messageHTML br {
     text-align: center;
 }
+
+.transport-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 16px;
+    margin: 1.5rem auto 2rem;
+    max-width: 960px;
+    padding: 0 1rem;
+}
+
+.transport-btn {
+    min-width: 90px;
+    min-height: 90px;
+    border-radius: 20px;
+    border: 2px solid transparent;
+    color: #fff;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.18s ease, filter 0.18s ease, box-shadow 0.18s ease;
+    box-shadow: 0 12px 24px rgba(15, 23, 42, 0.1);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.9rem 1.25rem;
+    text-transform: uppercase;
+}
+
+.transport-btn:hover {
+    transform: translateY(-2px);
+    filter: brightness(1.05);
+}
+
+.transport-icon {
+    width: 40px;
+    height: 40px;
+}
+
+.btn-t4 {
+    background: linear-gradient(135deg, #047a44, #2b9d5c);
+    border-color: #0e6f3c;
+}
+
+.btn-t1 {
+    background: linear-gradient(135deg, #ce1f29, #ff5c54);
+    border-color: #9f1720;
+}
+
+.btn-rer-b {
+    background: linear-gradient(135deg, #00358f, #3263d9);
+    border-color: #00276c;
+}
+
+.btn-rer-e {
+    background: linear-gradient(135deg, #b42878, #e05da8);
+    border-color: #8e195f;
+}
+
+.btn-bus1 {
+    background: linear-gradient(135deg, #ffe815, #ffce3f);
+    color: #111;
+    border-color: #d0a600;
+}
+
+.btn-bus5 {
+    background: linear-gradient(135deg, #d42f31, #ff6c5f);
+    border-color: #a3282b;
+}
+
+.btn-bus146 {
+    background: linear-gradient(135deg, #0067a6, #2f97d1);
+    border-color: #00507f;
+}
+
+.btn-bus602 {
+    background: linear-gradient(135deg, #1c7f6d, #4fbba1);
+    border-color: #156653;
+}
+
+.btn-bus603 {
+    background: linear-gradient(135deg, #8b3dd1, #b58be9);
+    border-color: #6831a0;
+}
+
+.btn-bus604 {
+    background: linear-gradient(135deg, #d47b1f, #f2a258);
+    border-color: #b56318;
+}
+
+.btn-bus605 {
+    background: linear-gradient(135deg, #0f5d78, #42a4bf);
+    border-color: #0b4a5d;
+}
+
+.btn-bus613 {
+    background: linear-gradient(135deg, #8f3ea6, #c782d0);
+    border-color: #6a2f80;
+}
+
+.btn-bus643 {
+    background: linear-gradient(135deg, #e17d1a, #f5a354);
+    border-color: #b26214;
+}
+
+@media (max-width: 680px) {
+    .transport-grid {
+        gap: 12px;
+    }
+
+    .transport-btn {
+        min-width: 80px;
+        min-height: 80px;
+        font-size: 0.95rem;
+    }
+}
