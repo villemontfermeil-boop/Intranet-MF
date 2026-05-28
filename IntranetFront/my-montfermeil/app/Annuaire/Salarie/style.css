@@ -1,28 +1,32 @@
 /* Conteneur principal */
 .container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
+    max-width: 1180px;
+    margin: 2rem auto;
+    padding: 26px;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #f8fbff;
+    border-radius: 28px;
+    box-shadow: 0 24px 70px rgba(15, 23, 42, 0.08);
 }
 
 /* Barre de recherche */
 .search-input {
     width: 100%;
-    max-width: 500px;
-    padding: 12px 16px;
-    margin-bottom: 25px;
-    border: 2px solid #e0e0e0;
-    border-radius: 8px;
+    max-width: 620px;
+    padding: 14px 18px;
+    margin-bottom: 24px;
+    border: 2px solid #dbe4ff;
+    border-radius: 12px;
     font-size: 16px;
     transition: all 0.3s ease;
     box-sizing: border-box;
+    background: #ffffff;
 }
 
 .search-input:focus {
     outline: none;
-    border-color: #007bff;
-    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+    border-color: #2563eb;
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
 }
 
 .search-input::placeholder {
@@ -31,51 +35,58 @@
 
 /* Titre */
 .results-title {
-    font-size: 1.5rem;
+    font-size: 2rem;
     margin-bottom: 20px;
-    color: #333;
-    font-weight: 600;
+    color: #1f2937;
+    font-weight: 700;
 }
 
 /* Message "aucun résultat" */
 .no-results {
     text-align: center;
     padding: 40px;
-    color: #666;
+    color: #506176;
     font-size: 1.1rem;
 }
 
 /* Tableau responsive */
+.table-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin-bottom: 22px;
+    border-radius: 18px;
+    background: white;
+    border: 1px solid #e6ecff;
+}
+
 .montableau {
     width: 100%;
+    min-width: 920px;
     border-collapse: collapse;
     background: white;
-    border-radius: 10px;
-    overflow: hidden;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
 }
 
 /* En-têtes du tableau */
 .montableau thead {
-    background-color: #f8f9fa;
+    background-color: #eef4ff;
 }
 
 .montableau th {
-    padding: 16px 12px;
+    padding: 16px 14px;
     text-align: left;
-    font-weight: 600;
-    color: #495057;
-    font-size: 14px;
+    font-weight: 700;
+    color: #334155;
+    font-size: 13px;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
-    border-bottom: 2px solid #dee2e6;
+    letter-spacing: 0.6px;
+    border-bottom: 2px solid #e2e8f0;
 }
 
 /* Cellules du tableau */
 .montableau td {
-    padding: 14px 12px;
-    border-bottom: 1px solid #e9ecef;
-    color: #212529;
+    padding: 14px 14px;
+    border-bottom: 1px solid #f1f3f5;
+    color: #2f3c53;
     font-size: 14px;
     vertical-align: middle;
 }

@@ -132,32 +132,32 @@ function ModifierSalarie() {
 
                                     {p.type === "salarie" ? (
                                         <>
-                                            <td>{p.nom ?? "N/A"} {p.prenom ?? ""}</td>
+                                            <td data-label="Nom">{p.nom ?? "N/A"} {p.prenom ?? ""}</td>
 
-                                            <td>
+                                            <td data-label="Téléphone">
                                                 {p.numero
                                                     ? <a href={`tel:${p.numero}`}>{p.numero}</a>
                                                     : "Aucun"}
                                             </td>
 
                                             {/* 🔥 téléphone pro remis */}
-                                            <td>
+                                            <td data-label="Tél. Pro">
                                                 {p.telephonepro
                                                     ? <a href={`tel:${p.telephonepro}`}>{p.telephonepro}</a>
                                                     : "Aucun"}
                                             </td>
 
-                                            <td>
+                                            <td data-label="Email">
                                                 {p.mail
                                                     ? <a href={`mailto:${p.mail}`}>{p.mail}</a>
                                                     : "Aucun"}
                                             </td>
 
-                                            <td>
+                                            <td data-label="Service">
                                                 {p.fonction ?? "N/A"}
                                             </td>
 
-                                            <td>
+                                            <td data-label="Localisation">
                                                 {p.organigramme ? (
                                                     <a href={`/Annuaire/Organisme/${p.organigramme.id}`}>
                                                         {p.organigramme.label}
@@ -165,7 +165,7 @@ function ModifierSalarie() {
                                                 ) : "N/A"}
                                             </td>
 
-                                            <td>
+                                            <td data-label="Découvrir">
                                                 <button
                                                     className="modifier-btn"
                                                     onClick={() => router.push(`/Annuaire/Salarie/${p.id}`)}
@@ -175,7 +175,7 @@ function ModifierSalarie() {
                                             </td>
 
                                             {getSessionBoolean("isAdmin") && (
-                                                <td>
+                                                <td data-label="Modifier">
                                                     <button
                                                         className="modifier-btn"
                                                         onClick={() => router.push(`/Annuaire/${p.id}`)}
@@ -189,21 +189,20 @@ function ModifierSalarie() {
                                         <>
                                             {/* 🔥 ORGANISME ALIGNÉ SUR MÊME STRUCTURE */}
 
-                                            <td style={{ textAlign: "center" }}><b>{p.label ?? "N/A"}</b></td>
+                                            <td data-label="Nom / Organisme" style={{ textAlign: "center" }}><b>{p.label ?? "N/A"}</b></td>
 
-                                            <td style={{ textAlign: "center" }}>
+                                            <td data-label="Téléphone" style={{ textAlign: "center" }}>
                                                 {p.telephone
                                                     ? <a href={`tel:${p.telephone}`}>{p.telephone}</a>
                                                     : "Aucun"}
                                             </td>
 
                                             {/* tel pro (vide pour organisme mais colonne conservée) */}
-                                            <td style={{ textAlign: "center" }}>-</td>
-                                            <td style={{ textAlign: "center" }}>-</td>
-                                            <td style={{ textAlign: "center" }}>-</td>
+                                            <td data-label="Tél. Pro" style={{ textAlign: "center" }}>-</td>
+                                            <td data-label="Email" style={{ textAlign: "center" }}>-</td>
+                                            <td data-label="Service" style={{ textAlign: "center" }}>-</td>
 
-
-                                            <td style={{ textAlign: "center" }}>
+                                            <td data-label="Localisation" style={{ textAlign: "center" }}>
                                                 <a
                                                     href={`https://www.google.com/search?q=${encodeURIComponent(p.adresse)}`}
                                                     target="_blank"
@@ -212,9 +211,7 @@ function ModifierSalarie() {
                                                 </a>
                                             </td>
 
-
-
-                                            <td>
+                                            <td data-label="Découvrir">
                                                 <button
                                                     className="modifier-btn"
                                                     onClick={() => router.push(`/Annuaire/Organisme/${p.id}`)}
@@ -224,7 +221,7 @@ function ModifierSalarie() {
                                             </td>
 
                                             {getSessionBoolean("isAdmin") && (
-                                                <td>-</td>
+                                                <td data-label="Modifier">-</td>
                                             )}
                                         </>
                                     )}
