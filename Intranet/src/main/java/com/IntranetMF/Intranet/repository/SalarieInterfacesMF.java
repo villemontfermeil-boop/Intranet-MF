@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.IntranetMF.Intranet.modele.LocalisationEnumMF.Localisation;
 import com.IntranetMF.Intranet.modele.SalarieMF;
+import com.IntranetMF.Intranet.modele.OganigrameMF;
 
 public interface SalarieInterfacesMF extends JpaRepository<SalarieMF, Long> {
 
@@ -21,5 +22,6 @@ public interface SalarieInterfacesMF extends JpaRepository<SalarieMF, Long> {
     // Repository
     List<SalarieMF> findByPrenomContainingIgnoreCaseOrNomContainingIgnoreCase(String prenom, String nom);
     List<SalarieMF> findByPrenomContainingIgnoreCaseAndNomContainingIgnoreCase(String prenom, String nom);
+    List<SalarieMF> findByOganigrame(OganigrameMF oganigrameMF);
 
 }

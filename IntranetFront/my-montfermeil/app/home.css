@@ -1,54 +1,317 @@
-.title {
-    text-align: center;
-    margin-bottom: 2rem;
+﻿@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  margin: 0;
+  background: white;
+
+  font-family: "Brown Pro", sans-serif;
+}
+
+.home-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 3.5rem 1rem 4rem;
+}
+
+.hero-section {
+  text-align: center;
+  margin-bottom: 3.5rem;
+  padding: 2.5rem 1rem 3rem;
+}
+
+.home-title {
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  line-height: 1.05;
+  color: #1e3a8a;
+  margin-bottom: 1rem;
+  font-weight: 800;
+}
+
+.home-subtitle {
+  max-width: 720px;
+  margin: 0 auto;
+  font-size: 1rem;
+  color: #475569;
+  line-height: 1.8;
 }
 
 .articles-container {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 2rem;
-    padding: 1rem;
-    place-items: center;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 680px));
+  justify-content: center;
+  gap: 1.4rem;
 }
 
 .article-card {
-    border: 3px solid #3498db;
-    padding: 1.5rem;
-    border-radius: 10px;
-    width: 100%;
-    max-width: 800px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  position: relative;
+  padding: 1.05rem 1rem;
+  max-width: 590px;
+  margin: 0 auto;
+  border-radius: 1rem;
+  box-shadow: 0 10px 22px rgba(15, 23, 42, 0.08);
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  background-color: #ffffff;
+  overflow: hidden;
+}
+
+.article-card--evenement {
+  border-top: 4px solid #3b82f6;
+  background-color: #eff6ff;
+}
+
+.article-card--important {
+  border-left: 6px solid #dc2626;
+  background-color: #fff1f2;
+}
+
+.article-card--annonce {
+  border-left: 6px solid #16a34a;
+  background-color: #ecfdf5;
+}
+
+.article-card--message {
+  border-left: 6px solid #f59e0b;
+  background-color: #fff7ed;
+}
+
+.article-card--information {
+  border-left: 6px solid #8b5cf6;
+  background-color: #f3e8ff;
+}
+
+.article-card--nondefini {
+  border-left: 6px solid #6b7280;
+  background-color: #f8fafc;
+}
+
+.article-card--default {
+  background-color: #ffffff;
+}
+
+.article-card__title {
+  margin: 0 0 0.5rem;
+  font-size: 1.25rem;
+  color: #111827;
+  text-align: center;
+}
+
+.article-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  color: #475569;
+  font-size: 0.9rem;
+  margin-bottom: 0.75rem;
+  justify-content: center;
 }
 
 .author-link {
-    color: blue;
-    cursor: pointer;
-    text-decoration: underline;
+  color: #2563eb;
+  cursor: pointer;
+  text-decoration: underline;
+  font-weight: 600;
+}
+
+.article-text {
+  color: #334155;
+  line-height: 1.65;
+  margin: 0.65rem 0 0;
+  white-space: pre-line;
+  text-align: center;
 }
 
 .media {
-    width: 100%;
-    max-width: 500px;
-    margin-top: 1rem;
-    border-radius: 8px;
+  width: 100%;
+  max-width: 100%;
+  display: block;
+  margin: 0.9rem auto 0;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.08);
 }
 
-/* 📱 Mobile */
-@media (max-width: 768px) {
-    .article-card {
-        padding: 1rem;
-    }
-    .title{
-        margin-bottom: 20px;
-    }
+.article-delete-button {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  width: 44px;
+  height: 44px;
+  border: none;
+  border-radius: 9999px;
+  background: #dc2626;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
 }
 
-/* 💻 Desktop large */
-@media (min-width: 1024px) {
-    .articles-container {
-        grid-template-columns: 1fr;
-    }
-    .title{
-        margin-bottom: 20px;
-    }
+.article-delete-button img {
+  width: 18px;
+  height: 18px;
+}
+
+.spinner-state,
+.error-state,
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 60vh;
+  text-align: center;
+  padding: 2rem;
+}
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid rgba(0, 0, 0, 0.1);
+  border-left-color: #2563eb;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.spinner-text,
+.empty-state p,
+.error-state p {
+  color: #475569;
+  font-size: 1rem;
+  max-width: 520px;
+}
+
+.error-state p {
+  color: #dc2626;
+}
+
+.retry-button {
+  padding: 0.95rem 1.5rem;
+  border: none;
+  border-radius: 0.95rem;
+  background: #2563eb;
+  color: #ffffff;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.retry-button:hover {
+  background: #1d4ed8;
+}
+
+.legend-container {
+  background-color: #f8fafc;
+  border-radius: 1.5rem;
+  padding: 2rem;
+  margin: 3rem auto 0;
+  max-width: 1000px;
+  box-shadow: 0 16px 35px rgba(15, 23, 42, 0.08);
+  border: 1px solid rgba(226, 232, 240, 0.9);
+}
+
+.legend-title {
+  text-align: center;
+  margin-bottom: 1.25rem;
+  color: #1f2937;
+  font-size: 1.3rem;
+  font-weight: 700;
+  border-bottom: 2px solid #2563eb;
+  padding-bottom: 1rem;
+}
+
+.legend-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  padding: 1rem;
+  border-radius: 1rem;
+  background-color: #ffffff;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.legend-dot {
+  width: 30px;
+  height: 30px;
+  border-radius: 0.75rem;
+}
+
+.legend-item--important .legend-dot {
+  background-color: #dc2626;
+}
+
+.legend-item--evenement .legend-dot {
+  background-color: #2563eb;
+}
+
+.legend-item--annonce .legend-dot {
+  background-color: #16a34a;
+}
+
+.legend-item--message .legend-dot {
+  background-color: #f59e0b;
+}
+
+.legend-item--information .legend-dot {
+  background-color: #8b5cf6;
+}
+
+.legend-item--nondefini .legend-dot {
+  background-color: #6b7280;
+}
+
+.legend-item strong {
+  display: block;
+  color: #111827;
+  margin-bottom: 0.35rem;
+}
+
+.legend-item p {
+  margin: 0;
+  color: #475569;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.legend-note {
+  margin-top: 1.5rem;
+  padding: 1rem 1.2rem;
+  background-color: #e8f4fd;
+  border-radius: 1rem;
+  border-left: 4px solid #2563eb;
+  color: #1f2937;
+  font-size: 0.95rem;
+  line-height: 1.7;
 }

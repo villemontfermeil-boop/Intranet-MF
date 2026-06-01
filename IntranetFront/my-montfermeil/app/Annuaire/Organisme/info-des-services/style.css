@@ -1,0 +1,124 @@
+.organisme-page {
+    max-width: 960px;
+    margin: 2.5rem auto;
+    padding: 0 1rem;
+}
+
+.organisme-panel {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 24px;
+    box-shadow: 0 16px 40px rgba(15, 23, 42, 0.08);
+    padding: 1.75rem;
+}
+
+.organisme-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.organisme-header h2 {
+    margin: 0;
+    font-size: 1.65rem;
+    color: #111827;
+}
+
+.organisme-header p {
+    margin: 0.45rem 0 0;
+    color: #4b5563;
+    max-width: 520px;
+    line-height: 1.6;
+}
+
+.toggle-btn,
+.submit-btn,
+.organisme-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.85rem 1.25rem;
+    border-radius: 14px;
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.toggle-btn,
+.submit-btn {
+    background-color: #2563eb;
+    color: #ffffff;
+    min-width: 180px;
+}
+
+.toggle-btn:hover,
+.submit-btn:hover,
+.organisme-link:hover {
+    transform: translateY(-1px);
+}
+
+.organisme-link {
+    width: 100%;
+    text-align: left;
+    background: #f8fafc;
+    color: #1f2937;
+    border: 1px solid #e5e7eb;
+    padding: 0.9rem 1rem;
+    border-radius: 16px;
+}
+
+.organisme-link:hover {
+    background: #eff6ff;
+}
+
+.table-wrapper {
+    overflow-x: auto;
+}
+
+.table-salaries {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.table-salaries td {
+    padding: 0.65rem 0;
+    text-align: center;
+}
+
+.file-input {
+    width: 100%;
+    padding: 0.9rem 1rem;
+    border-radius: 16px;
+    border: 1px solid #d1d5db;
+    background: #f8fafc;
+    color: #111827;
+}
+
+.organisme-panel table {
+    width: 100%;
+}
+
+.organisme-panel tbody tr + tr td {
+    padding-top: 0.75rem;
+}
+
+@media (max-width: 640px) {
+    .organisme-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .toggle-btn,
+    .submit-btn {
+        width: 100%;
+        min-width: auto;
+    }
+
+    .organisme-link {
+        text-align: center;
+    }
+}

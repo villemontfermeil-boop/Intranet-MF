@@ -9,48 +9,58 @@ function ApplicationSite() {
     const routeur = useRouter()
     return (
         <div style={{placeItems: "center"}}>
-            <h2><u>Vous pouvez interagir avec les images, ils vous redirigeront vers les pages concernées.</u></h2>
+            <h2 style={{textAlign: "center"}}><u>Vous pouvez interagir avec les images, elles vous redirigeront vers les pages concernées.</u></h2>
             <table border={1}>
                 <tbody>
                     <tr>
                         <td>
-                            <img src="/outlook.png" onClick={() =>window.location.href = "https://outlook.office365.com/mail"} alt="" style={{ height: "160px" }} />
+                            <a href="https://outlook.office365.com/mail" target="_blank" rel="noopener noreferrer">
+                                <img src="/outlook.png" alt="Outlook" style={{ height: "160px", cursor: "pointer" }} />
+                            </a>
                         </td>
                         <td>
-                            <img src="/glpi.png" alt=""onClick={() =>window.location.href = "https://glpi.montfermeil.fr/glpi"}  style={{ height: "130px" }} />
-
+                            <a href="https://glpi.montfermeil.fr/glpi" target="_blank" rel="noopener noreferrer">
+                                <img src="/glpi.png" alt="GLPI" style={{ height: "130px", cursor: "pointer" }} />
+                            </a>
                         </td>
                         <td>
-                            <img src="/ciril.png" onClick={() =>window.location.href = "https://s-cirilweb.montfermeil.fr"} alt="" style={{ height: "140px" }} />
-
+                            <a href="https://s-cirilweb.montfermeil.fr" target="_blank" rel="noopener noreferrer">
+                                <img src="/ciril.png" alt="CIRIL" style={{ height: "140px", cursor: "pointer" }} />
+                            </a>
                         </td>
                     </tr>
                     <tr>
                         <td>
-                            <img src="/atal.png" onClick={() =>window.location.href = "https://s-atalweb.montfermeil.fr/Account/Login?ReturnUrl=%2F"} alt="" style={{ height: "140px" }} />
-
+                            <a href="https://s-atalweb.montfermeil.fr/Account/Login?ReturnUrl=%2F" target="_blank" rel="noopener noreferrer">
+                                <img src="/atal.png" alt="ATAL" style={{ height: "140px", cursor: "pointer" }} />
+                            </a>
                         </td>
                         <td>
-                            <img src="/arpege.png" onClick={() =>window.location.href = "https://www.espaces-citoyens.net/montfermeil/espaces-agents/#/login"} alt="" style={{ height: "60px" }} />
-
+                            <a href="https://www.espaces-citoyens.net/montfermeil/espaces-agents/#/login" target="_blank" rel="noopener noreferrer">
+                                <img src="/arpege.png" alt="ARPEGE" style={{ height: "60px", cursor: "pointer" }} />
+                            </a>
                         </td>
                         <td>
-                            <img src="/ciril-group.png" onClick={() =>window.location.href = "https://cirilcourrier:9090/CivilNetDocument/"} alt="" style={{ height: "60px", display: "flex", justifyContent: "center", marginLeft: "80px" }} />
-
+                            <a href="https://cirilcourrier:9090/CivilNetDocument/" target="_blank" rel="noopener noreferrer">
+                                <img src="/ciril-group.png" alt="CIRIL Group" style={{ height: "60px", display: "flex", justifyContent: "center", marginLeft: "80px", cursor: "pointer" }} />
+                            </a>
                         </td>
-
-
                     </tr>
                     <tr>
                         <td>
-                            <img src="webdebil.png" onClick={() =>window.location.href = "https://webdebil-ville.montfermeil/users/login"} style={{ height: "150px", marginLeft: "40px" }} alt="" />
+                            <a href="https://webdebil-ville.montfermeil/users/login" target="_blank" rel="noopener noreferrer">
+                                <img src="webdebil.png" style={{ height: "150px", marginLeft: "40px", cursor: "pointer" }} alt="WebDebil" />
+                            </a>
                         </td>
                         <td>
-                            <img src="MF.png" onClick={() =>window.location.href = "https://www.ville-montfermeil.fr/page-daccueil/"} style={{height: "170px", marginLeft: "10px"}} alt="" />
-
+                            <a href="https://www.ville-montfermeil.fr/page-daccueil/" target="_blank" rel="noopener noreferrer">
+                                <img src="MF.png" style={{ height: "170px", marginLeft: "10px", cursor: "pointer" }} alt="Ville Montfermeil" />
+                            </a>
                         </td>
                         <td>
-                            <img src="concerto.png" onClick={() =>window.location.href = "https://concerto.arperge.fr/montfermeil/ConcertoPetiteEnfance/#/login"} style={{ height: "50px", marginRight: "20px" }} alt="" />
+                            <a href="https://concerto.arperge.fr/montfermeil/ConcertoPetiteEnfance/#/login" target="_blank" rel="noopener noreferrer">
+                                <img src="concerto.png" style={{ height: "50px", marginRight: "20px", cursor: "pointer" }} alt="Concerto" />
+                            </a>
                         </td>
                     </tr>
                 </tbody>

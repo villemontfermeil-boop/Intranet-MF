@@ -1,121 +1,211 @@
 'use client';
 
-import { Params } from "next/dist/server/request/params";
 import { useParams } from "next/navigation";
-import { Router, useRouter } from "next/router";
 import { useEffect, useState } from "react";
-
-
-
-
+import "./style.css";
 
 function SalariePage() {
     const params = useParams();
-    const id = params?.id ? parseInt(params.id as string) : 0;
-    const [salarie, SetSalarie] = useState<any>({})
-    
-    if (sessionStorage.length == 0 || sessionStorage.length == null) {
-       window.location.href="/"
+    const id = params?.id ? Number(params.id) : undefined;
+
+    // États pour les données
+    const [salarie, setSalarie] = useState<any>({});
+    const [backend, setBackend] = useState<any>({});
+
+    const [image, setImage] = useState<any>({});
+    const [loading, setLoading] = useState(true); // État de chargement
+
+    const profileImage = `${backend.api}/uploads/Photos/${image.photo}`;
+
+    console.log("Il contient :", image);
+
+    // Redirection si non connecté
+    if (typeof window !== 'undefined' && (sessionStorage.length === 0 || sessionStorage.length == null)) {
+        window.location.href = "/";
     }
+
     async function LookingForid(id: number) {
-
-        const identifiant = sessionStorage.getItem("mail")
-        const password = sessionStorage.getItem("MDP")
-
-        const credential = btoa(`${identifiant}:${password}`)
+        const token = sessionStorage.getItem("token")
         try {
-            const response = await fetch(`http://localhost:8080/salaries/${id}`, {
-                method: "GET",
+            const response = await fetch(`/api/Montfermeil/users/${id}`, {
                 headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                    'Authorization': `Basic ${credential}`
+                    'Authorization': `Bearer ${token}`
                 }
-
-
-            })
+            });
             const data = await response.json();
-            SetSalarie(data);
-
-
-
+            console.log( data);
+            setSalarie(data);
         } catch (error) {
-            console.log(error)
+            console.log("L ERRRRRRRRRRREURRRRRRRRRRRRR",error);
+        }
+    }
+
+    async function getBackend() {
+
+        const token = sessionStorage.getItem('token') || ''
+        console.log(token);
+        try {
+
+            const res = await fetch(`/api/Montfermeil/connexion`,
+                {
+                    headers: {
+                        'authorization': token
+                    },
+                }
+            );
+            const data = await res.json();
+
+            console.log("DATA api :", data);
 
 
+            setBackend(data);
 
+        } catch (err) {
+            console.log(err);
+        }
+    }
+
+    async function getProfile(oneId: number) {
+        try {
+            const token = sessionStorage.getItem("token");
+            const reponse = await fetch(`/api/Montfermeil/users/Photo/${oneId}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+            const json = await reponse.json();
+            setImage(json);
+            console.log(json);
+        } catch (e) {
+            console.log(e);
         }
     }
 
     useEffect(() => {
+        if (!id || isNaN(id)) return;
 
-        LookingForid(id)
-    }, [])
-    console.log(salarie)
+        // Chargement des données
+        const loadData = async () => {
+            setLoading(true);
+            await Promise.all([
+                LookingForid(id),
+                getProfile(id),
+                getBackend()
+            ]);
+            setLoading(false);
+        };
+
+        loadData();
+    }, [id]);
+
+    // 🔹 AFFICHAGE DU CHARGEMENT
+    if (loading) {
+        return (
+            <div style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                height: "100vh",
+                flexDirection: "column"
+            }}>
+                <div className="spinner"></div>
+                <p style={{ marginTop: "20px", fontSize: "18px" }}>
+                    Chargement du profil...
+                </p>
+
+                <style jsx>{`
+                    .spinner {
+                        border: 4px solid rgba(0, 0, 0, 0.1);
+                        width: 50px;
+                        height: 50px;
+                        border-radius: 50%;
+                        border-left-color: #09f;
+                        animation: spin 1s linear infinite;
+                    }
+                    
+                    @keyframes spin {
+                        0% { transform: rotate(0deg); }
+                        100% { transform: rotate(360deg); }
+                    }
+                `}</style>
+            </div>
+        );
+    }
+
     return (
-        <div>
-            <div style={{ placeItems: "center" }}>
+        <main className="profile-page">
+            <section className="profile-header">
                 <h1>
                     <u>
-                        {salarie.nom}
-                        {"   "}
-                        {salarie.prenom}
+                        {salarie.nom} {salarie.prenom}
                     </u>
                 </h1>
-                <table border={1} style={{ textAlign: "center" }} >
-                    <thead >
-                        <tr>
-                            <th style={{ paddingRight: "50%" }}>
-                                Fonction:
-                            </th>
-                            <td>
-                                {salarie.fonction}
-                            </td>
-                        </tr>
-                        <tr>
-                            <th style={{ paddingRight: "50%" }}>
-                                Localisation:
-                            </th>
-                            <td>
-                                {salarie.localisation}
-                            </td>
-                        </tr>
-                        <tr>
-                            <th style={{ paddingRight: "50%" }}>
-                                Numero:
-                            </th>
-                            <td>
-                                {salarie.numero}
-                            </td>
-                        </tr>
-                        <tr>
-                            <th style={{ paddingRight: "50%" }}>
-                                Téléphone pro:
-                            </th>
-                            <td>
-                                {salarie.telephonepro || 'NON_DÉFINI'}
-                            </td>
-                        </tr>
-                        <tr>
-                            <th style={{ paddingRight: "50%" }}>
-                                Email:
-                            </th>
-                            <td>
-                               <a href={`mailTo:${salarie.mail}`}> {salarie.mail}</a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th style={{ paddingRight: "0%" }}>
-                                Statut sur le site :
-                            </th>
-                            <td>
-                                {salarie.isConnected ? <img src="/checkbox.png" style={{ width: "10%" }} /> : <img src="/cross.png" style={{ width: "10%" }} />}
-                            </td>
-                        </tr>
+            </section>
 
-                    </thead>
-                </table>
+            <div className="profile-layout">
+                <aside className="photo-card">
+                    <img src="/cadre.png" className="profile-frame" alt="cadre" />
+                    {image.status !== 500 ? (
+                        <img src={profileImage} className="profile-avatar" alt="photo profil" />
+                    ) : (
+                        <img className="profile-avatar" src="/cerclePhoto.png" alt="photo par défaut" />
+                    )}
+                </aside>
+
+                <section className="profile-card">
+                    <table className="profile-table">
+                        <tbody>
+                            <tr>
+                                <th>Service :</th>
+                                <td>{salarie.fonction}</td>
+                            </tr>
+                            <tr>
+                                <th>Localisation :</th>
+                                <td>
+                                    <a className="profile-link" href={`/Annuaire/Organisme/${salarie.organigramme?.id}`}>
+                                        {salarie.organigramme?.label || 'Non défini'}
+                                    </a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Numéro :</th>
+                                <td>
+                                    <a className="profile-link" href={`tel:${salarie.numero}`}>
+                                        {salarie.numero || 'NON_DÉFINI'}
+                                    </a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Téléphone pro :</th>
+                                <td>
+                                    <a className="profile-link" href={`tel:${salarie.telephonepro || ''}`}>
+                                        {salarie.telephonepro || 'NON_DÉFINI'}
+                                    </a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Email :</th>
+                                <td>
+                                    <a className="profile-link" href={`mailto:${salarie.mail}`}>
+                                        {salarie.mail || 'Non défini'}
+                                    </a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Statut :</th>
+                                <td>
+                                    {salarie.isConnected ? (
+                                        <img src="/checkbox.png" className="profile-status-icon" alt="connecté" />
+                                    ) : (
+                                        <img src="/cross.png" className="profile-status-icon" alt="déconnecté" />
+                                    )}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </section>
             </div>
-        </div>
+        </main>
     );
 }
 

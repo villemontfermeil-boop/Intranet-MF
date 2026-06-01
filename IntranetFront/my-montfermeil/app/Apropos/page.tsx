@@ -48,8 +48,7 @@ export default function AboutPage() {
                 </section>
 
                 <p style={styles.footer}>
-                    En utilisant cet intranet, vous reconnaissez son caractère privé et acceptez
-                    ses conditions d’utilisation.
+                    L’accès à cet intranet est réservé aux agents de la mairie. En l’utilisant, l’utilisateur reconnaît son statut et s’engage à en respecter les règles d’usage.
                 </p>
             </div>
         </div>

@@ -11,17 +11,20 @@ function AdminPanel() {
 
     const [isAdmin, setIsadmin] = useState<boolean>(false)
     const router = useRouter();
+    const [loading, setLoading] = useState(false); // État de chargement
 
     const [newSalarie, setNewSalarie] = useState({
         nom: '',
         prenom: '',
-        email: '',
+        mail: '',
         password: '',
         numero: '',
-        telpro: '',
-        localisation: '',
+        numeroPro: '',
+        localisation: 'NON_DEFINI',
         fonction: 'NON_DEFINI'
     })
+
+    const [passwordVerif, setPasswordVerif] = useState<String>("");
     useEffect(() => {
         const visiteur = sessionStorage.getItem('isAdmin');
         setIsadmin(visiteur === "true");
@@ -31,56 +34,92 @@ function AdminPanel() {
         setNewSalarie({ ...newSalarie, [e.target.name]: e.target.value });
     };
 
+    function motDePasseValide(mdp: string): boolean {
+        const pattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
+        return pattern.test(mdp);
+    }
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         console.log('Données du formulaire :', newSalarie);
 
-        // if(newSalarie.password.length<8  ){
+        if (!motDePasseValide(newSalarie.password)) {
+            alert("Mot de passe invalide, assuré vous d'avoir mis au moins:  une minuscule, une majuscule, un chiffre/nombre ,un caractère spécial")
+        } else {
+            if (passwordVerif != newSalarie.password) {
+                alert("Mot de passe invalide, assuré vous d'avoir mis le même mot de passe sur les 2 champs")
 
-        // }
+            } else {
 
-        try {
-            const idnetifiantAdmin = sessionStorage.getItem("mail");
-            const passwordAdmin = sessionStorage.getItem("MDP");
-            const credential = btoa(`${idnetifiantAdmin}:${passwordAdmin}`)
+                try {
+                    setLoading(true); // Début du chargement
 
-            //zone a supprimer en prod
+                    const idnetifiantAdmin = sessionStorage.getItem("mail");
+                    const passwordAdmin = sessionStorage.getItem("MDP");
+                    const credential = btoa(`${idnetifiantAdmin}:${passwordAdmin}`)
 
-            console.log("Credential", sessionStorage);
-            console.log("Data", newSalarie);
+                    //zone a supprimer en prod
 
-            //
-            const response = await fetch("http://localhost:8080/salaries/NewSalarie", {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                    'Authorization': `Basic ${credential}`
-                },
-                body: new URLSearchParams({
-                    nom: newSalarie.nom,
-                    prenom: newSalarie.prenom,
-                    mail: newSalarie.email,
-                    numero: String(newSalarie.numero),
-                    numeroPro: String(newSalarie.telpro),
-                    fonction: newSalarie.fonction,
-                    password: newSalarie.password,
-                    localisation: newSalarie.localisation || 'NON_DEFINI'
-                })
+                    console.log("Credential", sessionStorage);
+                    console.log("Data", newSalarie);
+
+                    //
+
+                    const response = await fetch("/api/Montfermeil/users/NewSalarie", {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+
+                        },
+                        body: new URLSearchParams(newSalarie as Record<string, string>)
+                    }
+                    );
+                    console.log(response);
+                    console.log("Headers:", Object.fromEntries(response.headers.entries()));
+                    setLoading(false); // Fin du chargement (succès ou erreur)
+
+                    alert(`${newSalarie.nom} ${newSalarie.prenom} à été ajouter`)
+                    router.push('/')
+                } catch (error) {
+                    console.log(error);
 
 
+                }
             }
-            );
-            console.log(response);
-            console.log("Headers:", Object.fromEntries(response.headers.entries()));
-            alert(`${newSalarie.nom} ${newSalarie.prenom} à été ajouter`)
-            router.push('/')
-        } catch (error) {
-            console.log(error);
-
-
         }
     }
+    if (loading) {
+        return (
+            <div style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                height: "100vh",
+                flexDirection: "column"
+            }}>
+                <div className="spinner"></div>
+                <p style={{ marginTop: "20px", fontSize: "18px", color: "#666" }}>
+                    Ajout du salarié..
+                </p>
 
+                <style jsx>{`
+                    .spinner {
+                        border: 4px solid rgba(0, 0, 0, 0.1);
+                        width: 50px;
+                        height: 50px;
+                        border-radius: 50%;
+                        border-left-color: #3498db;
+                        animation: spin 1s linear infinite;
+                    }
+                    
+                    @keyframes spin {
+                        0% { transform: rotate(0deg); }
+                        100% { transform: rotate(360deg); }
+                    }
+                `}</style>
+            </div>
+        );
+    }
     if (isAdmin == true) {
         return (
             <div>
@@ -105,9 +144,9 @@ function AdminPanel() {
                         />
                         <input
                             type="email"
-                            name="email"
+                            name="mail"
                             placeholder="Email"
-                            value={newSalarie.email}
+                            value={newSalarie.mail}
                             onChange={handleChange}
                             required
                         />
@@ -121,9 +160,9 @@ function AdminPanel() {
                         />
                         <input
                             type="numero"
-                            name="telpro"
+                            name="numeroPro"
                             placeholder="Téléphone pro"
-                            value={newSalarie.telpro}
+                            value={newSalarie.numeroPro}
                             onChange={handleChange}
                             required
                         />
@@ -136,28 +175,32 @@ function AdminPanel() {
                             required
                         />
 
-                        <select name="localisation" value={newSalarie.localisation || 'NON_DEFINI'} onChange={handleChange}>
-                            <option value="NON_DEFINI">NON_DEFINI</option>
-                            <option value="COMMUNICATION">COMMUNICATION</option>
-                            <option value="CABINET_DU_MAIRE">CABINET_DU_MAIRE</option>
-                            <option value="ELUS">ELUS</option>
-                            <option value="POLICE_MUNICIPALE">POLICE_MUNICIPALE</option>
-                            <option value="PROSPECTIVE_ET_MUTATIONS_URBAINES">PROSPECTIVE_ET_MUTATIONS_URBAINES</option>
-                            <option value="VIE_HABITANT_ET_VIE_DE_LA_CITE">VIE_HABITANT_ET_VIE_DE_LA_CITE</option>
-                            <option value="VILLE_ATTRACTIVE">VILLE_ATTRACTIVE</option>
-                            <option value="VILLE_MODERNE">VILLE_MODERNE</option>
+                        <input
+                            type="password"
+                            name="passwordVerif"
+                            placeholder="Réentrez le Mot de passe"
+                            onChange={(e) => setPasswordVerif(e.target.value.toString())}
+                            required
+                        />
+                        <select style={{ fontFamily: '"Brown Pro", sans-serif' }} name="localisation" value={newSalarie.localisation || 'NON_DEFINI'} onChange={handleChange}>
+                            <option value="NON_DEFINI">NON DEFINI</option>
+                            <option value="VILLE_ÉDUCATIVE">VILLE ÉDUCATIVE</option>
+
+                            <option value="PROSPERTCTIVE_ET_MUTATION_URBAINES">PROSPERTCTIVE ET MUTATION URBAINES</option>
+                            <option value="VILLE_CULTURELLE">VILLE CULTURELLE</option>
+
+                            <option value="COHÉSION_LOCALE">COHÉSION LOCALE</option>
+                            <option value="VILLE_MODERNE">VILLE MODERNE</option>
+                            <option value="VILLE_ATTRACTIVE">VILLE ATTRACTIVE</option>
+                            <option value="DIRECTION_GÉNÉRALE">DIRECTION GÉNÉRALE</option>
                         </select>
 
-                        <select
+                        <select style={{ fontFamily: '"Brown Pro", sans-serif' }}
                             name="fonction"
                             value={newSalarie.fonction}
                             onChange={handleChange}
                         >
-                            <option disabled>--Direction Générale--</option>
-                            <option value="Police municipales">Police municipales</option>
-                            <option value="Cabinet">Cabinet</option>
-                            <option value="Communication">Communication</option>
-
+                            <option value="NON_DEFINI">NON DEFINI</option>
 
                             <option disabled>--Ville éducative--</option>
                             <option value="4 Multi-accueils">4 Multi-acceuils</option>
@@ -170,13 +213,40 @@ function AdminPanel() {
                             <option value="PIJ">PIJ</option>
                             <option value="Mediation">Mediation</option>
 
-
                             <option disabled>--Prospective et mutations urbaines--</option>
                             <option value="Développement Urbain: Urbanisme">Développement Urbain: Urbanisme</option>
                             <option value="Développement Urbain: Foncier">Développement Urbain: Foncier</option>
                             <option value="Développement Urbain: PPSP">Développement Urbain: PPSP</option>
                             <option value="Stratégies territoriales">Stratégies territoriales</option>
                             <option value="Performance de l'habitat">Performance de l'habitat</option>
+
+
+                            <option disabled>--Ville culturelle--</option>
+                            <option value="Ecoles municipales">Ecoles municipales</option>
+                            <option value="Programmation culturelle">Programmation culturelle</option>
+                            <option value="Coopération culturelle-Médicis">Coopération culturelle-Médicis</option>
+                            <option value="Grands évènements">Grands évènements</option>
+                            <option value="Médiathèque-Ludothèque">Médiathèque-Ludothèque</option>
+
+
+
+
+
+                            <option disabled>--Cohésion local--</option>
+                            <option value="Agora">Agora</option>
+                            <option value="Vie des quartiers et citoyenneté">Vie des quartiers et citoyenneté</option>
+                            <option value="Animation commerciale patrimoniale">Animation commerciale patrimoniale</option>
+                            <option value="CCAS">CCAS</option>
+                            <option value="Inclusion et développement numérique">Inclusion et développement numérique</option>
+
+                            <option disabled>--Ville moderne--</option>
+                            <option value="Ressources humaines">Ressources humaines</option>
+                            <option value="Affaires juridiques">Affaires juridiques</option>
+                            <option value="Commandes publique">Commandes publique</option>
+                            <option value="Transformation numérique">Transformation numérique</option>
+                            <option value="Finances">Finances</option>
+                            <option value="Archives documentation">Archives documentation</option>
+                            <option value="Guichet unique">Guichet unique</option>
 
 
                             <option disabled>--Ville attractive--</option>
@@ -190,30 +260,16 @@ function AdminPanel() {
 
 
 
-                            <option disabled>--Ville moderne--</option>
-                            <option value="Ressources humaines">Ressources humaines</option>
-                            <option value="Affaires juridiques">Affaires juridiques</option>
-                            <option value="Commandes publique">Commandes publique</option>
-                            <option value="Transformation numérique">Transformation numérique</option>
-                            <option value="Finances">Finances</option>
-                            <option value="Archives documentation">Archives documentation</option>
-                            <option value="Guichet unique">Guichet unique</option>
+                            <option disabled>--Direction Générale--</option>
+                            <option value="Police municipales">Police municipales</option>
+                            <option value="Cabinet">Cabinet</option>
+                            <option value="Communication">Communication</option>
+                            <option value="Courrier">Courrier</option>
 
 
-                            <option disabled>--Cohésion local--</option>
-                            <option value="Agora">Agora</option>
-                            <option value="Vie des quartiers et citoyenneté">Vie des quartiers et citoyenneté</option>
-                            <option value="Animation commerciale patrimoniale">Animation commerciale patrimoniale</option>
-                            <option value="CCAS">CCAS</option>
-                            <option value="Inclusion et développement numérique">Inclusion et développement numérique</option>
 
 
-                            <option disabled>--Ville culturelle--</option>
-                            <option value="Ecoles municipales">Ecoles municipales</option>
-                            <option value="Programmation culturelle">Programmation culturelle</option>
-                            <option value="Coopération culturelle-Médicis">Coopération culturelle-Médicis</option>
-                            <option value="Grands évènements">Grands évènements</option>
-                            <option value="Médiathèque-Ludothèque">Médiathèque-Ludothèque</option>
+
 
 
 
@@ -228,7 +284,7 @@ function AdminPanel() {
                         <button type="submit">Créer</button>
                     </form>
                 </div>
-                <p style={{textAlign: "center"}}>*Seule les administrateurs peuvent créer un salarié *</p>
+                <p style={{ textAlign: "center" }}>*Seuls les administrateurs peuvent créer un salarié. *</p>
             </div>
         )
     } else {

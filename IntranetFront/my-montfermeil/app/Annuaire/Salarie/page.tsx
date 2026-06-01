@@ -1,144 +1,245 @@
 'use client'
 
-import { defaultConfig } from "next/dist/server/config-shared";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react"
+import { useEffect, useState } from "react";
 import "@/app/Annuaire/Salarie/style.css";
-
+import { getSessionBoolean, getSessionItemOrEmpty } from "@/app/utils/sessionStorage";
 
 function ModifierSalarie() {
 
-    const [search, SetSearch] = useState<string>("")
-    const [pepole, Setpeople] = useState<any[]>([]);
-    const [visible, SetVisible] = useState(true);
-    const routeur = useRouter();
+    const [search, setSearch] = useState<string>("");
+    const [people, setPeople] = useState<any[]>([]);
+    const [loading, setLoading] = useState(false);
+    const router = useRouter();
 
-    async function LookingForName(name: string) {
+    // 🔥 fetch sécurisé
+    async function fetchData(url: string, options: RequestInit = {}) {
+        const token = getSessionItemOrEmpty("token");
 
-        const identifiant = sessionStorage.getItem("mail")
-        const password = sessionStorage.getItem("MDP")
+        const res = await fetch(url, {
+            ...options,
+            headers: {
+                Authorization: `Bearer ${token}`,
+                ...(options.headers || {})
+            }
+        });
 
-        const credential = btoa(`${identifiant}:${password}`)
-        try {
-            const response = await fetch(`http://localhost:8080/salaries/Salarie/${encodeURIComponent(name)}`, {
-                method: "GET",
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                    'Authorization': `Basic ${credential}`
-                }
+        if (!res.ok) return [];
 
-
-            })
-            const data = await response.json();
-            Setpeople(data);
-            SetVisible(true)
-
-
-
-        } catch (error) {
-            console.log(error)
-            SetVisible(true)
-
-
-        }
+        const text = await res.text();
+        return text ? JSON.parse(text) : [];
     }
+
+    async function searchAll(name: string) {
+        const token = getSessionItemOrEmpty("token");
+
+        const [salaries, organismes] = await Promise.all([
+            fetchData(
+                `/api/Montfermeil/users/Salarie/${encodeURIComponent(name)}`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                }
+            ),
+            fetchData(
+                `/api/Montfermeil/organisation/label/${encodeURIComponent(name)}`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                }
+            )
+        ]);
+
+        const formattedSalaries = salaries.map((s: any) => ({
+            ...s,
+            type: "salarie"
+        }));
+
+        const formattedOrganismes = organismes.map((o: any) => ({
+            ...o,
+            type: "organisme"
+        }));
+
+        return [...formattedSalaries, ...formattedOrganismes];
+    }
+
+    // 🔥 protection accès
     useEffect(() => {
-        if (sessionStorage.length == 0 || sessionStorage == null) {
-            routeur.push("/");
+        if (!getSessionItemOrEmpty("token")) {
+            router.push("/");
+        }
+    }, []);
+
+    // 🔥 debounce propre
+    useEffect(() => {
+        if (!search.trim()) {
+            setPeople([]);
+            return;
         }
 
-    }, [])
-    useEffect(() => {
+        setLoading(true);
 
-        if (search.trim() !== "") {
-            //temps de chargement
-            SetVisible(false)
+        const timer = setTimeout(async () => {
+            const results = await searchAll(search);
+            setPeople(results);
+            setLoading(false);
+        }, 1300);
 
-            setTimeout(() => {
-                LookingForName(search);
-            }, 1000);
+        return () => clearTimeout(timer);
 
-        } else {
-            Setpeople([]);
-        }
+    }, [search]);
 
-    }, [search])
+    console.log(people)
 
     return (
         <div className="container">
+
             <input
                 type="text"
                 value={search}
-                onChange={(e) => SetSearch(e.target.value)}
-                placeholder="Rechercher un salarié par nom..."
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Rechercher un salarié ou organisme..."
                 className="search-input"
             />
-            <div>
-                <h3 className="results-title">Résultats ({pepole.length})</h3>
 
-                <h2 hidden={visible}>Chargement... </h2>
+            <h3 className="results-title">
+                Résultats ({people.length})
+            </h3>
 
-                {pepole.length > 0 ? (
-                    <div className="table-container">
-                        <table className="montableau">
-                            <thead>
-                                <tr>
-                                    <th>Nom</th>
-                                    <th>Prénom</th>
-                                    <th>Téléphone</th>
-                                    <th className="hide-on-mobile">Tél. Pro</th>
-                                    <th>Email</th>
-                                    <th className="hide-on-tablet">Fonction</th>
-                                    <th>Services</th>
-                                    <th>Lieux</th>
-                                    <th>Découvrir</th>
-                                    {/* Ajouter une collone lieux */}
-                                    {sessionStorage.getItem("isAdmin") == 'true' && <th>Modifier</th>}
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {pepole.map((person, index) => (
-                                    <tr key={index}>
-                                        <td data-label="Nom">{person.nom || 'N/A'}</td>
-                                        <td data-label="Prénom">{person.prenom || 'N/A'}</td>
-                                        <td data-label="Téléphone">{person.numero || 'N/A'}</td>
-                                        <td className="hide-on-mobile" data-label="Tél. Pro">{person.telephonepro || 'N/A'}</td>
-                                        <td data-label="Email">
-                                            <a href={`mailto:${person.mail || 'N/A'}`}>
-                                                {person.mail || 'N/A'}
-                                            </a>
-                                        </td>
-                                        <td className="hide-on-tablet" data-label="Fonction">{person.fonction || 'N/A'}</td>
-                                        <td data-label="Services">{person.localisation || 'N/A'}</td>
-                                        <td>V</td>
-                                        <td><button onClick={() => routeur.push(`/Annuaire/Salarie/${person.id}`)}
-                                            className="modifier-btn">Voir</button></td>
-                                        {sessionStorage.getItem("isAdmin") == 'true' && (
+            {loading && <h2>Chargement...</h2>}
 
-                                            <td data-label="Actions">
+            {people.length > 0 ? (
+                <div className="table-container">
+                    <table className="montableau">
+                        <thead>
+                            <tr>
+                                <th>Nom</th>
+                                <th>Téléphone</th>
+                                <th>Tél. Pro</th>
+                                <th>Email</th>
+                                <th>Service</th>
+                                <th>Localisation</th>
+                                <th>Découvrir</th>
+                                {getSessionBoolean("isAdmin") && <th>Modifier</th>}
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {people.map((p, index) => (
+                                <tr key={index}>
+
+                                    {p.type === "salarie" ? (
+                                        <>
+                                            <td data-label="Nom">{p.nom ?? "N/A"} {p.prenom ?? ""}</td>
+
+                                            <td data-label="Téléphone">
+                                                {p.numero
+                                                    ? <a style={{color: "blue"}} href={`tel:${p.numero}`}><u>{p.numero}</u></a>
+                                                    : "Aucun"}
+                                            </td>
+
+                                            {/* 🔥 téléphone pro remis */}
+                                            <td data-label="Tél. Pro">
+                                                {p.telephonepro
+                                                    ? <a style={{color: "blue"}} href={`tel:${p.telephonepro}`}><u>{p.telephonepro} </u></a>
+                                                    : "Aucun"}
+                                            </td>
+
+                                            <td data-label="Email">
+                                                {p.mail
+                                                    ? <a style={{color: "blue"}} href={`mailto:${p.mail}`}><u>{p.mail} </u></a>
+                                                    : "Aucun"}
+                                            </td>
+
+                                            <td data-label="Service">
+                                                {p.fonction ?? "N/A"}
+                                            </td>
+
+                                            <td data-label="Localisation">
+                                                {p.organigramme ? (
+                                                    <u><a style={{color:"blue"}} href={`/Annuaire/Organisme/${p.organigramme.id}`}>
+                                                        {p.organigramme.label}
+                                                    </a></u>
+                                                ) : "N/A"}
+                                            </td>
+
+                                            <td data-label="Découvrir">
                                                 <button
-                                                    onClick={() => routeur.push(`/Annuaire/${person.id}`)}
                                                     className="modifier-btn"
+                                                    onClick={() => router.push(`/Annuaire/Salarie/${p.id}`)}
                                                 >
-                                                    Modifier
+                                                    Voir profil
                                                 </button>
                                             </td>
-                                        )}
 
-                                    </tr>
-                                ))}
+                                            {getSessionBoolean("isAdmin") && (
+                                                <td data-label="Modifier">
+                                                    <button
+                                                        className="modifier-btn"
+                                                        onClick={() => router.push(`/Annuaire/${p.id}`)}
+                                                    >
+                                                        Modifier
+                                                    </button>
+                                                </td>
+                                            )}
+                                        </>
+                                    ) : (
+                                        <>
+                                            {/* 🔥 ORGANISME ALIGNÉ SUR MÊME STRUCTURE */}
 
-                            </tbody>
-                        </table>
+                                            <td data-label="Nom / Organisme" style={{ textAlign: "center" }}><b>{p.label ?? "N/A"}</b></td>
 
-                    </div>
+                                            <td data-label="Téléphone" style={{ textAlign: "center" }}>
+                                                {p.telephone
+                                                    ? <a href={`tel:${p.telephone}`}>{p.telephone}</a>
+                                                    : "Aucun"}
+                                            </td>
 
-                ) : search.length > 0 ? (
-                    <p className="no-results">Aucun résultat trouvé pour "{search}"</p>
-                ) : null}
-            </div>
+                                            {/* tel pro (vide pour organisme mais colonne conservée) */}
+                                            <td data-label="Tél. Pro" style={{ textAlign: "center" }}>-</td>
+                                            <td data-label="Email" style={{ textAlign: "center" }}>-</td>
+                                            <td data-label="Service" style={{ textAlign: "center" }}>-</td>
+
+                                            <td data-label="Localisation" style={{ textAlign: "center" }}>
+                                                <a
+                                                    href={`https://www.google.com/search?q=${encodeURIComponent(p.adresse)}`}
+                                                    target="_blank"
+                                                >
+                                                    {p.adresse ?? "N/A"}
+                                                </a>
+                                            </td>
+
+                                            <td data-label="Découvrir">
+                                                <button
+                                                    className="modifier-btn"
+                                                    onClick={() => router.push(`/Annuaire/Organisme/${p.id}`)}
+                                                >
+                                                    Voir organisme
+                                                </button>
+                                            </td>
+
+                                            {getSessionBoolean("isAdmin") && (
+                                                <td data-label="Modifier">-</td>
+                                            )}
+                                        </>
+                                    )}
+
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+
+            ) : search.length > 0 && !loading ? (
+                <p className="no-results">
+                    Aucun résultat trouvé pour "{search}"
+                </p>
+            ) : null}
+
         </div>
-    )
+    );
 }
 
 export default ModifierSalarie;

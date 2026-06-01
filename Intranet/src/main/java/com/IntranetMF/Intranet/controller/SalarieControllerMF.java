@@ -1,62 +1,186 @@
 package com.IntranetMF.Intranet.controller;
 
-import java.time.Instant;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
+import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import java.util.Optional;
 
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+import java.nio.file.Files;
 import com.IntranetMF.Intranet.modele.SalarieMF;
+import com.IntranetMF.Intranet.modele.OganigrameMF;
 import com.IntranetMF.Intranet.repository.SalarieInterfacesMF;
+import com.IntranetMF.Intranet.repository.OrganismeInterfacesMF;
+
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 
 import jakarta.transaction.Transactional;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 
+/**
+ * Controller REST pour gérer les salariés.
+ *
+ * Fournit les endpoints pour récupérer, rechercher, modifier,
+ * créer, synchroniser et déconnecter des salariés.
+ */
 @RestController
 @RequestMapping("/salaries")
 public class SalarieControllerMF {
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    private String logDir = "log/Salarie/"
+            + LocalDate.now().getYear() + "/"
+            + LocalDate.now().getMonthValue() + "/"
+            + LocalDate.now().getDayOfMonth();
 
     public final SalarieInterfacesMF salarieControllerMF;
+    public final OrganismeInterfacesMF oganigrameMF;
 
-    public SalarieControllerMF(SalarieInterfacesMF salarieControllerMF) {
+    @PersistenceContext
+    private EntityManager entityManager;
+
+    public SalarieControllerMF(SalarieInterfacesMF salarieControllerMF, OrganismeInterfacesMF oganigrameMF) {
         this.salarieControllerMF = salarieControllerMF;
+        this.oganigrameMF = oganigrameMF;
     }
 
+    /**
+     * Renvoie le salarié correspondant à l'identifiant fourni.
+     *
+     * @param jwt Le jeton JWT de l'utilisateur authentifié.
+     * @param id  L'identifiant du salarié recherché.
+     * @return le salarié trouvé.
+     * @throws RuntimeException si le compte JWT n'existe pas ou si le salarié n'est pas trouvé.
+     */
     @GetMapping("/{id}")
-    public SalarieMF getMethodName(@PathVariable Long id) {
+    public SalarieMF getMethodName(@AuthenticationPrincipal Jwt jwt, @PathVariable Long id) {
+
+        String email = jwt.getClaim("email");
+        Optional<SalarieMF> personne = salarieControllerMF.findByMail(email);
+
+        if (!personne.isPresent()) {
+            throw new RuntimeException("Compte innexistant");
+        }
+
         var salarieOpt = salarieControllerMF.findById(id);
         if (salarieOpt.isPresent()) {
-            return salarieOpt.get();
+            SalarieMF salarie = salarieOpt.get();
+            String text = salarie.getNom() + " " + salarie.getPrenom() + " . A été rechercher. Par "
+                    + personne.get().getPrenom() + " " + salarie.getNom();
+            logContenu(text);
+            return salarie;
         } else {
             throw new RuntimeException("Salarie not found with id: " + id);
         }
+
     }
 
+    /**
+     * Renvoie un salarié à partir de son adresse e-mail.
+     *
+     * @param jwt   Le jeton JWT de l'utilisateur authentifié.
+     * @param email L'adresse e-mail du salarié à récupérer.
+     * @return le salarié trouvé.
+     * @throws RuntimeException si le compte JWT n'existe pas ou si le salarié n'est pas trouvé.
+     */
+    @GetMapping("/email/{email}")
+    public SalarieMF getEmail(@AuthenticationPrincipal Jwt jwt, @PathVariable String email) {
+        Optional<SalarieMF> unSalarie = salarieControllerMF.findByMail(email);
+
+        String emailV = jwt.getClaim("email");
+        Optional<SalarieMF> personne = salarieControllerMF.findByMail(email);
+
+        if (!personne.isPresent()) {
+            throw new RuntimeException("Compte innexistant");
+        }
+
+        if (unSalarie.isPresent()) {
+
+            String text = email + "  A été rechercher. Par "
+                    + personne.get().getPrenom() + " " + personne.get().getNom();
+            logContenu(text);
+            return unSalarie.get();
+        } else {
+            throw new RuntimeException("Salarie not found with email: " + email);
+
+        }
+    }
+
+    /**
+     * Vérifie les rôles de l'utilisateur authentifié.
+     *
+     * @param auth Le contexte d'authentification Spring Security.
+     * @return les autorités du principal.
+     */
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/test-role")
+    public Object test(Authentication auth) {
+        return auth.getAuthorities();
+    }
+
+    /**
+     * Renvoie la liste de tous les salariés.
+     *
+     * @param jwt Le jeton JWT de l'utilisateur authentifié.
+     * @return tous les salariés enregistrés dans la base de données.
+     * @throws RuntimeException si le compte JWT n'existe pas.
+     */
     @GetMapping("/")
-    public Iterable<SalarieMF> getAllSalaries() {
+    public Iterable<SalarieMF> getAllSalaries(@AuthenticationPrincipal Jwt jwt) {
+
+        String email = jwt.getClaim("email");
+        Optional<SalarieMF> personne = salarieControllerMF.findByMail(email);
+
+        if (!personne.isPresent()) {
+            throw new RuntimeException("Compte innexistant");
+        }
+
+        String text = personne.get().getPrenom() + " " + personne.get().getNom() + " A chercher tout les utilisateur";
+        logContenu(text);
+
         return salarieControllerMF.findAll();
     }
 
+    /**
+     * Recherche des salariés par nom ou prénom.
+     *
+     * @param jwt Le jeton JWT de l'utilisateur authentifié.
+     * @param nom Le terme de recherche (nom, prénom ou combinaison).
+     * @return la liste des salariés correspondant à la recherche.
+     * @throws RuntimeException si le compte JWT n'existe pas.
+     */
     @GetMapping("/Salarie/{nom}")
-    public List<SalarieMF> findSalarierbymail(@PathVariable String nom) {
+    public List<SalarieMF> findSalarierbymail(@AuthenticationPrincipal Jwt jwt, @PathVariable String nom) {
 
         String[] coupage = nom.trim().split("\\s+"); // Séparer en mots
 
         List<SalarieMF> salarie;
+
+        String email = jwt.getClaim("email");
+        Optional<SalarieMF> personne = salarieControllerMF.findByMail(email);
+
+        if (!personne.isPresent()) {
+            throw new RuntimeException("Compte innexistant");
+        }
 
         if (coupage.length >= 2) {
             String prenom = coupage[0];
@@ -71,22 +195,86 @@ public class SalarieControllerMF {
         }
 
         if (!salarie.isEmpty()) {
+            String text = personne.get().getPrenom() + " " + personne.get().getNom() + " A chercher " + nom;
+            logContenu(text);
             return salarie;
         } else {
-            throw new RuntimeException("Aucun salarié trouvé pour : " + nom);
+            return List.of();
         }
     }
 
+    /**
+     * Renvoie les salariés d'un organigramme donné.
+     *
+     * @param jwt Le jeton JWT de l'utilisateur authentifié.
+     * @param id  L'identifiant de l'organigramme.
+     * @return la liste des salariés appartenant à cet organigramme.
+     * @throws RuntimeException si le compte JWT n'existe pas ou si l'organigramme n'est pas trouvé.
+     */
+    @GetMapping("/organigramme/{id}")
+    public List<SalarieMF> getOrganigrammeById(@AuthenticationPrincipal Jwt jwt, @PathVariable Long id) {
+        Optional<OganigrameMF> OG = oganigrameMF.findById(id);
+
+        String email = jwt.getClaim("email");
+        Optional<SalarieMF> personne = salarieControllerMF.findByMail(email);
+
+        if (!personne.isPresent()) {
+            throw new RuntimeException("Compte innexistant");
+        }
+
+        if (OG.isPresent()) {
+            List<SalarieMF> salarieorganigramme = salarieControllerMF.findByOganigrame(OG.get());
+            String text = personne.get().getPrenom() + " " + personne.get().getNom()
+                    + " A chercher l'orgnigramme numéro  " + id;
+            logContenu(text);
+            return salarieorganigramme;
+
+        }
+        throw new RuntimeException("Aucun organisme avec cette id : " + id);
+
+    }
+
+    /**
+     * Modifie un salarié existant.
+     *
+     * @param jwt          Le jeton JWT de l'utilisateur authentifié.
+     * @param id           L'identifiant du salarié à modifier.
+     * @param nom          Le nouveau nom.
+     * @param prenom       Le nouveau prénom.
+     * @param mail         La nouvelle adresse e-mail.
+     * @param numero       Le nouveau numéro de téléphone personnel.
+     * @param numeroPro    Le nouveau numéro de téléphone professionnel.
+     * @param fonction     La nouvelle fonction du salarié.
+     * @param localisation La nouvelle localisation.
+     * @return le salarié mis à jour.
+     * @throws RuntimeException si le compte JWT n'existe pas ou si le salarié n'est pas trouvé.
+     */
+    @PreAuthorize("hasRole('ADMIN')")
     @PatchMapping("/Modification/Salarie/{id}")
     public SalarieMF ModifyASalarier(
+            @AuthenticationPrincipal Jwt jwt,
             @PathVariable Long id,
             @RequestParam String nom,
             @RequestParam String prenom,
             @RequestParam String mail,
-            @RequestParam Integer numero,
-            @RequestParam Integer numeroPro,
+            @RequestParam String numero,
+            @RequestParam String numeroPro,
             @RequestParam String fonction,
             @RequestParam String localisation) {
+
+        if (!numero.matches("\\d+")) {
+            throw new IllegalArgumentException("Numéro invalide : uniquement des chiffres autorisés");
+        }
+        if (!numeroPro.matches("\\d+")) {
+            throw new IllegalArgumentException("Numéro invalide : uniquement des chiffres autorisés");
+        }
+
+        String email = jwt.getClaim("email");
+        Optional<SalarieMF> personne = salarieControllerMF.findByMail(email);
+
+        if (!personne.isPresent()) {
+            throw new RuntimeException("Compte innexistant");
+        }
 
         var salarierOpt = salarieControllerMF.findById(id);
         if (salarierOpt.isPresent()) {
@@ -99,29 +287,56 @@ public class SalarieControllerMF {
             salarier.setFonction(fonction);
             salarier.setLocalisation(
                     com.IntranetMF.Intranet.modele.LocalisationEnumMF.Localisation.valueOf(localisation));
+            System.out.print(salarier);
+
+            String text = personne.get().getPrenom() + " " + personne.get().getNom() + " a modifier : "
+                    + salarier.getNom() + " " + salarier.getPrenom();
+            logContenu(text);
             return salarieControllerMF.save(salarier); // sauvegarde de l'objet existant modifié
         } else {
             throw new RuntimeException("Aucun salarié trouvé pour cet ID: " + id);
         }
     }
 
+    /**
+     * Crée un nouveau salarié.
+     *
+     * @param jwt          Le jeton JWT de l'utilisateur authentifié.
+     * @param nom          Le nom du salarié.
+     * @param prenom       Le prénom du salarié.
+     * @param mail         L'adresse e-mail du salarié.
+     * @param numero       Le numéro de téléphone personnel du salarié.
+     * @param numeroPro    Le numéro de téléphone professionnel du salarié.
+     * @param fonction     La fonction du salarié.
+     * @param localisation La localisation du salarié.
+     * @return le salarié nouvellement créé.
+     * @throws RuntimeException si le compte JWT n'existe pas.
+     */
     @Transactional
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/NewSalarie")
     public SalarieMF createSalarie(
-            @RequestParam String nom,
+            @AuthenticationPrincipal Jwt jwt, @RequestParam String nom,
             @RequestParam String prenom,
             @RequestParam String mail,
-            @RequestParam Integer numero,
-            @RequestParam Integer numeroPro,
+            @RequestParam String numero,
+            @RequestParam String numeroPro,
             @RequestParam String fonction,
-            @RequestParam String password,
-            @RequestParam String localisation,
-            @RequestHeader(value = "X-Admin-Token", required = false) String adminToken) {
+            @RequestParam String localisation) {
 
-        // if (adminToken == null || !adminToken.equals("adminMF-token")){
-        // throw new RuntimeException("Unauthorized: Admin access required to create a
-        // new salarie.");
-        // }
+        if (!numero.matches("\\d+")) {
+            throw new IllegalArgumentException("Numéro invalide : uniquement des chiffres autorisés");
+        }
+        if (!numeroPro.matches("\\d+")) {
+            throw new IllegalArgumentException("Numéro invalide : uniquement des chiffres autorisés");
+        }
+
+        String email = jwt.getClaim("email");
+        Optional<SalarieMF> personne = salarieControllerMF.findByMail(email);
+
+        if (!personne.isPresent()) {
+            throw new RuntimeException("Compte innexistant");
+        }
         SalarieMF newSalarie = new SalarieMF();
         newSalarie.setNom(nom);
         newSalarie.setPrenom(prenom);
@@ -130,129 +345,137 @@ public class SalarieControllerMF {
         newSalarie.setNumero(numero);
         newSalarie.setFonction(fonction);
 
-        if (!checkingPassword(password).equals("OK")) {
-            throw new RuntimeException("Password validation failed: " + checkingPassword(password));
-        }
-
-        String encodedPassword = passwordEncoder.encode(password);
-        newSalarie.setPassword(encodedPassword);
         newSalarie.setIsAdmin(false);
         newSalarie.setLocalisation(
                 com.IntranetMF.Intranet.modele.LocalisationEnumMF.Localisation.valueOf(localisation));
         newSalarie.setIsConnected(false);
 
+        int intNum = 1;
+        Long longNum = Long.valueOf(intNum);
+        Optional<OganigrameMF> og = oganigrameMF.findById(longNum);
+
+        newSalarie.setOrganigramme(og.get());
+
+        System.out.print(newSalarie);
+        String text = personne.get().getPrenom() + " " + personne.get().getNom() +" a ajouter : " + nom + " " + prenom;
+        logContenu(text);
         return salarieControllerMF.save(newSalarie);
     }
 
-    @PostMapping("/login")
-    public SalarieMF loginSalarie(
-            @RequestParam String mail,
-            @RequestParam String password,
-            @RequestHeader(value = "Authorization", required = true) String authorization) {
+    /**
+     * Synchronise un utilisateur externe avec la base de données interne.
+     *
+     * @param userData Les données utilisateur reçues (email, nom, prénom, etc.).
+     * @return le salarié synchronisé (créé ou mis à jour).
+     */
+    @PostMapping("/sync")
+    public SalarieMF syncUser(@RequestBody Map<String, String> userData) {
+        String email = userData.get("email");
 
-        if (authorization == null || !authorization.equals("Bearer intranetMF-token")) {
-            throw new RuntimeException("Unauthorized: Valid token required to login.");
-        }
+        var salarieOpt = salarieControllerMF.findByMail(email);
 
-        var salarieOpt = salarieControllerMF.findByMail(mail);
         if (salarieOpt.isPresent()) {
-            SalarieMF salarie = salarieOpt.get();
-
-            ZonedDateTime parisTime = ZonedDateTime.now(ZoneId.of("Europe/Paris"));
-            LocalDateTime localDateTime = parisTime.toLocalDateTime();
-
-            if (passwordEncoder.matches(password, salarie.getPassword())) {
-                salarie.setIsConnected(true);
-                salarie.setBeginLogin(localDateTime);
-
-                salarieControllerMF.save(salarie);
-
-                // Pour voir qui c'est connecter
-                System.out.println("Salarier:" + salarie);
-                System.out.println("Heure système : " + LocalDateTime.now());
-                System.out.println("Heure UTC : " + Instant.now());
-                System.out.println("Fuseau par défaut : " + ZoneId.systemDefault());
-                return salarie;
-            } else {
-                throw new RuntimeException("Invalid account: ");
-            }
-        } else {
-            throw new RuntimeException("Invalid account: ");
+            SalarieMF existing = salarieOpt.get();
+            existing.setIsConnected(true);
+            // Update other fields if needed
+            existing.setNom(userData.get("nom"));
+            existing.setPrenom(userData.get("prenom"));
+            return salarieControllerMF.save(existing);
         }
+
+        // Create new
+        SalarieMF newUser = new SalarieMF();
+        newUser.setMail(email);
+        newUser.setNom(userData.get("nom"));
+        newUser.setPrenom(userData.get("prenom"));
+        newUser.setIsConnected(true);
+        newUser.setIsAdmin(false);
+        // Set defaults
+        newUser.setLocalisation(com.IntranetMF.Intranet.modele.LocalisationEnumMF.Localisation.NON_DEFINI); // Assuming
+                                                                                                            // default
+        newUser.setNumero(userData.get("telephoneNumber"));
+        newUser.setTelPro(userData.get("mobilePro"));
+        newUser.setFonction(userData.get("fonction"));
+
+        String text = "Nouveau utilisateur synchronisé : " + userData.get("nom") + " " + userData.get("prenom");
+        logContenu(text);
+        return salarieControllerMF.save(newUser);
     }
 
+    /**
+     * Déconnecte un salarié en passant son statut isConnected à false.
+     *
+     * @param email L'email du salarié à déconnecter.
+     * @return le salarié mis à jour après déconnexion.
+     * @throws RuntimeException si l'email est manquant ou si le salarié n'est pas trouvé.
+     */
     @PostMapping("/logout")
-    public SalarieMF logoutSalarie(
-            @RequestParam String mail) {
+    @Transactional
+    public SalarieMF logoutSalarie(@RequestParam String email) {
+        System.out.println("\n====================================");
+        System.out.println("🔓 LOGOUT REQUEST START");
+        System.out.println("UserData: " + email);
+        System.out.println("====================================\n");
 
-        var salarieOpt = salarieControllerMF.findByMail(mail);
+        System.out.println("📧 Looking for email: " + email);
+
+        if (email == null || email.isEmpty()) {
+            System.out.println("❌ ERROR: Email is required for logout");
+            throw new RuntimeException("Email is required for logout");
+        }
+
+        var salarieOpt = salarieControllerMF.findByMail(email);
+
         if (salarieOpt.isPresent()) {
             SalarieMF salarie = salarieOpt.get();
-
-            ZonedDateTime parisTime = ZonedDateTime.now(ZoneId.of("Europe/Paris"));
-            LocalDateTime localDateTime = parisTime.toLocalDateTime();
+            System.out.println("✅ User found - Name: " + salarie.getNom() + " " + salarie.getPrenom());
+            System.out.println("   Current isConnected: " + salarie.getIsConnected());
+            System.out.println("   Current beginLogin: " + salarie.getBeginLogin());
 
             salarie.setIsConnected(false);
-            salarie.setLastLogin(localDateTime);
-            salarieControllerMF.save(salarie);
+            salarie.setLastLogin(LocalDateTime.now());
+            System.out.println("   Set isConnected to: " + salarie.getIsConnected());
+            System.out.println("   Set lastLogin to: " + salarie.getLastLogin());
 
-            // Pour voir qui c'est déconnecter
-            System.out.println("Salarier:" + salarie);
-            System.out.println("Heure système : " + LocalDateTime.now());
-            System.out.println("Heure UTC : " + Instant.now());
-            System.out.println("Fuseau par défaut : " + ZoneId.systemDefault());
-            return salarie;
+            SalarieMF saved = salarieControllerMF.save(salarie);
+            entityManager.flush(); // Force immediate database update
+            System.out.println("   Saved - isConnected is now: " + saved.getIsConnected());
+            System.out.println("   Saved - lastLogin is now: " + saved.getLastLogin());
+
+            String logText = "🔓 DÉCONNEXION: " + salarie.getNom() + " " + salarie.getPrenom() + " s'est déconnecté à "
+                    + salarie.getLastLogin();
+            System.out.println(logText);
+            logContenu(logText);
+
+            System.out.println("✅ LOGOUT SUCCESS\n");
+            return saved;
         } else {
-            throw new RuntimeException("Salarie not found");
+            System.out.println("❌ User NOT found with email: " + email);
+            throw new RuntimeException("Salarie not found with email: " + email);
         }
     }
 
-    @PatchMapping("/PasswordReset")
-    public String passwordReset(@RequestParam Long id, @RequestParam String password) {
-        Optional<SalarieMF> salarie = salarieControllerMF.findById(id);
-        if (salarie.isPresent()) {
-            SalarieMF LeSalarier = salarie.get();
+    public void logContenu(String message) {
+        String nomDuFichier = "LogsSalarier.txt";
+        Path cheminPath = Paths.get(logDir, nomDuFichier);
 
-            if (!checkingPassword(password).equals("OK")) {
-                throw new RuntimeException("Password validation failed: " + checkingPassword(password));
-            }
-
-            String encodedPassword = passwordEncoder.encode(password);
-            LeSalarier.setPassword(encodedPassword);
-
-            salarieControllerMF.save(LeSalarier);
-            System.out.println("Mots de passe: "+ password);
-            return "Réinitialisation éffectuer avec succes";
-        } else {
-            return "identifiant inconnue";
-        }
-    }
-
-    /*
-     * Cette méthode vérifie si le mot de passe respecte les critères de sécurité
-     * suivants :
-     * - Au moins 8 caractères de long
-     * - Contient au moins une lettre majuscule
-     * - Contient au moins une lettre minuscule
-     * - Contient au moins un chiffre
-     * - Contient au moins un caractère spécial (!@#$%^&*())
-     */
-
-    public String checkingPassword(String password) {
-        if (password.length() < 8) {
-            return "Password must be at least 8 characters long.";
-        } else if (!password.matches(".*[A-Z].*")) {
-            return "Password must contain at least one uppercase letter.";
-        } else if (!password.matches(".*[a-z].*")) {
-            return "Password must contain at least one lowercase letter.";
-        } else if (!password.matches(".*\\d.*")) {
-            return "Password must contain at least one digit.";
-        } else if (!password.matches(".*[!@#$%^&*()].*")) {
-            return "Password must contain at least one special character (!@#$%^&*()).";
-        } else {
-            return "OK";
+        // créer dossier si nécessaire
+        File dir = new File(logDir);
+        if (!dir.exists()) {
+            dir.mkdirs();
         }
 
+        String contenu = LocalDateTime.now() + " - " + message + "\n";
+
+        try {
+            Files.write(
+                    cheminPath, // ✅ on passe le Path du fichier
+                    contenu.getBytes(StandardCharsets.UTF_8),
+                    StandardOpenOption.CREATE,
+                    StandardOpenOption.APPEND);
+        } catch (IOException e) {
+            e.printStackTrace(); // au moins loguer l'erreur
+        }
     }
 
 }

@@ -1,8 +1,9 @@
 package com.IntranetMF.Intranet.modele;
+
 import java.time.LocalDateTime;
 
 import com.IntranetMF.Intranet.modele.LocalisationEnumMF.Localisation;
-
+import com.IntranetMF.Intranet.modele.OganigrameMF;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -10,82 +11,95 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name= "Salarie_MF")
+@Table(name = "Salarie_MF")
 @NoArgsConstructor
 public class SalarieMF {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name= "ID_MF")
+    @Column(name = "ID_MF")
     private Long id;
 
-    @Column(name ="NOM_MF")
+    @Column(name = "NOM_MF")
     private String nom;
 
-    @Column(name= "PRENOM_MF")
+    @Column(name = "PRENOM_MF")
     private String prenom;
 
-    @Column(name= "EMAIL_MF")
+    @Column(name = "EMAIL_MF")
     private String mail;
-    
-    @Column(name= "TELEPHONE_MF")
-    private Integer numero;
 
-    @Column(name= "TELEPHONE_PRO")
-    private Integer numeroPro;
+    @Column(name = "TELEPHONE_MF")
+    private String numero;
 
-    @Column(name= "FONCTION_MF")
+    @Column(name = "TELEPHONE_PRO")
+    private String numeroPro;
+
+    @Column(name = "FONCTION_MF")
     private String fonction;
 
-    @Column(name="PASSWORD_MF")
+    @Column(name = "PASSWORD_MF")
     private String password;
 
-    @Column(name="IS_ADMIN")
+    @Column(name = "IS_ADMIN")
     private Boolean isAdmin;
 
-    @Column(name="LOCALISATION_MF")
+    @Column(name = "LOCALISATION_MF")
     @Enumerated(EnumType.STRING)
     private Localisation localisation;
 
-    
-    @Column(name="BEGIN_LOGIN")
+    @Column(name = "BEGIN_LOGIN")
     private LocalDateTime beginLogin;
 
-    @Column(name="LAST_LOGIN")
+    @Column(name = "LAST_LOGIN")
     private LocalDateTime lastLogin;
 
-    @Column(name="IS_CONNECTED")
+    @Column(name = "IS_CONNECTED")
     private Boolean isConnected;
+    
+    @ManyToOne
+    @JoinColumn(name = "OGANIGRAMME_ID", nullable = true)
+    private OganigrameMF oganigrame;
 
+    // Getters
+    public OganigrameMF getOrganigramme() {
+        return oganigrame;
+    }
 
-
-
-    //Getters
     public Long getId() {
         return id;
     }
+
     public String getNom() {
         return nom;
     }
+
     public String getPrenom() {
         return prenom;
     }
+
     public String getFonction() {
         return fonction;
     }
-    public Integer getNumero() {
+
+    public String getNumero() {
         return numero;
     }
+
     public Localisation getLocalisation() {
         return localisation;
     }
+
     public Boolean getIsConnected() {
         return isConnected;
     }
+
     public String getMail() {
         return mail;
     }
@@ -93,42 +107,48 @@ public class SalarieMF {
     public String getPassword() {
         return password;
     }
+
     public LocalDateTime getBeginLogin() {
         return beginLogin;
     }
+
     public LocalDateTime getLastLogin() {
         return lastLogin;
     }
+
     public Boolean getIsAdmin() {
         return isAdmin;
     }
 
-    public Integer getTelephonepro(){
+    public String getTelephonepro() {
         return numeroPro;
     }
 
-
-
-
-    //Setters
+    // Setters
     public void setId(Long id) {
         this.id = id;
     }
+
     public void setNom(String nom) {
         this.nom = nom;
     }
+
     public void setPrenom(String prenom) {
         this.prenom = prenom;
     }
+
     public void setFonction(String fonction) {
         this.fonction = fonction;
     }
-    public void setNumero(Integer numero) {
+
+    public void setNumero(String numero) {
         this.numero = numero;
     }
+
     public void setLocalisation(Localisation localisation) {
         this.localisation = localisation;
     }
+
     public void setIsConnected(Boolean isConnected) {
         this.isConnected = isConnected;
     }
@@ -136,27 +156,29 @@ public class SalarieMF {
     public void setMail(String mail) {
         this.mail = mail;
     }
+
     public void setPassword(String password) {
         this.password = password;
     }
+
     public void setBeginLogin(LocalDateTime beginLogin) {
         this.beginLogin = beginLogin;
     }
+
     public void setLastLogin(LocalDateTime lastLogin) {
         this.lastLogin = lastLogin;
     }
+
     public void setIsAdmin(Boolean isAdmin) {
         this.isAdmin = isAdmin;
     }
-    public void setTelPro(Integer tel){
+
+    public void setTelPro(String tel) {
         this.numeroPro = tel;
     }
-    
 
-
-
-
-  
-    
+    public void setOrganigramme(OganigrameMF unorganisme) {
+        this.oganigrame = unorganisme;
+    }
 
 }

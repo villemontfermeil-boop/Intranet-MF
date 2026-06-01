@@ -1,9 +1,9 @@
 
 'use client';
 
-import { FallbackMode } from 'next/dist/lib/fallback';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { json } from 'stream/consumers';
 interface Props {
     params: { id: string };
 }
@@ -15,11 +15,12 @@ function SalarieModification() {
     const [isInPasswordMode, SetPasswordMode] = useState(false);
     const show = !isInPasswordMode;
     const [submitButton, SetSubmit] = useState<boolean>(false);
+    const [echouay, setEchouay] = useState<boolean>(true)
 
     const [passwordForgot, setNewpassword] = useState({
         mdp: ''
     })
-
+    const [loading, setLoading] = useState(true); // État de chargement
     const [button, setButton] = useState<boolean>(false);
     const login = sessionStorage.getItem('mail')
     const password = sessionStorage.getItem('MDP')
@@ -37,17 +38,12 @@ function SalarieModification() {
     const idValue = id ?
         (Array.isArray(id) ? id[0] : id) :
         '';
-
-
+    const number = parseInt(idValue)
     const credential = btoa(`${login}:${password}`)
     const api = async () => {
         try {
-            const reponse = await fetch(`http://localhost:8080/salaries/${id}`, {
-                method: "GET",
-                headers: {
-                    'Authorization': `Basic ${credential}`
-                }
-            })
+            const reponse = await fetch(`/api/Montfermeil/users/${idValue}`)
+            console.log(reponse)
             const result = await reponse.json();
             SetData(result);
             SetPersonne({
@@ -59,6 +55,8 @@ function SalarieModification() {
                 fonction: result.fonction ?? '',
                 localisationS: result.localisation ?? 'NON_DEFINI'
             });
+            setLoading(false); // Début du chargement
+
         } catch (error) {
             console.log(error)
             console.log(credential)
@@ -74,41 +72,43 @@ function SalarieModification() {
         localisationH: string,
         telpro: string
     ) {
+        const payload = new URLSearchParams({
+            nom: nomP,
+            prenom: prenomP,
+            mail: emailP,
+            numero: telephoneportableP,
+            numeroPro: telpro || '0',
+            fonction: fonction,
+            localisation: localisationH
+        });
+
         try {
-            const response = await fetch(
-                `http://localhost:8080/salaries/Modification/Salarie/${id}`,
-                {
-                    method: "PATCH",
-                    headers: {
-                        "Authorization": `Basic ${credential}`,
-                        "Content-Type": "application/x-www-form-urlencoded"
-                    },
-                    body: new URLSearchParams({
-                        nom: nomP,
-                        prenom: prenomP,
-                        mail: emailP,
-                        numero: telephoneportableP,
-                        numeroPro: telpro || '0',
-                        fonction: fonction,
-                        localisation: localisationH || "NON_DEFINI"
-                    }).toString()
-                }
-            );
-            console.log("Finn", personne);
+            const login = sessionStorage.getItem('mail');
+            const password = sessionStorage.getItem('MDP');
+            const credential = btoa(`${login}:${password}`);
+
+            const response = await fetch(`/api/Montfermeil/users/Modification/Salarie/${idValue}`, {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded"
+                },
+                body: payload
+            });
+
             if (!response.ok) {
-                const errorText = await response.text();
-                throw new Error(`Erreur lors de la modification : ${errorText}`);
+                alert(`Erreur lors de la modification : ${response.statusText}`);
+                return null;
             }
 
-            const result = await response.json();
-            console.log("Modification réussie :", result);
-            // Redirection si tu veux
-            alert("Modification éffectuer evc succès" + personne)
+            console.log("Modification réussie :");
+            alert("Modification effectuée avec succès !");
             router.push("/");
         } catch (error) {
             console.error(error);
         }
     }
+
+
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         SetPersonne({ ...personne, [e.target.name]: e.target.value });
     };
@@ -116,25 +116,33 @@ function SalarieModification() {
     const handlechangePassword = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         setNewpassword({ ...passwordForgot, [e.target.name]: e.target.value })
     }
+    function motDePasseValide(mdp: string): boolean {
+        const pattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
+        return pattern.test(mdp);
+    }
 
     async function passwordReset() {
-        try {
-
-
-            const response = await fetch("http://localhost:8080/salaries/PasswordReset", {
-                method: "PATCH",
-                headers: {
-                    "Authorization": `Basic ${credential}`,
-                    "Content-Type": "application/x-www-form-urlencoded"
-                },
-                body: new URLSearchParams({
+        if (motDePasseValide(passwordForgot.mdp)) {
+            try {
+                const users = {
                     id: idValue || '',
                     password: passwordForgot.mdp || ''
+                }
+                const response = await fetch("/api/Montfermeil/users/PasswordReset", {
+                    method: "PATCH",
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: new URLSearchParams(users as Record<string, string>)
                 })
-            })
-            alert("Modification éffectuer avec succès");
-        } catch (error) {
-            console.log(error)
+                alert("Modification éffectuer avec succès");
+                router.push('/')
+
+            } catch (error) {
+                console.log(error)
+            }
+        } else {
+            setEchouay(false);
         }
 
     }
@@ -157,14 +165,47 @@ function SalarieModification() {
         }
     }, [button, submitButton])
 
+    if (loading) {
+        return (
+            <div style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                height: "100vh",
+                flexDirection: "column"
+            }}>
+                <div className="spinner"></div>
+                <p style={{ marginTop: "20px", fontSize: "18px", color: "#666" }}>
+                    Chargement du salarié..
+                </p>
 
+                <style jsx>{`
+                    .spinner {
+                        border: 4px solid rgba(0, 0, 0, 0.1);
+                        width: 50px;
+                        height: 50px;
+                        border-radius: 50%;
+                        border-left-color: #3498db;
+                        animation: spin 1s linear infinite;
+                    }
+                    
+                    @keyframes spin {
+                        0% { transform: rotate(0deg); }
+                        100% { transform: rotate(360deg); }
+                    }
+                `}</style>
+            </div>
+        );
+    }
+
+  
 
     console.log(data)
     return (
         <div style={{ placeItems: "center" }}>
             <h1>Voici l'id : {id} </h1>
             <div style={{ placeItems: "center" }}>
-                <button hidden={isInPasswordMode} onClick={() => SetPasswordMode(true)}>Modifier le mots de passe</button>
+                <button hidden={isInPasswordMode} onClick={() => SetPasswordMode(true)}>Modifier le mot de passe</button>
                 <button hidden={show} onClick={() => SetPasswordMode(false)}>Modifier le salarié</button>
 
             </div>
@@ -251,7 +292,7 @@ function SalarieModification() {
                         </tr>
 
                         <tr>
-                            <th>Localisation</th>
+                            <th>Service</th>
                             <td>
                                 <div style={{ marginBottom: "5px" }}>
                                     <strong>Actuelle :</strong>
@@ -283,7 +324,7 @@ function SalarieModification() {
                         </tr>
 
                         <tr>
-                            <th>Fonction</th>
+                            <th>Service</th>
                             <td>
                                 {/* <input
                                     name="fonction"
@@ -399,10 +440,10 @@ function SalarieModification() {
                     <thead>
                         <tr>
                             <th>
-                                Nouveaux mots de passe:
+                                Nouveau mot de passe:
                             </th>
                             <td>
-                                <input style={{ width: "95%" }} onChange={handlechangePassword} type="text" name="mdp" id="" />
+                                <input style={{ width: "95%" }} onChange={handlechangePassword} type="password" name="mdp" id="" />
                             </td>
                         </tr>
                         <tr>
@@ -412,7 +453,10 @@ function SalarieModification() {
                         </tr>
                     </thead>
                 </table>
+                <div hidden={echouay}><h4 style={{ color: "red", textAlign: "center" }}><u>Veillez à ce que le mot de passe contienne : 1 lettre majuscule, 1 lettre minuscule, 1 caractère spécial, 1 chiffre, et qu'il comporte plus de 8 caractères.</u></h4></div>
+
             </div>
+
         </div>
     )
 }
