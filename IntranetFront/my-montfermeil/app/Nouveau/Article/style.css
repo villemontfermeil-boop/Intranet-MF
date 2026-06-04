@@ -4,6 +4,12 @@
   padding: 2rem 1rem;
 }
 
+@media (max-width: 640px) {
+  .article-creation-page {
+    padding: 1.5rem 0.75rem;
+  }
+}
+
 .article-creation-card {
   background: #ffffff;
   border: 1px solid #e5e7eb;
@@ -12,11 +18,25 @@
   box-shadow: 0 18px 45px rgba(15, 23, 42, 0.08);
 }
 
+@media (max-width: 768px) {
+  .article-creation-card {
+    border-radius: 20px;
+    padding: 1.5rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .article-creation-card {
+    border-radius: 16px;
+    padding: 1.25rem;
+  }
+}
+
 .article-creation-card h1 {
   text-align: center;
   margin-bottom: 1rem;
   color: #111827;
-  font-size: clamp(2rem, 3vw, 2.5rem);
+  font-size: clamp(1.5rem, 3vw, 2.5rem);
 }
 
 .article-notes {
@@ -25,6 +45,15 @@
   text-align: center;
   color: #475569;
   line-height: 1.75;
+  font-size: clamp(0.875rem, 2vw, 1rem);
+  padding: 0 1rem;
+}
+
+@media (max-width: 640px) {
+  .article-notes {
+    margin: 0 auto 1.2rem;
+    padding: 0 0.5rem;
+  }
 }
 
 .article-table {
@@ -48,6 +77,31 @@
   border-radius: 18px;
 }
 
+@media (max-width: 768px) {
+  .article-table {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .article-table th {
+    width: 100%;
+    padding: 0;
+    display: none;
+  }
+
+  .article-table tr {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .article-table td {
+    width: 100%;
+    padding: 0.75rem;
+  }
+}
+
 .input-field,
 .textarea-field,
 .select-field,
@@ -60,6 +114,28 @@
   font-size: 1rem;
   color: #0f172a;
   background: #ffffff;
+  box-sizing: border-box;
+  transition: all 0.3s ease;
+}
+
+.input-field:focus,
+.textarea-field:focus,
+.select-field:focus,
+.file-input:focus {
+  border-color: #2563eb;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+@media (max-width: 640px) {
+  .input-field,
+  .textarea-field,
+  .select-field,
+  .file-input {
+    min-height: 44px;
+    padding: 0.85rem 0.9rem;
+    font-size: 16px;
+  }
 }
 
 .textarea-field {
@@ -77,9 +153,22 @@
   font-weight: 700;
   cursor: pointer;
   transition: transform 0.2s ease, background 0.2s ease;
+  font-size: 1rem;
 }
 
 .submit-button:hover {
   background: #1d4ed8;
   transform: translateY(-1px);
 }
+
+.submit-button:active {
+  transform: translateY(0);
+}
+
+@media (max-width: 640px) {
+  .submit-button {
+    padding: 0.9rem 1rem;
+    border-radius: 14px;
+  }
+}
+
