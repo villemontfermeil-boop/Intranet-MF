@@ -2,11 +2,25 @@
 .container {
     max-width: 1180px;
     margin: 2rem auto;
-    padding: 26px;
+    padding: 1.5rem;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background: #f8fbff;
     border-radius: 28px;
     box-shadow: 0 24px 70px rgba(15, 23, 42, 0.08);
+}
+
+@media (max-width: 640px) {
+  .container {
+    margin: 1rem auto;
+    padding: 1rem;
+    border-radius: 16px;
+  }
+}
+
+@media (min-width: 641px) and (max-width: 1024px) {
+  .container {
+    padding: 1.5rem;
+  }
 }
 
 /* Barre de recherche */
@@ -33,12 +47,33 @@
     color: #999;
 }
 
+@media (max-width: 640px) {
+  .search-input {
+    padding: 12px 14px;
+    font-size: 14px;
+    margin-bottom: 16px;
+  }
+}
+
 /* Titre */
 .results-title {
     font-size: 2rem;
     margin-bottom: 20px;
     color: #1f2937;
     font-weight: 700;
+}
+
+@media (max-width: 640px) {
+  .results-title {
+    font-size: 1.5rem;
+    margin-bottom: 16px;
+  }
+}
+
+@media (min-width: 641px) and (max-width: 1024px) {
+  .results-title {
+    font-size: 1.75rem;
+  }
 }
 
 /* Message "aucun résultat" */
@@ -48,6 +83,14 @@
     color: #506176;
     font-size: 1.1rem;
 }
+
+@media (max-width: 640px) {
+  .no-results {
+    padding: 30px;
+    font-size: 1rem;
+  }
+}
+
 
 /* Tableau responsive */
 .table-container {
@@ -61,9 +104,26 @@
 
 .montableau {
     width: 100%;
-    min-width: 920px;
     border-collapse: collapse;
     background: white;
+}
+
+@media (max-width: 1024px) {
+  .montableau {
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .montableau {
+    font-size: 0.85rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .montableau {
+    font-size: 0.8rem;
+  }
 }
 
 /* En-têtes du tableau */
@@ -76,10 +136,12 @@
     text-align: left;
     font-weight: 700;
     color: #334155;
-    font-size: 13px;
+    font-size: clamp(11px, 2vw, 13px);
     text-transform: uppercase;
     letter-spacing: 0.6px;
     border-bottom: 2px solid #e2e8f0;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
 }
 
 /* Cellules du tableau */
@@ -87,8 +149,28 @@
     padding: 14px 14px;
     border-bottom: 1px solid #f1f3f5;
     color: #2f3c53;
-    font-size: 14px;
+    font-size: clamp(12px, 2vw, 14px);
     vertical-align: middle;
+}
+
+@media (max-width: 768px) {
+  .montableau th {
+    padding: 12px 10px;
+  }
+  
+  .montableau td {
+    padding: 10px 10px;
+  }
+}
+
+@media (max-width: 640px) {
+  .montableau th {
+    padding: 10px 8px;
+  }
+  
+  .montableau td {
+    padding: 8px 8px;
+  }
 }
 
 .montableau tr:last-child td {
