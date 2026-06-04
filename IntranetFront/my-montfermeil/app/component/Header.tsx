@@ -295,7 +295,7 @@ function Header({ nom }: { nom: string | null }) {
                                 </button>
                             </>
                         ) : (
-                            <div>Loading Keycloak...</div>
+                            <div>Connexion à  Keycloak...</div>
                         )}
                     </div>
                 </form>

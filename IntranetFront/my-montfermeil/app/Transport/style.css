@@ -9,25 +9,16 @@
 }
 
 .transport-grid {
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
     justify-content: center;
-    gap: 16px;
+    gap: 18px;
     margin: 1.5rem auto 2rem;
     max-width: 960px;
     padding: 0 1rem;
 }
 
-@media (max-width: 640px) {
-  .transport-grid {
-    gap: 12px;
-    margin: 1rem auto 1.5rem;
-    padding: 0 0.75rem;
-  }
-}
-
 .transport-btn {
-    min-width: 90px;
     min-height: 90px;
     border-radius: 20px;
     border: 2px solid transparent;
@@ -42,6 +33,8 @@
     justify-content: center;
     padding: 0.9rem 1.25rem;
     text-transform: uppercase;
+    width: 100%;
+    min-width: unset;
 }
 
 .transport-btn:hover {
@@ -53,28 +46,10 @@
     transform: translateY(0);
 }
 
-@media (max-width: 640px) {
-  .transport-btn {
-    min-width: 80px;
-    min-height: 80px;
-    font-size: 0.85rem;
-    padding: 0.75rem 1rem;
-    border-radius: 16px;
-  }
-}
-
 .transport-icon {
     width: 40px;
     height: 40px;
 }
-
-@media (max-width: 640px) {
-  .transport-icon {
-    width: 32px;
-    height: 32px;
-  }
-}
-
 
 .btn-t4 {
     background: linear-gradient(135deg, #047a44, #2b9d5c);
@@ -142,14 +117,51 @@
     border-color: #b26214;
 }
 
-@media (max-width: 680px) {
-    .transport-grid {
-        gap: 12px;
-    }
+@media (max-width: 900px) {
+  .transport-grid {
+    grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+    gap: 14px;
+  }
 
-    .transport-btn {
-        min-width: 80px;
-        min-height: 80px;
-        font-size: 0.95rem;
-    }
+  .transport-btn {
+    padding: 0.75rem 1rem;
+    font-size: 0.95rem;
+  }
+
+  .transport-icon {
+    width: 34px;
+    height: 34px;
+  }
 }
+
+@media (max-width: 640px) {
+  .transport-grid {
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 12px;
+    padding: 0 0.75rem;
+    margin: 1rem auto 1.5rem;
+  }
+
+  .transport-btn {
+    min-height: 75px;
+    font-size: 0.85rem;
+    border-radius: 16px;
+  }
+
+  .transport-icon {
+    width: 28px;
+    height: 28px;
+  }
+}
+
+@media (max-width: 480px) {
+  .transport-grid {
+    grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+    gap: 10px;
+  }
+
+  .transport-btn {
+    padding: 0.65rem 0.75rem;
+  }
+}
+
