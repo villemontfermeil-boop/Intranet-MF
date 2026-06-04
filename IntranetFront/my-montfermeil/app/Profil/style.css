@@ -161,3 +161,53 @@
         transform: rotate(360deg);
     }
 }
+
+/* Responsive adjustments */
+@media (max-width: 900px) {
+  .profile-layout {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .photo-card,
+  .profile-card {
+    padding: 1.25rem;
+  }
+
+  .profile-button {
+    margin-top: 2rem;
+  }
+ 
+}
+
+@media (max-width: 640px) {
+  .profile-page {
+    padding: 1.5rem 0.75rem 2rem;
+  }
+
+  .photo-card {
+    padding: 1rem;
+    border-radius: 20px;
+  }
+
+  .profile-card {
+    padding: 1.2rem;
+    border-radius: 20px;
+  }
+
+  .profile-button {
+    margin-top: 1.25rem;
+    padding: 0.85rem 1rem;
+    font-size: 0.95rem;
+  }
+
+  .profile-table th,
+  .profile-table td {
+    padding: 0.85rem;
+    font-size: 0.95rem;
+  }
+
+  .profile-table th {
+    width: 100%;
+  }
+}
