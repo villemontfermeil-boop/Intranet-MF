@@ -1,21 +1,24 @@
 package com.IntranetMF.Intranet.controller;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
-import java.nio.file.Path;
-import java.nio.file.Files;
-import java.io.File;
 
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.DataFormat;
+import org.apache.poi.ss.usermodel.Row;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,6 +34,8 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import com.IntranetMF.Intranet.repository.RecommanderInterfacesMF;
 import com.IntranetMF.Intranet.repository.SalarieInterfacesMF;
+
+import jakarta.servlet.http.HttpServletResponse;
 
 import com.IntranetMF.Intranet.modele.SalarieMF;
 import com.IntranetMF.Intranet.modele.OganigrameMF;
@@ -61,10 +66,10 @@ public class RecommanderControllerMF {
     /**
      * Crée une nouvelle recommandation de courrier.
      *
-     * @param jwt          Le jeton JWT de l'utilisateur authentifié.
-     * @param Recommander  Le texte de la recommandation.
-     * @param date         La date souhaitée.
-     * @param services     Le service destinataire.
+     * @param jwt         Le jeton JWT de l'utilisateur authentifié.
+     * @param Recommander Le texte de la recommandation.
+     * @param date        La date souhaitée.
+     * @param services    Le service destinataire.
      * @return la recommandation enregistrée.
      */
     @PostMapping("/nouveaux")
@@ -89,7 +94,7 @@ public class RecommanderControllerMF {
                     recommander.setRecommande(Recommander);
                     recommander.setService(services);
                     recommander.setDate(date);
-                    logContenu(salarie.getNom() +" "+ salarie.getPrenom() + " à ajouter un recommander" );
+                    logContenu(salarie.getNom() + " " + salarie.getPrenom() + " à ajouter un recommander");
 
                     return recommanderInterfacesMF.save(recommander);
 
@@ -117,7 +122,8 @@ public class RecommanderControllerMF {
             if (personne.get().getIsConnected()) {
                 if ("COURRIER".equals(personne.get().getOrganigramme().getLabel())) {
                     List<RecommandeMF> recommander = recommanderInterfacesMF.findAllByOrderByDateDesc();
-                    logContenu(personne.get().getNom() +" "+ personne.get().getPrenom() + " à chercher tout les recommander" );
+                    logContenu(personne.get().getNom() + " " + personne.get().getPrenom()
+                            + " à chercher tout les recommander");
 
                     return recommander;
                 }
@@ -163,11 +169,68 @@ public class RecommanderControllerMF {
         recommanders = recommanderInterfacesMF.findByRecommanderContainingIgnoreCaseOrderByDateDesc(recherche);
 
         if (!recommanders.isEmpty()) {
-            logContenu(personne.get().getNom() +" "+ personne.get().getPrenom() +" à  chercher:  " + recherche);
+            logContenu(personne.get().getNom() + " " + personne.get().getPrenom() + " à  chercher:  " + recherche);
             return recommanders;
         } else {
             return List.of();
         }
+    }
+
+    @GetMapping("/export/excel")
+    public void exportExcel(@AuthenticationPrincipal Jwt jwt ,HttpServletResponse response) throws IOException {
+
+         String email = jwt.getClaim("email");
+        Optional<SalarieMF> personne = salarieInterfacesMF.findByMail(email);
+
+        if (!personne.isPresent()) {
+            throw new RuntimeException("Aucun salarié trouver");
+
+        }
+
+        if (!personne.get().getIsConnected()) {
+            throw new RuntimeException("Vous devez etre connecter");
+
+        }
+        if (!"COURRIER".equals(personne.get().getOrganigramme().getLabel())) {
+            throw new RuntimeException("Vous devez etre du service courrier");
+
+        }
+        response.setContentType(
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        response.setHeader(
+                "Content-Disposition",
+                "attachment; filename=export.xlsx");
+
+        XSSFWorkbook workbook = new XSSFWorkbook();
+
+        var sheet = workbook.createSheet("Données");
+
+        DataFormat dataFormat = workbook.createDataFormat();
+        CellStyle dateCellStyle = workbook.createCellStyle();
+        dateCellStyle.setDataFormat(dataFormat.getFormat("yyyy-mm-dd"));
+
+        Row header = sheet.createRow(0);
+        header.createCell(0).setCellValue("ID");
+        header.createCell(1).setCellValue("Date_envoie");
+        header.createCell(2).setCellValue("Recommande");
+        header.createCell(3).setCellValue("Service");
+
+        int rowNum = 1;
+
+        for (RecommandeMF r : recommanderInterfacesMF.findAll()) {
+            Row row = sheet.createRow(rowNum++);
+            row.createCell(0).setCellValue(r.getId());
+            Cell dateCell = row.createCell(1);
+            if (r.getDate() != null) {
+                dateCell.setCellValue(Date.from(r.getDate().atStartOfDay(ZoneId.systemDefault()).toInstant()));
+                dateCell.setCellStyle(dateCellStyle);
+            }
+            row.createCell(2).setCellValue(r.getRecommande());
+            row.createCell(3).setCellValue(r.getService());
+        }
+
+        workbook.write(response.getOutputStream());
+        workbook.close();
     }
 
     public void logContenu(String message) {
