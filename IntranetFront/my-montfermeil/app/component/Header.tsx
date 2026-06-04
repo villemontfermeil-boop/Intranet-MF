@@ -285,7 +285,7 @@ function Header({ nom }: { nom: string | null }) {
                                     Nouvel article
                                 </button>}
                                 {sessionStorage.length > 0 && sessionStorage.getItem('fonction') == "COURRIER" && <button type="button" className='MenuButton' onClick={() => router.push("/Annuaire/Recommander")}>
-                                    Recommander
+                                    Recommandé
                                 </button>}
 
                                 <button type='button' className='MenuButton' onClick={() => router.push('/Profil')}> Mon profil </button>

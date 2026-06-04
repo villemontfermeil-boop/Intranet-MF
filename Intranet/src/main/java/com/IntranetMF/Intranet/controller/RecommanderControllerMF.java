@@ -228,7 +228,7 @@ public class RecommanderControllerMF {
             row.createCell(2).setCellValue(r.getRecommande());
             row.createCell(3).setCellValue(r.getService());
         }
-
+logContenu(personne.get().getNom() + " "+ personne.get().getPrenom()+ "A récupérer l'excel des recommecommandé" );
         workbook.write(response.getOutputStream());
         workbook.close();
     }
