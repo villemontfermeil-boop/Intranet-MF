@@ -1,7 +1,7 @@
 'use client';
 
 import React from "react";
-
+import Legendes from "../component/Legendes";
 export default function AboutPage() {
     return (
         <div style={styles.page}>
@@ -30,7 +30,7 @@ export default function AboutPage() {
                     <h2 style={styles.subtitle}>Mises à jour et nouveaux contenus</h2>
                     <p style={styles.text}>
                         Le site est amené à évoluer régulièrement. Des <strong>mises à jour
-                        techniques</strong> ainsi que de <strong>nouveaux contenus</strong> seront
+                            techniques</strong> ainsi que de <strong>nouveaux contenus</strong> seront
                         ajoutés afin d’améliorer l’expérience utilisateur et de répondre aux besoins
                         des agents.
                     </p>
@@ -50,6 +50,9 @@ export default function AboutPage() {
                 <p style={styles.footer}>
                     L’accès à cet intranet est réservé aux agents de la mairie. En l’utilisant, l’utilisateur reconnaît son statut et s’engage à en respecter les règles d’usage.
                 </p>
+
+                <Legendes />
+
             </div>
         </div>
     );

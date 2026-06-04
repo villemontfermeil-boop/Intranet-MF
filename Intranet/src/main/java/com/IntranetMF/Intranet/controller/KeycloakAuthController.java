@@ -87,6 +87,7 @@ public class KeycloakAuthController {
             existing.setNom(userData.getOrDefault("nom", existing.getNom()));
             existing.setPrenom(userData.getOrDefault("prenom", existing.getPrenom()));
             existing.setIsAdmin(isAdmin);
+            existing.setMail(userData.get("email"));
             existing.setOrganigramme(organigramme.get());
 
             System.out.println("   Set isConnected = true");
