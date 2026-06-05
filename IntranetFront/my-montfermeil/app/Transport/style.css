@@ -1,11 +1,9 @@
 .messageHTML {
     text-align: center;
+    padding: 1rem;
 }
 
-.messageHTML p {
-    text-align: center;
-}
-
+.messageHTML p,
 .messageHTML br {
     text-align: center;
 }
@@ -18,6 +16,14 @@
     margin: 1.5rem auto 2rem;
     max-width: 960px;
     padding: 0 1rem;
+}
+
+@media (max-width: 640px) {
+  .transport-grid {
+    gap: 12px;
+    margin: 1rem auto 1.5rem;
+    padding: 0 0.75rem;
+  }
 }
 
 .transport-btn {
@@ -43,10 +49,32 @@
     filter: brightness(1.05);
 }
 
+.transport-btn:active {
+    transform: translateY(0);
+}
+
+@media (max-width: 640px) {
+  .transport-btn {
+    min-width: 80px;
+    min-height: 80px;
+    font-size: 0.85rem;
+    padding: 0.75rem 1rem;
+    border-radius: 16px;
+  }
+}
+
 .transport-icon {
     width: 40px;
     height: 40px;
 }
+
+@media (max-width: 640px) {
+  .transport-icon {
+    width: 32px;
+    height: 32px;
+  }
+}
+
 
 .btn-t4 {
     background: linear-gradient(135deg, #047a44, #2b9d5c);

@@ -22,7 +22,6 @@
 body {
   margin: 0;
   background: white;
-
   font-family: "Brown Pro", sans-serif;
 }
 
@@ -39,7 +38,7 @@ body {
 }
 
 .home-title {
-  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-size: clamp(1.75rem, 5vw, 4rem);
   line-height: 1.05;
   color: #1e3a8a;
   margin-bottom: 1rem;
@@ -49,28 +48,48 @@ body {
 .home-subtitle {
   max-width: 720px;
   margin: 0 auto;
-  font-size: 1rem;
+  font-size: clamp(0.875rem, 2vw, 1rem);
   color: #475569;
   line-height: 1.8;
+  padding: 0 1rem;
 }
 
 .articles-container {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 680px));
+  grid-template-columns: 1fr;
   justify-content: center;
   gap: 1.4rem;
+  padding: 0 1rem;
+}
+
+@media (min-width: 640px) {
+  .articles-container {
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .articles-container {
+    grid-template-columns: repeat(auto-fit, minmax(350px, 680px));
+  }
 }
 
 .article-card {
   position: relative;
-  padding: 1.05rem 1rem;
-  max-width: 590px;
+  padding: 1.25rem 1rem;
+  max-width: 100%;
   margin: 0 auto;
   border-radius: 1rem;
   box-shadow: 0 10px 22px rgba(15, 23, 42, 0.08);
   border: 1px solid rgba(148, 163, 184, 0.14);
   background-color: #ffffff;
   overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.article-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.12);
 }
 
 .article-card--evenement {
@@ -97,6 +116,7 @@ body {
   border-left: 6px solid #8b5cf6;
   background-color: #f3e8ff;
 }
+
 
 .article-card--nondefini {
   border-left: 6px solid #6b7280;
