@@ -18,6 +18,8 @@ function pageRecommander() {
     const [cacher, setCacher] = useState<boolean>(false);
     const formData = new FormData();
     const routeur = useRouter()
+    const [exportButton, setExport] = useState<boolean>(false);
+    const [data2, setData2] = useState<any>([]);
     const [recommanderNew, setRecommanderNew] = useState<RecommanderType>({
         recommander: "",
         date: "",
@@ -27,14 +29,15 @@ function pageRecommander() {
 
 
 
-    useEffect(()=>{
-        if(sessionStorage.length == 0|| sessionStorage.length == null || sessionStorage.getItem("fonction") != "COURRIER"){
+    useEffect(() => {
+        if (sessionStorage.length == 0 || sessionStorage.length == null || sessionStorage.getItem("fonction") != "COURRIER") {
             alert("Vous devez etre de ce service pour pouvoir y accéder")
             routeur.push('/')
         }
     }, [])
     async function getRecommander() {
         const token = sessionStorage.getItem("token") || "";
+        setLoading(true);
 
         try {
             const data = await fetch("/api/Montfermeil/recommend/all", {
@@ -53,8 +56,51 @@ function pageRecommander() {
         }
     }
 
+
+    async function getRecommanderInExcel() {
+        const token = sessionStorage.getItem("token") || "";
+        setLoading(true);
+
+        try {
+
+            const data = await fetch(`/api/Montfermeil/recommend/export`, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+
+            if (!data.ok) {
+                throw new Error("Erreur export");
+            }
+
+            const blob = await data.blob();
+
+            const downloadUrl = window.URL.createObjectURL(blob);
+
+            const a = document.createElement("a");
+            a.href = downloadUrl;
+            a.download = "export.xlsx";
+
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+
+            window.URL.revokeObjectURL(downloadUrl);
+            setLoading(false);
+
+        } catch (ex) {
+            console.log(ex)
+            setLoading(false);
+
+
+        }
+    }
+
+
     async function getRecommanderByName(nom: string) {
         const token = sessionStorage.getItem("token") || "";
+        setLoading(true);
+
         try {
 
             const data = await fetch(`/api/Montfermeil/recommend/${nom}`, {
@@ -131,6 +177,13 @@ function pageRecommander() {
         return () => clearTimeout(timer);
     }, [text]);
 
+    useEffect(() => {
+        if (exportButton) {
+            getRecommanderInExcel()
+        }
+        setExport(false)
+
+    }, [exportButton]);
 
 
     if (loading) {
@@ -166,22 +219,27 @@ function pageRecommander() {
     }
 
     return (
-        <div >
-            <h1 style={{ textAlign: "center", left: "20px" }}><u>Recommandé</u></h1>
-            <button style={{ width: "100%" }} onClick={() => cacher == false ? setCacher(true) : setCacher(false)}>Ajouter un recommander</button>
+        <div className="Main">
+            <h1 className="page-title">Recommandations Courrier</h1>
+            <button onClick={() => cacher == false ? setCacher(true) : setCacher(false)}>
+                {cacher ? "Annuler" : "Ajouter un recommander"}
+            </button>
+            <button onClick={() => exportButton == false ? setExport(true) : setExport(false)}>
+                Exporter en Excel
+            </button>
 
             <div className="table-container" hidden={cacher}>
-                <div>
+                {/* <div className="action-buttons">
+               
+                </div> */}
 
+                <div className="search-container">
                     <input
-                        style={{ width: "89%" }}
-                        placeholder="Rechercher un n° de recommander"
+                        placeholder="🔍 Rechercher par n° ou mot-clé..."
                         type="text"
                         onChange={(e) => setnumero(e.target.value)}
                     />
-                    <button style={{
-                        width: "10%",
-                    }} type="submit" onClick={() => setText(numero)}>Chercher</button>
+                    <button type="submit" onClick={() => setText(numero)}>Chercher</button>
                 </div>
 
                 <table className="table-salaries" style={{ textAlign: "center" }}>
@@ -221,19 +279,14 @@ function pageRecommander() {
                 </table>
             </div>
 
-            <div className="table-container" hidden={cacher == true ? false : true}>
+            <div className="table-container form-container" hidden={cacher == true ? false : true}>
+                <h2 style={{ color: "#2c3e50", marginBottom: "25px" }}>Ajouter une nouvelle recommandation</h2>
                 <table>
                     <tbody>
                         <tr>
-                            <th>
-                                Date
-                            </th>
-                            <th>
-                                n° de recommandé
-                            </th>
-                            <th>
-                                Services
-                            </th>
+                            <th style={{ textAlign: "left", color: "#667eea", fontWeight: "600" }}>Date</th>
+                            <th style={{ textAlign: "left", color: "#667eea", fontWeight: "600" }}>Numéro Recommandé</th>
+                            <th style={{ textAlign: "left", color: "#667eea", fontWeight: "600" }}>Service</th>
                         </tr>
                         <tr>
                             <td>
@@ -251,6 +304,7 @@ function pageRecommander() {
                             <td>
                                 <input
                                     type="text"
+                                    placeholder="Ex: REC-001"
                                     onChange={(e) =>
                                         setRecommanderNew({
                                             ...recommanderNew,
@@ -263,6 +317,7 @@ function pageRecommander() {
                             <td>
                                 <input
                                     type="text"
+                                    placeholder="Ex: Courrier"
                                     onChange={(e) =>
                                         setRecommanderNew({
                                             ...recommanderNew,
@@ -274,7 +329,7 @@ function pageRecommander() {
                         </tr>
                         <tr>
                             <td colSpan={3}>
-                                <button onClick={() => nouveauxRecommander()}>Ajouter</button>
+                                <button onClick={() => nouveauxRecommander()}>✓ Ajouter</button>
                             </td>
                         </tr>
                     </tbody>
