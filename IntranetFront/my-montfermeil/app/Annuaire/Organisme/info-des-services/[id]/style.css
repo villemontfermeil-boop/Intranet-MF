@@ -1,17 +1,28 @@
 .Main {
     text-align: center;
+    padding: 1rem;
 }
 
 .table-container {
-    max-height: 300px;
+    max-height: 500px;
     overflow-y: auto;
     margin-top: 20px;
     border: 1px solid #ccc;
     border-radius: 10px;
+    background: white;
+}
+
+@media (max-width: 640px) {
+  .table-container {
+    max-height: 400px;
+    margin-top: 16px;
+    border-radius: 8px;
+  }
 }
 
 .theTable {
     width: 100%;
+    min-width: 300px;
 }
 
 .table-salaries {
@@ -21,18 +32,36 @@
 
 .table-salaries th,
 .table-salaries td {
-    padding: 6px 10px; /* espace réduit */
+    padding: 6px 10px;
     border-bottom: 1px solid #ddd;
     text-align: center;
+}
+
+.table-salaries th {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    font-weight: 600;
+    position: sticky;
+    top: 0;
+    z-index: 10;
 }
 
 .table-salaries tr:hover {
     background-color: #f5f5f5;
 }
 
-.table-salaries thead th {
-    position: sticky;
-    top: 0;
-    background: white;
-    z-index: 1;
+@media (max-width: 768px) {
+  .table-salaries th,
+  .table-salaries td {
+    padding: 5px 8px;
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .table-salaries th,
+  .table-salaries td {
+    padding: 4px 6px;
+    font-size: 0.85rem;
+  }
 }
