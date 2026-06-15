@@ -56,6 +56,7 @@ public class SecurityConfig {
                         .requestMatchers("/Article/getArticle").permitAll()
                         .requestMatchers("/Article/deleteArticle/{id}").authenticated()
                         .requestMatchers("/salaries/login").authenticated()
+                        .requestMatchers("/ai/ask").authenticated()
                         .requestMatchers("/salaries/logout").permitAll()
                         .requestMatchers("/auth/sync").permitAll()
                         .requestMatchers("/Oublie/motDePasse").hasRole("ADMIN")
