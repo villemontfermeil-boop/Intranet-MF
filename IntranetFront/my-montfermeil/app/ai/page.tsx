@@ -35,6 +35,7 @@ export default function AiPage() {
     const token = getSessionItemOrEmpty("token");
 
     try {
+      console.log("POMPTE:", prompt)
       const res = await fetch("/api/Montfermeil/ai", {
         method: "POST",
         headers: {
@@ -89,9 +90,11 @@ export default function AiPage() {
             className={`ai-bubble ${
               msg.role === "user" ? "user" : "assistant"
             }`}
+
           >
-            {msg.content}
+          {msg.content}
           </div>
+          
         ))}
 
         {loading && (
