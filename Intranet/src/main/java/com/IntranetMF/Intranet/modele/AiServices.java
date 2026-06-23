@@ -24,42 +24,43 @@ public class AiServices {
     headers.setContentType(MediaType.APPLICATION_JSON);
     headers.setBearerAuth(apiKey);
 
-    String body = """
-        {
-          "model": "mistral-small-latest",
-          "messages": [
-            {
-              "role": "user",
-              "content": "%s"
-            }
-          ]
-        }
-        """.formatted(prompt);
-
-    HttpEntity<String> request = new HttpEntity<>(body, headers);
-
-    ResponseEntity<String> response = restTemplate.postForEntity(
-        "https://api.mistral.ai/v1/chat/completions",
-        request,
-        String.class);
-
     try {
-      JsonNode root = mapper.readTree(response.getBody());
-      String content = root.path("choices")
+      ObjectNode root = mapper.createObjectNode();
+      root.put("model", "mistral-small-latest");
+
+      ArrayNode messages = mapper.createArrayNode();
+      ObjectNode message = mapper.createObjectNode();
+
+      message.put("role", "user");
+      message.put("content", prompt);
+
+      messages.add(message);
+      root.set("messages", messages);
+
+      String body = mapper.writeValueAsString(root);
+
+      HttpEntity<String> request = new HttpEntity<>(body, headers);
+
+      ResponseEntity<String> response = restTemplate.postForEntity(
+          "https://api.mistral.ai/v1/chat/completions",
+          request,
+          String.class);
+
+      JsonNode json = mapper.readTree(response.getBody());
+      System.out.print(json.path("choices")
           .get(0)
           .path("message")
           .path("content")
-          .asText();
-      System.out.println("MESSAGE: " + content);
-
-      return root.path("choices")
+          .asText());
+      return json.path("choices")
           .get(0)
           .path("message")
           .path("content")
           .asText();
 
     } catch (Exception e) {
-      throw new RuntimeException("Erreur parsing IA", e);
+      e.printStackTrace(); 
+      throw new RuntimeException("Erreur IA", e);
     }
   }
 }
