@@ -281,6 +281,10 @@ function Header({ nom }: { nom: string | null }) {
                                     Informations des services
                                 </button>
 
+                                <button type="button" className='MenuButton' onClick={() => router.push('/ai')}>
+                                    Discusssion avec IA 
+                                </button>
+
                                 {sessionStorage.length > 0 && sessionStorage.getItem('fonction') == "COMMUNICATION" && <button type="button" className='MenuButton' onClick={() => router.push("/Nouveau/Article")}>
                                     Nouvel article
                                 </button>}
@@ -295,7 +299,7 @@ function Header({ nom }: { nom: string | null }) {
                                 </button>
                             </>
                         ) : (
-                            <div>Loading Keycloak...</div>
+                            <div>Connexion à  Keycloak...</div>
                         )}
                     </div>
                 </form>
