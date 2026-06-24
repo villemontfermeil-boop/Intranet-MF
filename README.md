@@ -8,7 +8,7 @@ Une plateforme d'intranet moderne pour la Ville de Montfermeil, permettant aux e
 - **Annuaire complet** avec recherche par nom/prénom
 - **Profils détaillés**: fonction, localisation, téléphone personnel/professionnel
 - **Système de rôles**: utilisateurs classiques et administrateurs
-- **Authentification JWT** avec traçabilité des connexions
+- **Authentification JWT / Keycloak** avec traçabilité des connexions
 
 ### 📰 Gestion des articles
 - Publication d'articles avec images/vidéos
@@ -36,17 +36,17 @@ Une plateforme d'intranet moderne pour la Ville de Montfermeil, permettant aux e
 
 ### Backend
 - **Framework**: Spring Boot (Java)
-- **Base de données**: SQL
-- **Authentification**: OAuth2 / JWT
-- **Gestion des fichiers**: Système de fichiers local
+- **Base de données**: SQL (Postgres / MySQL)
+- **Authentification**: Keycloak (OIDC) + JWT
+- **Gestion des fichiers**: Système de fichiers local (uploads/)
 
 ### Frontend
-- **Framework**: Next.js 15+ (React)
+- **Framework**: Next.js (React) - app router
 - **Langage**: TypeScript
 - **Styles**: CSS custom
 - **State Management**: React Hooks + SessionStorage
 
-### Architecture
+### Architecture (extrait)
 ```
 Intranet-MF/
 ├── Intranet/                    # Backend Spring Boot
@@ -64,55 +64,56 @@ Intranet-MF/
 
 ---
 
-## 🚀 Démarrage rapide
+## 🚀 Démarrage rapide (commandes mises à jour)
+
+> Remarque : ce dépôt contient du code backend et frontend. Ci‑dessous les commandes exactes utilisées pour les environnements demandés.
 
 ### Prérequis
-- **Java 17+**
-- **Node.js 18+**
-- **npm / yarn / pnpm**
-- **MySQL/PostgreSQL** (ou base de données SQL)
+- Java 17+
+- Node.js 18+
+- npm / yarn / pnpm
+- MySQL/PostgreSQL (ou autre base SQL)
 
-### Installation Backend
+### Keycloak - commandes (exactes fournies)
 
-```bash
-cd Intranet
-
-# Configurer la base de données
-# Éditer: src/main/resources/application.properties ou application.yml
-# Ajouter les configurations:
-# - spring.datasource.url
-# - spring.datasource.username
-# - spring.datasource.password
-# - spring.jpa.hibernate.ddl-auto
-
-# Compiler et lancer
-mvn clean install
-mvn spring-boot:run
+- Développement (PowerShell / CMD Windows) :
+```powershell
+.\kc.bat start-dev `
+  --https-certificate-file=..\certs\192.168.56.11.pem `
+  --https-certificate-key-file=..\certs\192.168.56.11-key.pem `
+  --https-port=8081 `
+  --http-port=8082
 ```
 
-Le backend sera disponible sur `http://localhost:8080`
-
-### Installation Frontend
-
-```bash
-cd IntranetFront/my-montfermeil
-
-# Installer les dépendances
-npm install
-
-# Lancer en développement
-npm run dev
+- Production (PowerShell / CMD Windows) :
+```powershell
+.\kc.bat start `
+  --https-certificate-file=..\certs\192.168.56.11.pem `
+  --https-certificate-key-file=..\certs\192.168.56.11-key.pem `
+  --https-port=8081 `
+  --http-port=8082 `
+  --hostname=192.168.56.11
 ```
 
-Le frontend sera disponible sur `http://localhost:3000`
+> IMPORTANT : placez Keycloak dans un dossier sur le disque C: pour les commandes et chemins utilisés ci‑dessous (ex : `C:\keycloak-26.5.7\keycloak-26.5.7\`). Veillez à ce que le dossier `certs` existe : `C:\keycloak-26.5.7\keycloak-26.5.7\certs\`.
+
+### Spring Boot — Démarrage (exact demandé)
+```
+./gradlew bootrun
+```
+
+### Next.js — Démarrage (production-like)
+```
+node server.js
+```
 
 ---
 
-## 📋 API Endpoints
+## 📋 API Endpoints (extrait)
 
 ### 👤 Salariés
 | Méthode | Endpoint | Description |
-|---------|----------|-------------|
+|---------|---------:|-------------|
 | GET | `/salaries/{id}` | Récupérer un salarié par ID |
 | GET | `/salaries/` | Lister tous les salariés |
 | GET | `/salaries/Salarie/{nom}` | Rechercher par nom/prénom |
@@ -120,42 +121,40 @@ Le frontend sera disponible sur `http://localhost:3000`
 
 ### 📰 Articles
 | Méthode | Endpoint | Description |
-|---------|----------|-------------|
+|---------|---------:|-------------|
 | GET | `/Article/{id}` | Récupérer un article |
 | GET | `/Article/getArticle` | Lister tous les articles |
 | POST | `/Article/upload` | Créer un article avec fichier |
 
 ### 📮 Recommandés
 | Méthode | Endpoint | Description |
-|---------|----------|-------------|
+|---------|---------:|-------------|
 | POST | `/recommander/nouveaux` | Créer un recommandé |
 | GET | `/recommander/recommander` | Lister tous les recommandés |
 | GET | `/recommander/numero/{recherche}` | Rechercher un recommandé |
 
 ### 📁 Médias
 | Méthode | Endpoint | Description |
-|---------|----------|-------------|
+|---------|---------:|-------------|
 | GET | `/media/{filename}` | Récupérer un fichier |
 
 ---
 
 ## 🔐 Sécurité
-
-- **Authentification**: JWT (JSON Web Tokens)
-- **Autorisation**: Vérification des rôles (`@PreAuthorize` recommandé)
+- **Authentification**: Keycloak (OIDC) + JWT (Spring Security)
+- **Autorisation**: Vérification des rôles (`@PreAuthorize` conseillé)
 - **Upload de fichiers**: Validation MIME type
-- **Logs d'audit**: Traçabilité complète des actions utilisateur
-- **SessionStorage**: Maintien de session côté client (effacé à la fermeture)
+- **Logs d'audit**: Traçabilité des actions utilisateur
 
 ### Points d'amélioration recommandés:
-- ✅ Ajouter `@PreAuthorize` sur les endpoints sensibles
-- ✅ Implémenter une vraie gestion des erreurs (ExceptionHandler)
-- ✅ Externaliser les chemins de fichiers en configuration
-- ✅ Ajouter un vrai logger (SLF4J) au lieu de `printStackTrace()`
+- Ajouter `@PreAuthorize` sur endpoints sensibles
+- Implémenter un `GlobalExceptionHandler`
+- Externaliser les chemins (config)
+- Utiliser SLF4J / logger adapté
 
 ---
 
-## 📁 Structure des modèles
+## 📁 Structure des modèles (extraits)
 
 ### SalarieMF
 ```java
@@ -196,64 +195,84 @@ Le frontend sera disponible sur `http://localhost:3000`
 
 ---
 
+## 🔧 Démarrage et troubleshooting (certificats Keycloak)
+
+Si, après redirection vers Keycloak, le navigateur affiche une erreur de certificat :
+
+1. Installer `mkcert` sur la machine Windows qui héberge Keycloak (ex: `choco install mkcert` ou `scoop install mkcert`).
+2. Vider le contenu du dossier `certs` (supprimer uniquement les fichiers à l'intérieur — NE PAS supprimer le dossier). Exemple de chemin attendu :
+
+```
+C:\keycloak-26.5.7\keycloak-26.5.7\certs\
+```
+
+3. Ouvrir PowerShell en administrateur et exécuter depuis ce dossier la commande suivante :
+
+```powershell
+PS C:\keycloak-26.5.7\keycloak-26.5.7\certs> mkcert 192.168.56.11
+```
+
+4. `mkcert` générera le certificat et la clé (par ex. `192.168.56.11.pem` et `192.168.56.11-key.pem`). Assurez-vous que les noms correspondent aux chemins utilisés dans les commandes Keycloak ci‑dessus.
+5. Relancer Keycloak avec la commande `kc.bat` appropriée.
+
+> En production, utilisez un certificat émis par une CA digne de confiance (Let's Encrypt, CA interne, commerciale). `mkcert` est uniquement pour dev/local.
+
+---
+
+## 🖥️ Mise à jour du fichier hosts (Windows)
+
+Sur chaque machine cliente (ou sur le serveur si nécessaire), ajoutez les lignes suivantes au fichier :
+
+```
+# ajouter à C:\Windows\System32\drivers\etc\hosts (ouvrir Bloc‑notes en administrateur)
+127.0.0.1   keycloak.montfermeil.local
+192.168.56.11 montfermeil-intranet
+```
+
+Procédure rapide : ouvrir le Bloc‑notes en tant qu'administrateur → Ouvrir `C:\Windows\System32\drivers\etc\hosts` → ajouter les lignes → enregistrer.
+
+---
+
+## ✅ Checklist de déploiement / production
+- Utiliser un hostname DNS et certificats valides
+- Protéger les secrets (KEYCLOAK_ADMIN_PASSWORD, DB, AD bind pass)
+- Exposer uniquement HTTPS (reverse-proxy)
+- Sauvegarder la base et les dossiers d'uploads
+- Mettre en place monitoring et rotation des logs
+
+---
+
 ## 🐛 Problèmes connus et TODOs
-
-### À corriger (Bug/Sécurité)
-- [ ] Imports dupliqués dans les contrôleurs
-- [ ] Gestion des exceptions trop générique (`RuntimeException`)
-- [ ] Manque de validation des paramètres d'entrée
-- [ ] Fautes d'orthographe: "Recommander" vs "Recommandé", "Courier" vs "Courrier"
-
-### À améliorer (Architecture)
-- [ ] Créer une `ServiceLayer` pour la logique métier
-- [ ] Ajouter un `GlobalExceptionHandler`
-- [ ] Externaliser la configuration (chemins, paramètres)
-- [ ] Utiliser un vrai logger (SLF4J)
-- [ ] Ajouter des DTOs pour les requêtes/réponses
-- [ ] Implémenter la pagination pour les listes
-
-### Documentation
-- [ ] Ajouter des commentaires JavaDoc
-- [ ] Créer un guide de contribution
-- [ ] Documenter les modèles de données
-- [ ] Ajouter un guide de déploiement
+- Imports dupliqués dans certains contrôleurs
+- Gestion des exceptions trop générique (`RuntimeException`)
+- Validation des paramètres d'entrée à renforcer
+- Externaliser chemins de fichiers en configuration
+- Ajouter une couche de service (Service layer) et DTOs
 
 ---
 
 ## 👨‍💻 Contribution
-
-Les contributions sont bienvenues! Veuillez:
-
 1. Créer une branche (`git checkout -b feature/ma-feature`)
 2. Commiter vos changements (`git commit -m 'Add: description'`)
 3. Pousser la branche (`git push origin feature/ma-feature`)
 4. Créer une Pull Request
 
-### Standards de code
-- Utiliser les conventions Java (camelCase)
-- Ajouter des commentaires pour la logique complexe
-- Tester vos changements avant de pusher
-- Corriger les imports et formater le code
+Standards de code : conventions Java, tests, formatting, commentaires pour logique complexe.
 
 ---
 
 ## 📞 Support
-
-Pour toute question ou problème:
 - 📧 Contactez l'équipe IT de Montfermeil
 - 🐛 Ouvrez une issue sur GitHub
-- 💬 Consultez la documentation du projet
 
 ---
 
 ## 📄 Licence
-
 Ce projet est utilisé en interne par la Ville de Montfermeil.
 
 ---
 
 ## 🎉 Remerciements
-
 Merci à tous les contributeurs qui ont aidé à développer et maintenir cet intranet!
 
 ---
