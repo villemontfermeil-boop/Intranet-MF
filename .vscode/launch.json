@@ -1,0 +1,14 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot-IntranetAppApplication<Intranet>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.IntranetMF.Intranet.IntranetAppApplication",
+            "projectName": "Intranet",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}
