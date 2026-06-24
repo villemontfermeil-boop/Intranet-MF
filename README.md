@@ -272,10 +272,6 @@ Ce projet est utilisé en interne par la Ville de Montfermeil.
 
 ---
 
-## 🎉 Remerciements
-Merci à tous les contributeurs qui ont aidé à développer et maintenir cet intranet!
-
----
 
 **Dernière mise à jour**: Juin 2026
 **Version**: 2.0
