@@ -42,3 +42,4 @@ Intranet/uploads
 *.tsbuildinfo
 next-env.d.ts
 
+Intranet\src\main\resources\application.properties
