@@ -1,0 +1,133 @@
+# Root .gitignore for Intranet-MF (merged and extended)
+
+# Project-specific: keep wrappers and build outputs
+HELP.md
+.gradle
+build/
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+bin/
+!**/src/main/**/bin/
+!**/src/test/**/bin/
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+out/
+!**/src/main/**/out/
+!**/src/test/**/out/
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+### VS Code ###
+.vscode/
+
+# Intranet app logs and uploads
+/Intranet/log/
+/Intranet/uploads/
+
+# Node / Next
+node_modules/
+.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+/.next/
+/out/
+/dist/
+build/
+
+# Certificates and keys - ignore contents but keep directories
+# (do NOT commit private keys or certs)
+certs/*
+IntranetFront/my-montfermeil/certs/*
+Intranet/certs/*
+# If you need to keep an empty certs folder, add a .gitkeep inside it
+!certs/.gitkeep
+!IntranetFront/my-montfermeil/certs/.gitkeep
+!Intranet/certs/.gitkeep
+*.pem
+*.key
+*.p12
+*.jks
+*.keystore
+montfermeil-intranet+2.pem
+montfermeil-intranet+2-key.pem
+
+# Env files
+.env
+.env.local
+.env.*.local
+.env*
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Coverage
+coverage/
+
+# IDE / editor
+*.swp
+*~
+.sanity/
+
+# Java / Gradle
+*.class
+*.jar
+*.war
+*.ear
+/target/
+/build/
+.gradle/
+gradle-wrapper.jar
+
+# Temporary
+*.tmp
+*.bak
+
+# Uploaded files
+uploads/
+Intranet/uploads/
+
+# TypeScript cache
+*.tsbuildinfo
+next-env.d.ts
+
+# Secret scanning baseline
+.secrets.baseline
+
+# Misc
+.idea/
+.vscode/
+
+# Keep repo-specific gitignores for subprojects intact (Intranet/.gitignore, IntranetFront/...)
+
