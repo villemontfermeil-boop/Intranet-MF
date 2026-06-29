@@ -195,9 +195,9 @@ function HomePage() {
         {data.map((value, index) => {
           const articleKey = value.id ? value.id.toString() : `article-${index}`;
           return (
-            <article key={articleKey} className={getArticleClass(value.type)}>
+            <article key={articleKey} style={{ cursor: "pointer" }} onClick={() => router.push(`/Article/${value.id}`)} className={`article-card ${getArticleClass(value.type)}`}>
               {getSessionBoolean("isConnected") && getSessionItemOrEmpty("fonction") === "COMMUNICATION" && (
-                <button className="article-delete-button" type="button" onClick={() => deleteArticle(value.id?.toString() ?? "")}> 
+                <button className="article-delete-button" type="button" onClick={() => deleteArticle(value.id?.toString() ?? "")}>
                   <img src="/cross.png" alt="Supprimer" />
                 </button>
               )}
@@ -215,7 +215,7 @@ function HomePage() {
                   )}
                 </span>
               </div>
-              <p className="article-text" style={{textAlign: "center"}}>{value.description}</p>
+              <p className="article-text" style={{ textAlign: "center" }}>{value.description}</p>
 
               {value.mediaName && isVideo(value.mediaName) && (
                 <video controls className="media">
@@ -236,7 +236,7 @@ function HomePage() {
         })}
       </section>
 
-      
+
     </main>
   );
 }
