@@ -11,6 +11,8 @@ function unArticle() {
     const params = useParams();
     const [data, setData] = useState<any>({})
     const id = params.id
+    const [loading, setLoading] = useState(false);
+
     const prefix = process.env.NEXT_PUBLIC_PREFIX ?? "";
     const normalizedPrefix = prefix ? (prefix.endsWith("/") ? prefix : `${prefix}/`) : "";
     const isVideo = (fileName: string) => {
@@ -26,6 +28,7 @@ function unArticle() {
     };
 
     async function getArticleById() {
+        setLoading(true)
 
         const token = getSessionItemOrEmpty("token");
 
@@ -39,9 +42,12 @@ function unArticle() {
 
             console.log(json)
             setData(json);
+            setLoading(false)
 
         } catch (ex) {
             console.log("une érreur est survenue")
+            setLoading(false)
+
         }
     }
 
@@ -50,15 +56,49 @@ function unArticle() {
         getArticleById()
     }, [])
 
+
+
+    if (loading) {
+        return (
+            <div style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                height: "100vh",
+                flexDirection: "column"
+            }}>
+                <div className="spinner"></div>
+                <p style={{ marginTop: "20px", fontSize: "18px" }}>
+                    Chargement de l'article...
+                </p>
+
+                <style jsx>{`
+                    .spinner {
+                        border: 4px solid rgba(0, 0, 0, 0.1);
+                        width: 50px;
+                        height: 50px;
+                        border-radius: 50%;
+                        border-left-color: #09f;
+                        animation: spin 1s linear infinite;
+                    }
+                    
+                    @keyframes spin {
+                        0% { transform: rotate(0deg); }
+                        100% { transform: rotate(360deg); }
+                    }
+                `}</style>
+            </div>
+        );
+    }
     return (
         <div style={{ textAlign: "center" }}>
-           <u> <h1>{data.titre}</h1></u>
+            <u> <h1>{data.titre}</h1></u>
             <table>
                 <tbody>
 
                     <tr>
                         <td colSpan={2}>
-                            <b><p>Créer par <a target="blank" href={`/Annuaire/Salarie/${data.salarie?.id}`}>{data.salarie?.nom} {data.salarie?.prenom}</a> le {data.creation}</p></b>
+                            <b><p>Créer par <a className="author-link" target="blank" href={`/Annuaire/Salarie/${data.salarie?.id}`}>{data.salarie?.nom} {data.salarie?.prenom}</a> le {data.creation}</p></b>
 
                         </td>
                     </tr>

@@ -195,7 +195,7 @@ function HomePage() {
         {data.map((value, index) => {
           const articleKey = value.id ? value.id.toString() : `article-${index}`;
           return (
-            <article key={articleKey} style={{ cursor: "pointer" }} onClick={() => router.push(`/Article/${value.id}`)} className={`article-card ${getArticleClass(value.type)}`}>
+            <article key={articleKey} style={{ cursor: "pointer" }} onClick={() => router.push(`/Article/${value.id}`)}  className={`article-card ${getArticleClass(value.type)}`}>
               {getSessionBoolean("isConnected") && getSessionItemOrEmpty("fonction") === "COMMUNICATION" && (
                 <button className="article-delete-button" type="button" onClick={() => deleteArticle(value.id?.toString() ?? "")}>
                   <img src="/cross.png" alt="Supprimer" />
@@ -203,7 +203,7 @@ function HomePage() {
               )}
 
               <h4 className="article-card__title"><u>{value.titre}</u></h4>
-              <div className="article-meta">
+              <div className="article-meta" >
                 <span>Créé le : {value.creation}</span>
                 <span>
                   Par: {getSessionBoolean("isConnected") ? (
