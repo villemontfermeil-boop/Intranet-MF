@@ -128,7 +128,7 @@ function CreationArticle() {
               <th>Types d'événement :</th>
               <td>
                 <select className="select-field" onChange={handleChange} name="Types" value={article.Types}>
-                  <option value="Non_defini">Non défini</option>
+                  {/* <option value="Non_defini">Non_defini</option> */}
                   <option value="Message">Message</option>
                   <option value="Évennement">Évènement</option>
                   <option value="Information">Information</option>
