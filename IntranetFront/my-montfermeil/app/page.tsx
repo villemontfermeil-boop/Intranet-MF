@@ -86,7 +86,7 @@ function HomePage() {
       });
 
       if (!response.ok) {
-        throw new Error(`Erreur HTTP: ${response.status}`);
+        console.log(`Erreur HTTP: ${response.status}`);
       }
 
       const json = await response.json();
