@@ -112,7 +112,8 @@ public class TelechargementController {
 
                         fichierNouveaux.setDate(date);
                         fichierNouveaux.setOrganisme(organismme.get());
-                    logContenu(salarie.get().getNom()+ " "+ salarie.get().getPrenom() + "A ajouter le documents :  "+nom );
+                        logContenu(salarie.get().getNom() + " " + salarie.get().getPrenom()
+                                + "A ajouter le documents :  " + nom);
 
                         return telechargementInterface.save(fichierNouveaux);
                     } else {
@@ -233,6 +234,17 @@ public class TelechargementController {
         }
         throw new RuntimeException("3: salarié non trouver ");
 
+    }
+
+    /**
+     * Compte le nombre de fichier dans un organisme 
+     *
+     * @param id L'identifiant de l'organisme.
+     * @return le nombre de fichier d'un organisme.
+     */
+    @GetMapping("/nombre/{id}")
+    public int getCount(@PathVariable Long id) {
+        return telechargementInterface.countByOganigrameId(id);
     }
 
     /**

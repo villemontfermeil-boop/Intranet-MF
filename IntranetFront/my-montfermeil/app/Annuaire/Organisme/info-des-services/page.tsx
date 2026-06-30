@@ -5,103 +5,132 @@ import { useEffect, useState } from "react";
 import "./style.css";
 import { getSessionItemOrEmpty } from "@/app/utils/sessionStorage";
 
-
-
-
-
-
-function infoDesServices() {
-    const [organisme, SetOrganisme] = useState<any[]>([])
+function InfoDesServices() {
+    const [organisme, setOrganisme] = useState<any[]>([]);
     const [loading, setLoading] = useState(false);
     const [hider, setHider] = useState(false);
-    const routeur = useRouter();
+    const router = useRouter();
 
     const [file, setFile] = useState<File | null>(null);
     const [fileName, setFileName] = useState("");
 
+    // ========================
+    // GET ORGANISMES + COUNT
+    // ========================
     async function getOrganisme() {
-        setLoading(true)
+        setLoading(true);
+
         try {
             const token = getSessionItemOrEmpty("token");
 
-            const data = await fetch("/api/Montfermeil/organisation/label/all", {
+            // 1. récupérer organismes
+            const res = await fetch("/api/Montfermeil/organisation/label/all", {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
-            })
+            });
 
-            const json = await data.json();
+            const json = await res.json();
 
-            SetOrganisme(json);
-            console.log(json)
-            setLoading(false)
+            // 2. ajouter nombre de fichiers pour chaque organisme
+            const enriched = await Promise.all(
+                json.map(async (org: any) => {
+                    try {
+                        const resCount = await fetch(
+                            `/api/Montfermeil/organisation/files/number/${org.id}`,
+                            {
+                                headers: {
+                                    Authorization: `Bearer ${token}`
+                                }
+                            }
+                        );
 
+                        const data = await resCount.json();
+
+                        const count =
+                            typeof data === "number"
+                                ? data
+                                : data.count ?? data.nombre ?? 0;
+
+                        return {
+                            ...org,
+                            nombreFichiers: count
+                        };
+                    } catch (e) {
+                        console.log("Erreur count org:", org.id, e);
+
+                        return {
+                            ...org,
+                            nombreFichiers: 0
+                        };
+                    }
+                })
+            );
+
+            setOrganisme(enriched);
+
+            console.log("Organismes final :", enriched);
         } catch (ex) {
-            console.log(ex)
-            setLoading(false)
-
-
+            console.log(ex);
+        } finally {
+            setLoading(false);
         }
     }
 
-
-    async function setOrganisme() {
-        setLoading(true)
+    // ========================
+    // UPLOAD FILE
+    // ========================
+    async function uploadFile() {
+        setLoading(true);
 
         if (!file) {
             alert("Choisis un fichier");
-            setLoading(false)
-
+            setLoading(false);
             return;
         }
 
         const formData = new FormData();
-
-        // fichier physique
         formData.append("file", file);
-
-        // nom du fichier (texte)
         formData.append("nom", fileName || file.name);
-        formData.append("organisme", String(getSessionItemOrEmpty("organisme")) || '');
+        formData.append("organisme", String(getSessionItemOrEmpty("organisme")) || "");
 
         try {
             const token = getSessionItemOrEmpty("token");
 
-            const data = await fetch("/api/Montfermeil/download/new", {
+            const res = await fetch("/api/Montfermeil/download/new", {
                 method: "POST",
-
                 headers: {
                     Authorization: `Bearer ${token}`
                 },
                 body: formData
-            })
+            });
 
-            const json = await data.json();
+            const json = await res.json();
 
-            SetOrganisme(json);
-            console.log(json)
-            alert("Ajout éfectuer avec succès")
-            routeur.push("/")
-            setHider(false)
-            setLoading(false)
+            console.log(json);
+
+            alert("Ajout effectué avec succès");
+
+            router.push("/");
+            setHider(false);
+
+            // refresh list
+            getOrganisme();
 
         } catch (ex) {
-            console.log(ex)
-            setLoading(false)
-
-
+            console.log(ex);
+        } finally {
+            setLoading(false);
         }
     }
 
-
-
     useEffect(() => {
-        getOrganisme()
-    }, [])
+        getOrganisme();
+    }, []);
 
-
-
-
+    // ========================
+    // LOADING UI
+    // ========================
     if (loading) {
         return (
             <div style={{
@@ -112,101 +141,89 @@ function infoDesServices() {
                 flexDirection: "column"
             }}>
                 <div className="spinner"></div>
-                <p style={{ marginTop: "20px", fontSize: "18px" }}>
-                    Chargement des organisme...
+                <p style={{ marginTop: "20px" }}>
+                    Chargement...
                 </p>
-
-                <style jsx>{`
-                    .spinner {
-                        border: 4px solid rgba(0, 0, 0, 0.1);
-                        width: 50px;
-                        height: 50px;
-                        border-radius: 50%;
-                        border-left-color: #09f;
-                        animation: spin 1s linear infinite;
-                    }
-                    
-                    @keyframes spin {
-                        0% { transform: rotate(0deg); }
-                        100% { transform: rotate(360deg); }
-                    }
-                `}</style>
             </div>
         );
     }
 
-
-
+    // ========================
+    // UI
+    // ========================
     return (
         <div className="organisme-page">
             <section className="organisme-panel">
+
                 <div className="organisme-header">
                     <div>
                         <h2>Organismes & services</h2>
-                        <p>Consultez les organismes disponibles et importez un document.</p>
+                        <p>Consultez les organismes disponibles.</p>
                     </div>
-                    <button
-                        className="toggle-btn"
-                        onClick={() => setHider(!hider)}
-                    >
-                        {hider ? "Masquer le formulaire" : "Ajouter un document"}
+
+                    <button className="toggle-btn" onClick={() => setHider(!hider)}>
+                        {hider ? "Masquer" : "Ajouter"}
                     </button>
                 </div>
-
                 <div className="table-wrapper">
                     <table className="table-salaries">
+
+                        {/* FORM */}
                         <tbody hidden={!hider}>
                             <tr>
                                 <td>
                                     <input
-                                        type="file"
                                         className="file-input"
+                                        type="file"
                                         onChange={(e) => {
-                                            const file = e.target.files;
-                                            if (file && file.length > 0) {
-                                                setFileName(file[0].name);
-                                                setFile(file[0]);
-                                            } else {
-                                                setFile(null);
+                                            const f = e.target.files;
+                                            if (f && f.length > 0) {
+                                                setFile(f[0]);
+                                                setFileName(f[0].name);
                                             }
                                         }}
                                     />
                                 </td>
                             </tr>
+
                             <tr>
                                 <td>
-                                    <button
-                                        className="submit-btn"
-                                        type="submit"
-                                        onClick={() => setOrganisme()}
-                                    >
+                                    <button  className="submit-btn" onClick={uploadFile}>
                                         Envoyer
                                     </button>
                                 </td>
                             </tr>
                         </tbody>
 
+                        {/* LIST */}
                         <tbody hidden={hider}>
-                            {Array.isArray(organisme) && organisme.map((value, index) => (
+                            {organisme.map((value, index) => (
                                 <tr key={index}>
                                     <td>
                                         <button
-                                            className="organisme-link"
-                                            onClick={() => routeur.push(`/Annuaire/Organisme/info-des-services/${value.id}`)}
+                                           className="organisme-link"
+                                            onClick={() =>
+                                                router.push(
+                                                    `/Annuaire/Organisme/info-des-services/${value.id}`
+                                                )
+                                            }
                                         >
                                             {value.label}
                                         </button>
                                     </td>
+
+                                    <td>
+                                        {value.nombreFichiers} fichier(s)
+                                    </td>
                                 </tr>
                             ))}
                         </tbody>
+
                     </table>
                 </div>
             </section>
         </div>
     );
-
 }
 
-
-export default infoDesServices;
+export default InfoDesServices;
