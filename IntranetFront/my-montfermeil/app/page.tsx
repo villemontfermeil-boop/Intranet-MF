@@ -139,7 +139,7 @@ function HomePage() {
 
       if (response.ok) {
         alert("Suppression effectuée.");
-        router.refresh();
+        router.push("/");
       } else {
         console.error("Erreur suppression article", response.statusText);
       }

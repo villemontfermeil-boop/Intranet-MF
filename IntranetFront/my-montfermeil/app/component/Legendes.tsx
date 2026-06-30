@@ -36,12 +36,12 @@ function Legendes() {
             description: "ℹ️ Information générale",
             className: "legend-item--information",
         },
-        {
-            type: "Non_défini",
-            title: "Non défini",
-            description: "⚪ Type non spécifié",
-            className: "legend-item--nondefini",
-        },
+        // {
+        //     type: "Non_défini",
+        //     title: "Non défini",
+        //     description: "⚪ Type non spécifié",
+        //     className: "legend-item--nondefini",
+        // },
     ];
 
 
