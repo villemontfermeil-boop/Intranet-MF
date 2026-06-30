@@ -8,5 +8,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface TelechargementInterface extends JpaRepository<TelechargementMF, Long> {
     
     List<TelechargementMF> findByOganigrame(OganigrameMF oganigrameMF);
+    int countByOganigrameId(Long organigrammeId);
 
 }
