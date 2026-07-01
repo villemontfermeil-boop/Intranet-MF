@@ -1,5 +1,6 @@
 package com.IntranetMF.Intranet.controller;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -12,9 +13,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.nio.file.Path;
-import java.nio.file.Files;
-import java.io.File;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -41,6 +39,7 @@ import com.IntranetMF.Intranet.repository.SalarieInterfacesMF;
 @RestController
 @RequestMapping("/Article")
 public class ArticleControllerMF {
+    private final Path uploadRoot = Paths.get("uploads/articles");
     private final ArticleInterfacesMF articleControllerMF;
     private final SalarieInterfacesMF salarieInterfacesMF;
     private String logDir = "log/Article/" + LocalDate.now().getYear() + "/"
@@ -117,12 +116,12 @@ public class ArticleControllerMF {
                 uniqueFileName = UUID.randomUUID().toString() + fileExtension;
 
                 // Créer le dossier uploads s'il n'existe pas
-                Path uploadDir = Paths.get("src/main/resources/static/uploads");
+                Path uploadDir = uploadRoot;
+
                 if (!Files.exists(uploadDir)) {
                     Files.createDirectories(uploadDir);
                 }
 
-                // Sauvegarder le fichier
                 Path filePath = uploadDir.resolve(uniqueFileName);
                 Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
             }
@@ -138,10 +137,10 @@ public class ArticleControllerMF {
             article.setTitre(titre);
             if (type == null || type.isEmpty()) {
                 System.out.println("Le type est vide");
-            article.setType(com.IntranetMF.Intranet.modele.ArticleEnumMF.TypeArticle.Non_défini );
+                article.setType(com.IntranetMF.Intranet.modele.ArticleEnumMF.TypeArticle.Non_défini);
 
-            }else{
-            article.setType(com.IntranetMF.Intranet.modele.ArticleEnumMF.TypeArticle.valueOf(type));
+            } else {
+                article.setType(com.IntranetMF.Intranet.modele.ArticleEnumMF.TypeArticle.valueOf(type));
 
             }
             article.setSalarie(salarie);
@@ -149,7 +148,7 @@ public class ArticleControllerMF {
             // 4. Si fichier présent, enregistrer le nom et chemin
             if (uniqueFileName != null) {
                 article.setMediaName(uniqueFileName);
-                article.setPath("/uploads/" + uniqueFileName);
+                article.setPath("/uploads/articles/" + uniqueFileName);
             }
             String text = salarie.getNom() + " " + salarie.getPrenom() + " à publier un article appelé : " + titre;
 
@@ -189,28 +188,52 @@ public class ArticleControllerMF {
 
         ArticleMF articleMF = article.get();
         String pathFichier = articleMF.getPath();
+        boolean fichierSupprime = false;
+        String cheminAbsolu = "Non disponible";
 
         if (pathFichier != null && !pathFichier.trim().isEmpty()) {
             try {
-                Path chemin = Paths.get(pathFichier);
-                Files.deleteIfExists(chemin);
-                System.out.println("Fichier supprimé : " + chemin);
+
+                // récupérer juste le nom du fichier depuis /uploads/articles/xxx.png
+                String fileName = Paths.get(pathFichier).getFileName().toString();
+
+                // dossier réel
+                Path uploadDir = uploadRoot;
+
+                Path chemin = uploadDir.resolve(fileName);
+
+                cheminAbsolu = chemin.toAbsolutePath().toString();
+
+                if (Files.exists(chemin)) {
+                    Files.delete(chemin);
+                    fichierSupprime = true;
+                    System.out.println("✅ Fichier supprimé: " + cheminAbsolu);
+                } else {
+                    System.out.println("⚠️ Fichier introuvable: " + cheminAbsolu);
+                }
+
             } catch (IOException e) {
-                System.out.println("Erreur suppression fichier : " + e.getMessage());
+                e.printStackTrace();
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                        .body("Erreur lors de la suppression du fichier");
+                        .body("Erreur suppression fichier: " + e.getMessage());
             }
-        } else {
-            System.out.println("Aucun fichier à supprimer pour cet article");
         }
-
+        // Suppression de l'entrée en base de données
         articleControllerMF.deleteById(id);
+        System.out.println("✅ Article supprimé de la base de données (ID: " + id + ")");
 
-        String text = nom + " " + prenom + " a supprimé l'article : " + articleMF.getTitre();
+        // Log avec plus d'informations
+        String text = String.format("%s %s a supprimé l'article: '%s' (ID: %d) - Fichier: %s - Supprimé: %s",
+                nom, prenom,
+                articleMF.getTitre(),
+                id,
+                cheminAbsolu,
+                fichierSupprime ? "✅ Oui" : (pathFichier != null && !pathFichier.isEmpty() ? "❌ Non" : "N/A"));
         logContenu(text);
 
         return ResponseEntity.status(HttpStatus.ACCEPTED)
-                .body("L'article a bien été supprimé");
+                .body(String.format("L'article a bien été supprimé. Fichier physique: %s",
+                        fichierSupprime ? "supprimé" : "non trouvé ou déjà supprimé"));
     }
 
     public void logContenu(String message) {

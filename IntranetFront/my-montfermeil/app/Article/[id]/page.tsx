@@ -1,5 +1,5 @@
 'use client'
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { getSessionBoolean, getSessionItemOrEmpty } from "@/app/utils/sessionStorage";
 import { useEffect, useState } from "react";
 import "./style.css"
@@ -12,6 +12,7 @@ function unArticle() {
     const [data, setData] = useState<any>({})
     const id = params.id
     const [loading, setLoading] = useState(false);
+    const routeur = useRouter();
 
     const prefix = process.env.NEXT_PUBLIC_PREFIX ?? "";
     const normalizedPrefix = prefix ? (prefix.endsWith("/") ? prefix : `${prefix}/`) : "";
@@ -91,46 +92,59 @@ function unArticle() {
         );
     }
     return (
-        <div style={{ textAlign: "center" }}>
-            <u> <h1>{data.titre}</h1></u>
-            <table>
-                <tbody>
+        <div >
+            <div className="article-return">
+                <button  className="buttonstyle" onClick={()=> routeur.push("/")}>
+                    Retour
+                </button>
+            </div>
 
-                    <tr>
-                        <td colSpan={2}>
-                            <b><p>Créer par <a className="author-link" target="blank" href={`/Annuaire/Salarie/${data.salarie?.id}`}>{data.salarie?.nom} {data.salarie?.prenom}</a> le {data.creation}</p></b>
+            <main className="article-page">
 
-                        </td>
-                    </tr>
-                    <tr>
-                        <td colSpan={2}>
+                <article className="article-container">
 
-                            {data.mediaName && isVideo(data.mediaName) && (
-                                <video controls className="mediaa">
-                                    <source src={`${normalizedPrefix}${data.mediaName}`} />
-                                    Votre navigateur ne supporte pas la vidéo.
-                                </video>
-                            )}
+                    <header className="article-header">
+                        <h1 className="article-title">{data.titre}</h1>
 
-                            {data.mediaName && isImage(data.mediaName) && (
-                                <img
-                                    src={`${normalizedPrefix}${data.mediaName}`}
-                                    alt={data.description || "image article"}
-                                    className="mediaa"
-                                />
-                            )}
-                        </td>
-                    </tr>
-                    <tr>
-                        <td colSpan={2}>
-                            <p>{data.description}</p>
-                        </td>
-                    </tr>
-                </tbody>
+                        <div className="article-meta">
+                            <span>
+                                Par{" "}
+                                <a
+                                    className="author-link"
 
-            </table>
+                                    href={`/Annuaire/Salarie/${data.salarie?.id}`}
+                                >
+                                    {data.salarie?.nom} {data.salarie?.prenom}
+                                </a>
+                            </span>
+
+                            <span>{data.creation}</span>
+                        </div>
+                    </header>
+
+                    {data.mediaName && isVideo(data.mediaName) && (
+                        <video controls className="article-media">
+                            <source src={`${normalizedPrefix}${data.mediaName}`} />
+                            Votre navigateur ne supporte pas la vidéo.
+                        </video>
+                    )}
+
+                    {data.mediaName && isImage(data.mediaName) && (
+                        <img
+                            src={`${normalizedPrefix}${data.mediaName}`}
+                            alt={data.description || "image article"}
+                            className="article-media"
+                        />
+                    )}
+
+                    <section className="article-content">
+                        <p>{data.description}</p>
+                    </section>
+
+                </article>
+            </main>
         </div>
-    )
+    );
 }
 
 export default unArticle;
