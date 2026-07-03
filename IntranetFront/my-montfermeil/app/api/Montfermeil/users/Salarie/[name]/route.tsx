@@ -6,11 +6,7 @@ export async function GET(
   context: { params: Promise<{ name: string }> }
 ) {
   const { name } = await context.params;
-  const cookieStore = await cookies();
-  const credential = cookieStore.get("credential")?.value;
   const authHeader = request.headers.get('Authorization');
-  console.log("Fetching data for name =", name);
-  console.log("credential =", authHeader);
 
   try {
     const response = await fetch(

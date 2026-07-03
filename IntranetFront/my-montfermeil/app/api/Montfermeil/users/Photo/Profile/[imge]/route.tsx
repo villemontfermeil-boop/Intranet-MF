@@ -15,20 +15,13 @@ const backendUrl = process.env.BACKEND_API;
             return NextResponse.json({ error: 'Missing or invalid id parameter' }, { status: 400 });
         }
 
-        const cookiestore = await cookies();
-        const login = cookiestore.get('mail')?.value || "";
-        const password = cookiestore.get('MDP')?.value || "";
-        const credential = btoa(`${login}:${password}`);
-
         try{
             const backendApi = backendUrl?.endsWith('/') ? backendUrl : `${backendUrl}/`;
             const reponse = await fetch(`${backendApi}uploads/Photos/${image}`, {
                 headers:{
-                    Authorization: `Basic ${credential}`
                 }
             })
             const json = await reponse.json();
-            console.log(json);
             return NextResponse.json(json, {status: 200});
             
         }catch(e){

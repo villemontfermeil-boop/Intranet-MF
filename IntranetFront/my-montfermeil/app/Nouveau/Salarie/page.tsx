@@ -41,7 +41,6 @@ function AdminPanel() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        console.log('Données du formulaire :', newSalarie);
 
         if (!motDePasseValide(newSalarie.password)) {
             alert("Mot de passe invalide, assuré vous d'avoir mis au moins:  une minuscule, une majuscule, un chiffre/nombre ,un caractère spécial")
@@ -54,17 +53,6 @@ function AdminPanel() {
                 try {
                     setLoading(true); // Début du chargement
 
-                    const idnetifiantAdmin = sessionStorage.getItem("mail");
-                    const passwordAdmin = sessionStorage.getItem("MDP");
-                    const credential = btoa(`${idnetifiantAdmin}:${passwordAdmin}`)
-
-                    //zone a supprimer en prod
-
-                    console.log("Credential", sessionStorage);
-                    console.log("Data", newSalarie);
-
-                    //
-
                     const response = await fetch("/api/Montfermeil/users/NewSalarie", {
                         method: 'POST',
                         headers: {
@@ -74,8 +62,6 @@ function AdminPanel() {
                         body: new URLSearchParams(newSalarie as Record<string, string>)
                     }
                     );
-                    console.log(response);
-                    console.log("Headers:", Object.fromEntries(response.headers.entries()));
                     setLoading(false); // Fin du chargement (succès ou erreur)
 
                     alert(`${newSalarie.nom} ${newSalarie.prenom} à été ajouter`)

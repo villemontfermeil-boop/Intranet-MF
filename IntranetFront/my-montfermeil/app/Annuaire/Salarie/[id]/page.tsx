@@ -17,7 +17,6 @@ function SalariePage() {
 
     const profileImage = `${backend.api}/uploads/Photos/${image.photo}`;
 
-    console.log("Il contient :", image);
 
     // Redirection si non connecté
     if (typeof window !== 'undefined' && (sessionStorage.length === 0 || sessionStorage.length == null)) {
@@ -33,7 +32,6 @@ function SalariePage() {
                 }
             });
             const data = await response.json();
-            console.log( data);
             setSalarie(data);
         } catch (error) {
             console.log("L ERRRRRRRRRRREURRRRRRRRRRRRR",error);
@@ -43,7 +41,6 @@ function SalariePage() {
     async function getBackend() {
 
         const token = sessionStorage.getItem('token') || ''
-        console.log(token);
         try {
 
             const res = await fetch(`/api/Montfermeil/connexion`,
@@ -55,7 +52,6 @@ function SalariePage() {
             );
             const data = await res.json();
 
-            console.log("DATA api :", data);
 
 
             setBackend(data);
@@ -75,7 +71,6 @@ function SalariePage() {
             });
             const json = await reponse.json();
             setImage(json);
-            console.log(json);
         } catch (e) {
             console.log(e);
         }

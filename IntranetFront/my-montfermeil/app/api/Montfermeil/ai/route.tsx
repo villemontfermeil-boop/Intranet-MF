@@ -8,7 +8,6 @@ export async function POST(request: Request) {
     if(!auth || auth == null){
         return NextResponse.error();
     }
-    console.log("Prompte DANS ROUTE", prompt)
     const response = await fetch(`${process.env.BACKEND_API}/ai/ask`,
         {
             method: "POST",

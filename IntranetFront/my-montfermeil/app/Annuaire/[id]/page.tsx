@@ -39,11 +39,9 @@ function SalarieModification() {
         (Array.isArray(id) ? id[0] : id) :
         '';
     const number = parseInt(idValue)
-    const credential = btoa(`${login}:${password}`)
     const api = async () => {
         try {
             const reponse = await fetch(`/api/Montfermeil/users/${idValue}`)
-            console.log(reponse)
             const result = await reponse.json();
             SetData(result);
             SetPersonne({
@@ -59,7 +57,6 @@ function SalarieModification() {
 
         } catch (error) {
             console.log(error)
-            console.log(credential)
         }
     }
 
@@ -83,10 +80,6 @@ function SalarieModification() {
         });
 
         try {
-            const login = sessionStorage.getItem('mail');
-            const password = sessionStorage.getItem('MDP');
-            const credential = btoa(`${login}:${password}`);
-
             const response = await fetch(`/api/Montfermeil/users/Modification/Salarie/${idValue}`, {
                 method: "PATCH",
                 headers: {
@@ -100,7 +93,6 @@ function SalarieModification() {
                 return null;
             }
 
-            console.log("Modification réussie :");
             alert("Modification effectuée avec succès !");
             router.push("/");
         } catch (error) {
@@ -200,7 +192,6 @@ function SalarieModification() {
 
   
 
-    console.log(data)
     return (
         <div style={{ placeItems: "center" }}>
             <h1>Voici l'id : {id} </h1>

@@ -69,7 +69,6 @@ function InfoDesServices() {
 
             setOrganisme(enriched);
 
-            console.log("Organismes final :", enriched);
         } catch (ex) {
             console.log(ex);
         } finally {

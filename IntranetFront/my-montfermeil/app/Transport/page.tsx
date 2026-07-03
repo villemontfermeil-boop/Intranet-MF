@@ -99,7 +99,6 @@ function PageTransport() {
 
             const data: ApiResponse = await reponse.json();
 
-            console.log(data);
 
             const formattedMessages = data.disruptions.map((d) => ({
                 type: d.severity?.name,
@@ -121,7 +120,6 @@ function PageTransport() {
     useEffect(() => {
         if (choix) {
             GetInfo(choix)
-            console.log(choix)
             if (messages) {
                 getKey()
             }

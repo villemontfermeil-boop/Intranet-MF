@@ -66,7 +66,6 @@ export default function MotsDePasse() {
                 Myformdata.append("password", composition)
             }
             setSubmitted(true);
-            console.log(await response.json());
 
         } catch (ex) {
             console.log(ex)
