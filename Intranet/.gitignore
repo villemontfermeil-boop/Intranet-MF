@@ -38,4 +38,4 @@ out/
 
 /Intranet/log/
 /Intranet/uploads/
-Intranet/src/main/resources/application.properties
+Intranet/src/main/resources/
