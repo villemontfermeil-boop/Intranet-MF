@@ -272,7 +272,7 @@ function Header({ nom }: { nom: string | null }) {
                                 )}
 
                                 <button type="button" className='MenuButton' onClick={() => router.push('/Annuaire/Salarie')}>
-                                    Les agents
+                                    Annuaires
                                 </button>
                                 <button type='button' className='MenuButton' onClick={() => router.push('/Transport')}>
                                     Transport

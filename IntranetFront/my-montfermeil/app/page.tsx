@@ -177,7 +177,7 @@ function HomePage() {
   if (data.length === 0) {
     return (
       <div className="empty-state">
-        <p>Aucun article disponible pour le moment.</p>
+        <p>Aucun article disponible pour le moment. Pensez à rafraîchir la page.</p>
       </div>
     );
   }
