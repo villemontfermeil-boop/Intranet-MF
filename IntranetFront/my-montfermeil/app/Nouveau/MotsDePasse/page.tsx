@@ -59,7 +59,7 @@ export default function MotsDePasse() {
             });
 
             if (!response2.ok) {
-                throw new Error('Erreur lors de l\'envoi');
+                console.log('Erreur lors de l\'envoi');
             } else {
                 const Myformdata = new FormData()
                 Myformdata.append("email", email)

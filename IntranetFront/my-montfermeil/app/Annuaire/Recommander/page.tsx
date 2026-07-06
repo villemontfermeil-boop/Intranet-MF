@@ -70,7 +70,7 @@ function pageRecommander() {
             });
 
             if (!data.ok) {
-                throw new Error("Erreur export");
+                console.log("Erreur export");
             }
 
             const blob = await data.blob();
