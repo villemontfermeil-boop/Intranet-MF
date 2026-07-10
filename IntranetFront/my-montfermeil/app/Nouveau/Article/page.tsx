@@ -9,6 +9,8 @@ function CreationArticle() {
   const [file, setFile] = useState<File | null>(null);
   const [fonction, setFonction] = useState<string | null>(null);
   const router = useRouter();
+  const [loading, setLoading] = useState(false);
+
 
   const [article, setArticle] = useState({
     Titre: "",
@@ -29,6 +31,8 @@ function CreationArticle() {
 
   async function HandleSubmit() {
     try {
+      setLoading(true);
+
       const token = getSessionItemOrEmpty("token");
       const formData = new FormData();
 
@@ -60,10 +64,14 @@ function CreationArticle() {
         router.push("/");
       } else {
         const json = await response.json();
+        setLoading(false);
+
         alert("Erreur: " + (json.error || "Une erreur est survenue"));
       }
     } catch (error) {
       console.error(error);
+      setLoading(false);
+
       alert("Erreur lors de la publication de l'article.");
     }
   }
@@ -90,6 +98,40 @@ function CreationArticle() {
   const handleChangeTextArea = (e: any) => {
     setArticle({ ...article, [e.target.name]: e.target.value });
   };
+
+  if (loading) {
+    return (
+      <div style={{
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        height: "100vh",
+        flexDirection: "column"
+      }}>
+        <div className="spinner"></div>
+        <p style={{ marginTop: "20px", fontSize: "18px", color: "#666" }}>
+          Ajout de l'article..
+        </p>
+
+        <style jsx>{`
+                    .spinner {
+                        border: 4px solid rgba(0, 0, 0, 0.1);
+                        width: 50px;
+                        height: 50px;
+                        border-radius: 50%;
+                        border-left-color: #3498db;
+                        animation: spin 1s linear infinite;
+                    }
+                    
+                    @keyframes spin {
+                        0% { transform: rotate(0deg); }
+                        100% { transform: rotate(360deg); }
+                    }
+                `}</style>
+      </div>
+    );
+  }
+
 
   return (
     <main className="article-creation-page">
